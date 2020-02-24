@@ -18,17 +18,18 @@ class ActionLayout: public QGroupBox
 {
     Q_OBJECT
 public:
-    virtual ~ActionLayout() {};
-    explicit ActionLayout(QWidget* parent=0);
+    explicit ActionLayout(std::string actionName, QWidget* parent=0);
 
 public:
     QGridLayout *grid;
+
+protected:
+    QPushButton *send_button; //protected so derived class can enable/disable if necessary
 
 private:
     QLabel* windowLabel;
     QSlider *slider_percentage;
     QSpinBox *spinBox_percentage;
-    QPushButton *send_button;
 
 
 signals:

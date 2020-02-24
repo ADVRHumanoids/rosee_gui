@@ -1,21 +1,21 @@
 #include <rosee_gui/Window.h>
-#include <rosee_gui/ActionLayout.h>
-#include <rosee_gui/ActionBoxesLayout.h>
 
 Window::Window(QWidget *parent) : QWidget(parent) {
 
     QGridLayout *grid = new QGridLayout;
 
-    QGroupBox* actionLayout = new ActionLayout(this);
-    //actionLayout->setTitle("Action");
+    QGroupBox* actionLayout = new ActionLayout("Generic", this);
     grid->addWidget (actionLayout,0,0);
 
-
-    //QGroupBox* actionBoxesLayout = new ActionBoxesLayout(this) ;
-    //actionLayout->setTitle("ActionSpec"); //do not work...
-    //grid->addWidget (actionBoxesLayout, 0, 1);
-
-
+    std::vector <std::string> fingers;
+    fingers.push_back("finger_1");
+    fingers.push_back("figner_2");
+    fingers.push_back("figner_2");
+    fingers.push_back("figner_2");
+    fingers.push_back("figner_2");
+    unsigned int maxChecked = 2;
+    QGroupBox* actionBoxesLayout = new ActionBoxesLayout("GenericBox", fingers, maxChecked, this) ;
+    grid->addWidget (actionBoxesLayout, 0, 1);
 
     setLayout(grid);
 

@@ -15,7 +15,9 @@ add_compile_options(-std=c++11)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED)
+find_package(catkin REQUIRED COMPONENTS
+	roscpp
+)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
 
@@ -126,17 +128,20 @@ include_directories(
 )
 
 ## Declare a C++ library
-add_library(Window
-   src/Window.cpp
+add_library(Window SHARED
+    src/Window.cpp
+    include/rosee_gui/Window.h
+
 )
-add_library(ActionLayout
-   src/ActionLayout.cpp
+add_library(ActionLayout SHARED
+     src/ActionLayout.cpp
+    include/rosee_gui/ActionLayout.h
+
 )
-add_library(ActionBoxesLayout
-   src/ActionBoxesLayout.cpp
-)
-add_library(ActionTrigLayout
-   src/ActionTrigLayout.cpp
+add_library(ActionBoxesLayout SHARED
+    src/ActionBoxesLayout.cpp
+    include/rosee_gui/ActionBoxesLayout.h
+
 )
 
 ## Add cmake target dependencies of the library
@@ -173,15 +178,11 @@ target_link_libraries(ActionBoxesLayout
     Qt5::Widgets
 )
 
-target_link_libraries(ActionTrigLayout
-    Qt5::Widgets
-)
 
 target_link_libraries(Window
     Qt5::Widgets
     ActionLayout
     ActionBoxesLayout
-    ActionTrigLayout
 )
 
 #############

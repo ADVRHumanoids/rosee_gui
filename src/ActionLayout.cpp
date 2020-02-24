@@ -1,13 +1,13 @@
 #include <rosee_gui/ActionLayout.h>
 
-ActionLayout::ActionLayout(QWidget* parent) : QGroupBox(parent) {
+ActionLayout::ActionLayout(std::string actionName, QWidget* parent) : QGroupBox(parent) {
+
+    this->setMinimumSize(300,200);
 
     grid = new QGridLayout;
-    setFixedSize(300,200);
 
-    windowLabel = new QLabel ("ActionName");
+    windowLabel = new QLabel (QString::fromStdString(actionName));
     windowLabel->setAlignment(Qt::AlignCenter);
-    //windowLabel->setGeometry ( 100, 10, 100, 40 );
     grid->addWidget(windowLabel, 0, 0, 1, 2);
 
 
@@ -38,7 +38,6 @@ ActionLayout::ActionLayout(QWidget* parent) : QGroupBox(parent) {
 
     this->setStyleSheet("QGroupBox { border: 2px solid black;}");
     this->setLayout(grid);
-
 }
 
 void ActionLayout::slotSliderReceive(int value){

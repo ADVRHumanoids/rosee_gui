@@ -1,22 +1,29 @@
-#ifndef ACTIONSPECIFICWINDOW_H
-#define ACTIONSPECIFICWINDOW_H
+#ifndef ACTIONBOXESLAYOUT_H
+#define ACTIONBOXESLAYOUT_H
+
+#include <rosee_gui/ActionLayout.h>
 
 #include <QWidget>
-#include <rosee_gui/ActionLayout.h>
 #include <QGroupBox>
 #include <QCheckBox>
+#include <QButtonGroup>
 
 class ActionBoxesLayout : public ActionLayout
 {
     Q_OBJECT
 public:
-    virtual ~ActionBoxesLayout() {}
-    ActionBoxesLayout(QWidget* parent=0);
+    explicit ActionBoxesLayout(std::string actionName, std::vector<std::string> boxesNames, unsigned int maxChecked,
+                      QWidget* parent=0);
 private:
-    QGroupBox *groupBox;
+    QButtonGroup* boxes;
+    unsigned int maxChecked;
+    unsigned int actualChecked;
 
 protected:
-    //virtual void setupCheckBoxes () = 0;
+
+private slots:
+    void clickedSlot (QAbstractButton* button);
+
 };
 
-#endif // ACTIONSPECIFICWINDOW_H
+#endif // ACTIONBOXESLAYOUT_H
