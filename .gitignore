@@ -1,0 +1,6 @@
+*.user
+*.files
+*.includes
+*.config
+*.creator
+Makefile
