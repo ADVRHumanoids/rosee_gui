@@ -11,7 +11,7 @@ class Window : public QWidget
 {
     Q_OBJECT
 public:
-    explicit Window(QWidget *parent = 0);
+    explicit Window(ros::NodeHandle* nh, QWidget *parent = 0);
 
 signals:
 

@@ -4,14 +4,23 @@
 #include <QPushButton>
 
 #include <rosee_gui/Window.h>
+#include <ros/ros.h>
 
 int main(int argc, char **argv)
 {
     QApplication app (argc, argv);
 
-    Window window;
+    ros::init (argc, argv, "rosee_GUI");
+    ros::NodeHandle nh;
+
+    Window window(&nh);
 
     window.show();
 
-    return app.exec();
+    app.exec();
+
+    std::cout << "Qt gui closed, press ctrl+C to end program..." << std::endl;
+    while(ros::ok()) {}
+
+    return 0;
 }

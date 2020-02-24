@@ -17,12 +17,13 @@ add_compile_options(-std=c++11)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
 	roscpp
+        message_generation
 )
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+find_package(ros_end_effector REQUIRED)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -54,12 +55,14 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 ##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
-## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+## Generate messages in the 'msgs' folder
+add_message_files(
+    DIRECTORY msgs
+    FILES
+    EEGraspControl.msg
+    EEPinchControl.msg
+    EETriggerControl.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -76,10 +79,10 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
-# )
+generate_messages(
+   DEPENDENCIES
+   std_msgs  # Or other packages containing msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -134,7 +137,7 @@ add_library(Window SHARED
 
 )
 add_library(ActionLayout SHARED
-     src/ActionLayout.cpp
+    src/ActionLayout.cpp
     include/rosee_gui/ActionLayout.h
 
 )
@@ -153,6 +156,7 @@ add_library(ActionBoxesLayout SHARED
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(gui_main src/main.cpp)
+add_dependencies(gui_main ${catkin_EXPORTED_TARGETS})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -166,24 +170,32 @@ add_executable(gui_main src/main.cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(gui_main
+    ${catkin_LIBRARIES}
     Qt5::Widgets
     Window
 )
 
-target_link_libraries(ActionLayout
-    Qt5::Widgets
-)
-
-target_link_libraries(ActionBoxesLayout
-    Qt5::Widgets
-)
-
-
 target_link_libraries(Window
-    Qt5::Widgets
+    ${catkin_LIBRARIES}
     ActionLayout
     ActionBoxesLayout
 )
+add_dependencies(Window rosee_gui_generate_messages_cpp)
+
+target_link_libraries(ActionLayout
+    ${catkin_LIBRARIES}
+    Qt5::Widgets
+)
+add_dependencies(ActionLayout rosee_gui_generate_messages_cpp)
+
+target_link_libraries(ActionBoxesLayout
+    ${catkin_LIBRARIES}
+    Qt5::Widgets
+)
+add_dependencies(ActionBoxesLayout rosee_gui_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
+
+
+
 
 #############
 ## Install ##

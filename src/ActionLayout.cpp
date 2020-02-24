@@ -8,6 +8,7 @@ ActionLayout::ActionLayout(std::string actionName, QWidget* parent) : QGroupBox(
 
     windowLabel = new QLabel (QString::fromStdString(actionName));
     windowLabel->setAlignment(Qt::AlignCenter);
+    windowLabel->setStyleSheet("QLabel { font-size :30px }");
     grid->addWidget(windowLabel, 0, 0, 1, 2);
 
 
@@ -35,9 +36,29 @@ ActionLayout::ActionLayout(std::string actionName, QWidget* parent) : QGroupBox(
     QObject::connect(send_button, SIGNAL ( clicked()), this, SLOT (sendBtnClicked() ) );
     grid->addWidget(send_button, 3, 0);
 
+    this->rosMsgSeq = 0;
+    this->msgType = GENERIC;
 
     this->setStyleSheet("QGroupBox { border: 2px solid black;}");
     this->setLayout(grid);
+}
+
+int ActionLayout::getSpinBoxPercentage() {
+    return spinBox_percentage->value();
+}
+
+void ActionLayout::setRosPub (ros::NodeHandle * nh, std::string topicName, MsgType msgType) {
+    actionPub = nh->advertise<rosee_gui::EEGraspControl>(topicName, 1);
+}
+
+void ActionLayout::sendActionRos () {
+
+    rosee_gui::EEGraspControl msg;
+    msg.seq = rosMsgSeq++;
+    msg.stamp = ros::Time::now();
+    msg.percentage = spinBox_percentage->value();
+    actionPub.publish(msg);
+
 }
 
 void ActionLayout::slotSliderReceive(int value){
@@ -49,5 +70,7 @@ void ActionLayout::slotSliderReceive(int value){
 void ActionLayout::sendBtnClicked() {
 
     std::cout << "The value is " << spinBox_percentage->value() << std::endl;
+    std::cout << "Sending ROS message..." << std::endl;
+    sendActionRos();
 }
 
