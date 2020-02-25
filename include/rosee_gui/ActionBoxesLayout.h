@@ -9,7 +9,7 @@
 #include <QButtonGroup>
 
 #include <ros_end_effector/EETriggerControl.h>
-#include <rosee_gui/EEPinchControl.h>
+#include <ros_end_effector/EEPinchControl.h>
 
 class ActionBoxesLayout : public ActionLayout
 {

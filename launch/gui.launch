@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<launch>
+     <node type="gui_main" name="gui_main" pkg="rosee_gui" output="screen"/> 
+</launch>

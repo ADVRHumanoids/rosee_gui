@@ -48,12 +48,12 @@ int ActionLayout::getSpinBoxPercentage() {
 }
 
 void ActionLayout::setRosPub (ros::NodeHandle * nh, std::string topicName, MsgType msgType) {
-    actionPub = nh->advertise<rosee_gui::EEGraspControl>(topicName, 1);
+    actionPub = nh->advertise<ros_end_effector::EEGraspControl>(topicName, 1);
 }
 
 void ActionLayout::sendActionRos () {
 
-    rosee_gui::EEGraspControl msg;
+    ros_end_effector::EEGraspControl msg;
     msg.seq = rosMsgSeq++;
     msg.stamp = ros::Time::now();
     msg.percentage = spinBox_percentage->value();

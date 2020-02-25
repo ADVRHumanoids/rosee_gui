@@ -63,7 +63,7 @@ void ActionBoxesLayout::setRosPub(ros::NodeHandle *nh, std::string topicName, Ms
                       << "is " << maxChecked << " (should be 2)" <<std::endl;
             return;
         }
-        actionPub = nh->advertise<rosee_gui::EEPinchControl>(topicName, 1);
+        actionPub = nh->advertise<ros_end_effector::EEPinchControl>(topicName, 1);
         break;
     }
     default : {
@@ -94,7 +94,7 @@ void ActionBoxesLayout::sendActionRos() {
         break;
     }
     case PINCH : {
-        rosee_gui::EEPinchControl msg;
+        ros_end_effector::EEPinchControl msg;
         msg.seq = rosMsgSeq++;
         msg.stamp = ros::Time::now();
         msg.percentage = getSpinBoxPercentage();

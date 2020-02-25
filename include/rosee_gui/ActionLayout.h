@@ -14,7 +14,7 @@
 #include <iostream>
 
 #include <ros/ros.h>
-#include <rosee_gui/EEGraspControl.h>
+#include <ros_end_effector/EEGraspControl.h>
 
 //TODO or 0-box 1-box ?? if we have to send only a percentage and a certain number of string...
 enum MsgType {  GENERIC, TRIG, PINCH };

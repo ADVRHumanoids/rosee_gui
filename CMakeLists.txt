@@ -16,14 +16,16 @@ add_compile_options(-std=c++11)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-	roscpp
-        message_generation
+    roscpp
+    ros_end_effector #for msgs
 )
+
+#not catkin packages
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
 
 ## System dependencies are found with CMake's conventions
-find_package(ros_end_effector REQUIRED)
+# find_package(ros_end_effector REQUIRED)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -56,13 +58,10 @@ find_package(ros_end_effector REQUIRED)
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msgs' folder
-add_message_files(
-    DIRECTORY msgs
-    FILES
-    EEGraspControl.msg
-    EEPinchControl.msg
-    EETriggerControl.msg
-)
+# add_message_files(
+#   DIRECTORY msgs
+#   FILES
+# )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -79,10 +78,10 @@ add_message_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-   DEPENDENCIES
-   std_msgs  # Or other packages containing msgs
-)
+#generate_messages(
+#   DEPENDENCIES
+#   std_msgs  # Or other packages containing msgs
+#)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -116,7 +115,8 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES rosee_gui
-#  CATKIN_DEPENDS other_catkin_pkg
+#  CATKIN_DEPENDS 
+#        roscpp
 #  DEPENDS system_lib
 )
 
@@ -131,17 +131,18 @@ include_directories(
 )
 
 ## Declare a C++ library
-add_library(Window SHARED
+# needed also the .h for qt automoc things
+add_library(${PROJECT_NAME}_Window SHARED
     src/Window.cpp
     include/rosee_gui/Window.h
 
 )
-add_library(ActionLayout SHARED
+add_library(${PROJECT_NAME}_ActionLayout SHARED
     src/ActionLayout.cpp
     include/rosee_gui/ActionLayout.h
 
 )
-add_library(ActionBoxesLayout SHARED
+add_library(${PROJECT_NAME}_ActionBoxesLayout SHARED
     src/ActionBoxesLayout.cpp
     include/rosee_gui/ActionBoxesLayout.h
 
@@ -155,8 +156,8 @@ add_library(ActionBoxesLayout SHARED
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(gui_main src/main.cpp)
-add_dependencies(gui_main ${catkin_EXPORTED_TARGETS})
+add_executable(${PROJECT_NAME}_gui_main src/main.cpp)
+set_target_properties(${PROJECT_NAME}_gui_main PROPERTIES OUTPUT_NAME "gui_main")
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -169,30 +170,27 @@ add_dependencies(gui_main ${catkin_EXPORTED_TARGETS})
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(gui_main
+target_link_libraries(${PROJECT_NAME}_gui_main
     ${catkin_LIBRARIES}
     Qt5::Widgets
-    Window
+    ${PROJECT_NAME}_Window
 )
 
-target_link_libraries(Window
+target_link_libraries(${PROJECT_NAME}_Window
     ${catkin_LIBRARIES}
-    ActionLayout
-    ActionBoxesLayout
+    ${PROJECT_NAME}_ActionLayout
+    ${PROJECT_NAME}_ActionBoxesLayout
 )
-add_dependencies(Window rosee_gui_generate_messages_cpp)
 
-target_link_libraries(ActionLayout
-    ${catkin_LIBRARIES}
-    Qt5::Widgets
-)
-add_dependencies(ActionLayout rosee_gui_generate_messages_cpp)
-
-target_link_libraries(ActionBoxesLayout
+target_link_libraries(${PROJECT_NAME}_ActionLayout
     ${catkin_LIBRARIES}
     Qt5::Widgets
 )
-add_dependencies(ActionBoxesLayout rosee_gui_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
+
+target_link_libraries(${PROJECT_NAME}_ActionBoxesLayout
+    ${catkin_LIBRARIES}
+    Qt5::Widgets
+)
 
 
 
