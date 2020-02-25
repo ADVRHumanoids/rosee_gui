@@ -7,3 +7,4 @@ Makefile
 *.kdev4
 .kdev4/
 *.autosave
+*.kate-swp

@@ -2,6 +2,9 @@
 
 Window::Window(ros::NodeHandle *nh, QWidget *parent) : QWidget(parent) {
 
+    this->nh = nh;
+    getInfoServices();
+    
     QGridLayout *grid = new QGridLayout;
 
     ActionLayout* actionLayout = new ActionLayout("Generic", this);
@@ -23,8 +26,17 @@ Window::Window(ros::NodeHandle *nh, QWidget *parent) : QWidget(parent) {
     ActionBoxesLayout* actionBoxesLayout2 = new ActionBoxesLayout("Trig", fingers, 1, this) ;
     actionBoxesLayout2->setRosPub (nh, "ros_end_effector/trig", TRIG);
     grid->addWidget (actionBoxesLayout2, 0, 2);
+    
+    
+    ActionTimedLayout* timed = new ActionTimedLayout("wide_grasp", this);
+    grid->addWidget(timed, 1, 0, 1, 2);
 
     setLayout(grid);
 
 }
 
+void Window::getInfoServices() {
+    
+    //ros::ServiceClient client = nh.serviceClient<> ( " " );
+    
+}

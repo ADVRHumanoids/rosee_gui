@@ -135,18 +135,29 @@ include_directories(
 add_library(${PROJECT_NAME}_Window SHARED
     src/Window.cpp
     include/rosee_gui/Window.h
-
 )
+
 add_library(${PROJECT_NAME}_ActionLayout SHARED
     src/ActionLayout.cpp
     include/rosee_gui/ActionLayout.h
-
 )
+
 add_library(${PROJECT_NAME}_ActionBoxesLayout SHARED
     src/ActionBoxesLayout.cpp
     include/rosee_gui/ActionBoxesLayout.h
-
 )
+
+add_library(${PROJECT_NAME}_ActionTimedLayout SHARED
+    src/ActionTimedLayout.cpp
+    include/rosee_gui/ActionTimedLayout.h
+)
+
+add_library(${PROJECT_NAME}_ActionTimedElement SHARED
+    src/ActionTimedElement.cpp
+    include/rosee_gui/ActionTimedElement.h
+)
+
+
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -180,6 +191,7 @@ target_link_libraries(${PROJECT_NAME}_Window
     ${catkin_LIBRARIES}
     ${PROJECT_NAME}_ActionLayout
     ${PROJECT_NAME}_ActionBoxesLayout
+    ${PROJECT_NAME}_ActionTimedLayout
 )
 
 target_link_libraries(${PROJECT_NAME}_ActionLayout
@@ -188,6 +200,17 @@ target_link_libraries(${PROJECT_NAME}_ActionLayout
 )
 
 target_link_libraries(${PROJECT_NAME}_ActionBoxesLayout
+    ${catkin_LIBRARIES}
+    Qt5::Widgets
+)
+
+target_link_libraries(${PROJECT_NAME}_ActionTimedLayout
+    ${catkin_LIBRARIES}
+    Qt5::Widgets
+    ${PROJECT_NAME}_ActionTimedElement
+)
+
+target_link_libraries(${PROJECT_NAME}_ActionTimedElement
     ${catkin_LIBRARIES}
     Qt5::Widgets
 )

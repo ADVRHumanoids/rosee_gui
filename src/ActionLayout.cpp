@@ -9,7 +9,7 @@ ActionLayout::ActionLayout(std::string actionName, QWidget* parent) : QGroupBox(
     windowLabel = new QLabel (QString::fromStdString(actionName));
     windowLabel->setAlignment(Qt::AlignCenter);
     windowLabel->setStyleSheet("QLabel { font-size :30px }");
-    grid->addWidget(windowLabel, 0, 0, 1, 2);
+    grid->addWidget(windowLabel, 0, 0);
 
 
     QHBoxLayout *percentageLayout = new QHBoxLayout;

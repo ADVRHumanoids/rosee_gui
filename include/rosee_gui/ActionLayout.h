@@ -25,15 +25,14 @@ class ActionLayout: public QGroupBox
     Q_OBJECT
 public:
     explicit ActionLayout(std::string actionName, QWidget* parent=0);
-
-public:
-    QGridLayout *grid;
+    
     virtual void setRosPub (ros::NodeHandle * nh, std::string topicName, MsgType msgType = GENERIC);
-
-    unsigned int rosMsgSeq;
 
 
 protected:
+    QGridLayout *grid;
+    unsigned int rosMsgSeq;
+
     QPushButton *send_button; //protected so derived class can enable/disable if necessary
     ros::Publisher actionPub;
     /**

@@ -6,6 +6,7 @@
 #include <rosee_gui/Window.h>
 #include <ros/ros.h>
 
+
 int main(int argc, char **argv)
 {
     QApplication app (argc, argv);
@@ -24,3 +25,5 @@ int main(int argc, char **argv)
 
     return 0;
 }
+
+
