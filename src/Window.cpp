@@ -27,9 +27,15 @@ Window::Window(ros::NodeHandle *nh, QWidget *parent) : QWidget(parent) {
     actionBoxesLayout2->setRosPub (nh, "ros_end_effector/trig", TRIG);
     grid->addWidget (actionBoxesLayout2, 0, 2);
     
-    
-    ActionTimedLayout* timed = new ActionTimedLayout("wide_grasp", this);
-    grid->addWidget(timed, 1, 0, 1, 2);
+    std::vector<std::string> innerActionNames;
+    innerActionNames.push_back("spread_fing");
+    innerActionNames.push_back("grasp");
+    std::vector<std::pair<double,double>> innerTimeMargins;
+    innerTimeMargins.push_back(std::make_pair(0, 0.2) );
+    innerTimeMargins.push_back(std::make_pair(0.5, 0) );
+    ActionTimedLayout* timed = new ActionTimedLayout("wide_grasp", innerActionNames, 
+                                                     innerTimeMargins, this);
+    grid->addWidget(timed, 1, 0, 1, innerActionNames.size());
 
     setLayout(grid);
 

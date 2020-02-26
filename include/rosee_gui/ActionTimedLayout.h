@@ -17,6 +17,8 @@
 #ifndef ACTIONTIMEDLAYOUT_H
 #define ACTIONTIMEDLAYOUT_H
 
+#include <iostream>
+
 #include <QGroupBox>
 #include <QGridLayout>
 #include <QLabel>
@@ -31,13 +33,18 @@ class ActionTimedLayout : public QGroupBox {
     
     Q_OBJECT
 public :
-    explicit ActionTimedLayout (std::string actionName, QWidget* parent = 0);
+    explicit ActionTimedLayout (std::string actionName,
+                                std::vector<std::string> innerActionNames,
+                                std::vector<std::pair<double,double>> innerTimeMargins,
+                                QWidget* parent = 0);
 
 private: 
     QGridLayout *grid;
     QLabel* windowLabel;
     QPushButton *send_button;
 
+private slots:
+    void sendBtnClicked();
     
 };
 

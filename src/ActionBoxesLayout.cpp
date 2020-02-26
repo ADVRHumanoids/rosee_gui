@@ -34,7 +34,7 @@ ActionBoxesLayout::ActionBoxesLayout (std::string actionName, std::vector<std::s
                       SLOT (clickedSlot(QAbstractButton*)) );
 
     //father grid layout
-    grid->addLayout(boxesLayout, 1, 0);
+    grid->addLayout(boxesLayout, 2, 0);
 
 }
 

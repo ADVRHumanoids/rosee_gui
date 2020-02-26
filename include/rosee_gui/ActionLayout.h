@@ -10,6 +10,7 @@
 #include <QGridLayout>
 #include <QCheckBox>
 #include <QGroupBox>
+#include <QProgressBar>
 
 #include <iostream>
 
@@ -19,7 +20,7 @@
 //TODO or 0-box 1-box ?? if we have to send only a percentage and a certain number of string...
 enum MsgType {  GENERIC, TRIG, PINCH };
 
-//TODO: now graspmsg is used, but a better name should be generic msg (one where we only give the percentage)
+//TODO: now graspmsg is used for GENERIC, but a better name should be generic msg (one where we only give the percentage)
 class ActionLayout: public QGroupBox
 {
     Q_OBJECT
@@ -47,14 +48,11 @@ protected:
     int getSpinBoxPercentage();
 
 private:
-    QLabel* windowLabel;
     QSlider *slider_percentage;
     QSpinBox *spinBox_percentage;
+    QProgressBar *progressBar;
 
     virtual void sendActionRos();
-
-
-
 
 signals:
 

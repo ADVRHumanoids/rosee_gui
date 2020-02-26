@@ -18,12 +18,12 @@ int main(int argc, char **argv)
 
     window.show();
 
-    app.exec();
+    int appReturn = app.exec();
 
-    std::cout << "Qt gui closed, press ctrl+C to end program..." << std::endl;
-    while(ros::ok()) {}
+    // app.exec is blocking, if we are here user had closed the gui
+    ros::shutdown();
 
-    return 0;
+    return appReturn;
 }
 
 

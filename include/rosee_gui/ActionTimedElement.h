@@ -22,6 +22,10 @@
 #include <QLabel>
 #include <QProgressBar>
 
+//to set precision of double when converting to string
+#include <sstream> 
+#include <iomanip>
+
 /**
  * @todo write docs
  */
@@ -29,12 +33,10 @@ class ActionTimedElement : public QGroupBox {
     
     Q_OBJECT
 public:
-    explicit ActionTimedElement(std::string actionName, QWidget* parent=0);
+    explicit ActionTimedElement(std::string actionName, std::pair<double, double> margins, QWidget* parent=0);
 
 private: 
-    QGridLayout *grid;
-    QLabel* windowLabel;
-    QProgressBar *progressBar;
+    std::vector<QProgressBar*> progressBars;
 };
 
 #endif // ACTIONTIMEDELEMENT_H

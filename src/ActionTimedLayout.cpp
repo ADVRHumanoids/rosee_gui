@@ -16,27 +16,43 @@
 
 #include <rosee_gui/ActionTimedLayout.h>
 
-ActionTimedLayout::ActionTimedLayout (std::string actionName, QWidget* parent) : QGroupBox(parent) {
+ActionTimedLayout::ActionTimedLayout (std::string actionName, 
+                                      std::vector<std::string> innerActionNames,
+                                      std::vector<std::pair<double,double>> innerTimeMargins,
+                                      QWidget* parent) : QGroupBox(parent) {
     
+    if (innerActionNames.size() != innerTimeMargins.size() ) {
+        std::cerr << "[ERROR ActionTimedLayout costructor] different size of innerNames and innerTimeMargins: " << innerActionNames.size() << " and " << innerTimeMargins.size() << std::endl;
+        throw "";
+    }                                                        
+                                          
     this->setMinimumSize(600,200);
-    
+
     grid = new QGridLayout;
+    
+    unsigned int nInner = innerActionNames.size();
     
     windowLabel = new QLabel (QString::fromStdString(actionName));
     windowLabel->setAlignment(Qt::AlignCenter);
     windowLabel->setStyleSheet("QLabel { font-size : 40px }");
-    grid->addWidget(windowLabel, 0, 0, 1, 2); //TODO take 2 (colspan) from number of inners
+    grid->addWidget(windowLabel, 0, 0, 1, nInner);
     
     send_button = new QPushButton ( "SEND", this );
     send_button->setGeometry ( 100, 140, 100, 40 );
     QObject::connect(send_button, SIGNAL ( clicked()), this, SLOT (sendBtnClicked() ) );
-    grid->addWidget(send_button, 3, 0, 1, 2); //TODO take 2 (colspan) from number of inners
+    grid->addWidget(send_button, 3, 0, 1, nInner);
     
-    ActionTimedElement* element1 = new ActionTimedElement("el1");
-    grid->addWidget(element1, 2, 0 );
-    ActionTimedElement* element2 = new ActionTimedElement("el2");
-    grid->addWidget(element2, 2, 1 );
+    for (int i =0; i<nInner; i++) {
+        ActionTimedElement* element = 
+            new ActionTimedElement(innerActionNames.at(i), innerTimeMargins.at(i));
+        grid->addWidget(element, 2, i );
+    }
     
     this->setStyleSheet("QGroupBox { border: 2px solid black;}");
     this->setLayout(grid);
+}
+
+void ActionTimedLayout::sendBtnClicked() {
+
+    std::cout << "TODO, SEND ROS MESSAGE TO TIMED TOPIC" << std::endl;
 }

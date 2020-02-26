@@ -6,11 +6,14 @@ ActionLayout::ActionLayout(std::string actionName, QWidget* parent) : QGroupBox(
 
     grid = new QGridLayout;
 
-    windowLabel = new QLabel (QString::fromStdString(actionName));
-    windowLabel->setAlignment(Qt::AlignCenter);
-    windowLabel->setStyleSheet("QLabel { font-size :30px }");
-    grid->addWidget(windowLabel, 0, 0);
-
+    QLabel* titleLabel  = new QLabel (QString::fromStdString(actionName));
+    titleLabel->setAlignment(Qt::AlignCenter);
+    titleLabel->setStyleSheet("QLabel { font-size :30px }");
+    grid->addWidget(titleLabel, 0, 0);
+    
+    progressBar = new QProgressBar();
+    progressBar->setMaximumHeight(25);
+    grid->addWidget(progressBar, 1, 0);
 
     QHBoxLayout *percentageLayout = new QHBoxLayout;
     slider_percentage = new QSlider(this);
@@ -29,12 +32,12 @@ ActionLayout::ActionLayout(std::string actionName, QWidget* parent) : QGroupBox(
 
     percentageLayout->addWidget ( slider_percentage );
     percentageLayout->addWidget (spinBox_percentage);
-    grid->addLayout(percentageLayout, 2, 0);
+    grid->addLayout(percentageLayout, 3, 0);
 
     send_button = new QPushButton ( "SEND", this );
     send_button->setGeometry ( 100, 140, 100, 40 );
     QObject::connect(send_button, SIGNAL ( clicked()), this, SLOT (sendBtnClicked() ) );
-    grid->addWidget(send_button, 3, 0);
+    grid->addWidget(send_button, 4, 0);
 
     this->rosMsgSeq = 0;
     this->msgType = GENERIC;
