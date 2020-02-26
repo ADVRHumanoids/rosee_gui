@@ -15,9 +15,12 @@ ActionBoxesLayout::ActionBoxesLayout (std::string actionName, std::vector<std::s
     boxes = new QButtonGroup(this);
     boxes->setExclusive(false);
 
+    std::string str = "Check " + std::to_string(maxChecked) + " checkboxe(s) before sending";
+    QString sendBtnTooltip = QString::fromStdString(str);
     /// father members
     //disable until we check the right number of checkboxes
     send_button->setEnabled(false);
+    send_button->setToolTip(sendBtnTooltip);
 
     QGridLayout *boxesLayout = new QGridLayout;
     unsigned int buttonId = 0;
@@ -31,7 +34,7 @@ ActionBoxesLayout::ActionBoxesLayout (std::string actionName, std::vector<std::s
     }
 
     QObject::connect( boxes, SIGNAL (buttonClicked(QAbstractButton*)), this,
-                      SLOT (clickedSlot(QAbstractButton*)) );
+                      SLOT (clickCheckBoxSlot(QAbstractButton*)) );
 
     //father grid layout
     grid->addLayout(boxesLayout, 2, 0);
@@ -128,9 +131,9 @@ void ActionBoxesLayout::sendActionRos() {
 
 }
 
-void ActionBoxesLayout::clickedSlot (QAbstractButton* button) {
+void ActionBoxesLayout::clickCheckBoxSlot (QAbstractButton* button) {
 
-    if (button->isChecked()) {
+    if (button->isChecked()) { //if I clicked to check it...
         actualChecked++;
 
         if (actualChecked == maxChecked) {
@@ -139,15 +142,17 @@ void ActionBoxesLayout::clickedSlot (QAbstractButton* button) {
                 if (! box->isChecked() ) { //disable only the not checked obviously
                    box->setEnabled(false);
                 }
-            //enable send button (that is a father member)
+            //enable send button (that is a father member) and remove tooltip
             send_button->setEnabled(true);
+            send_button->setToolTip("");
             }
         }
 
-    } else {
+    } else { //If I click to uncheck it
         actualChecked--;
         //for sure now send button must be disables (or it may be already disabled)
         send_button->setEnabled(false);
+        send_button->setToolTip(sendBtnTooltip);
         for (auto box : boxes->buttons()) {
             box->setEnabled(true);
         }

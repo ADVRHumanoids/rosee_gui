@@ -74,6 +74,7 @@ void ActionLayout::sendBtnClicked() {
 
     std::cout << "The value is " << spinBox_percentage->value() << std::endl;
     std::cout << "Sending ROS message..." << std::endl;
+    progressBar->setValue(1);
     sendActionRos();
 }
 

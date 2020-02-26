@@ -15,8 +15,7 @@ class ActionBoxesLayout : public ActionLayout
 {
     Q_OBJECT
 public:
-    explicit ActionBoxesLayout(std::string actionName, std::vector<std::string> boxesNames, unsigned int maxChecked,
-                      QWidget* parent=0);
+    explicit ActionBoxesLayout(std::string actionName, std::vector<std::string> boxesNames, unsigned int maxChecked, QWidget* parent=0);
 
     void setRosPub(ros::NodeHandle * nh, std::string topicName, MsgType msgType) override;
 
@@ -24,7 +23,7 @@ private:
     QButtonGroup* boxes;
     unsigned int maxChecked;
     unsigned int actualChecked;
-
+    QString sendBtnTooltip;
 
     void sendActionRos() override;
 
@@ -32,7 +31,9 @@ private:
 protected:
 
 private slots:
-    void clickedSlot (QAbstractButton* button);
+    void clickCheckBoxSlot (QAbstractButton* button);
+    
+
 
 };
 

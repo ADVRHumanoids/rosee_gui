@@ -18,6 +18,7 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
     roscpp
     ros_end_effector #for msgs
+    rosee_msg
 )
 
 #not catkin packages

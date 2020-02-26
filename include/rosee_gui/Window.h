@@ -8,6 +8,8 @@
 #include <rosee_gui/ActionLayout.h>
 #include <rosee_gui/ActionTimedLayout.h>
 
+#include <rosee_msg/ActionsInfo.h>
+
 class Window : public QWidget
 {
     Q_OBJECT

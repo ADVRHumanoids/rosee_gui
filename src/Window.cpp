@@ -13,11 +13,12 @@ Window::Window(ros::NodeHandle *nh, QWidget *parent) : QWidget(parent) {
     grid->addWidget (actionLayout,0,0);
 
     std::vector <std::string> fingers;
-    fingers.push_back("finger_1");
-    fingers.push_back("figner_2");
-    fingers.push_back("figner_2");
-    fingers.push_back("figner_2");
-    fingers.push_back("figner_2");
+    fingers.push_back("thumb");
+    fingers.push_back("index");
+    fingers.push_back("middle");
+    fingers.push_back("ring");
+    fingers.push_back("pinky");
+    
     unsigned int maxChecked = 2;
     ActionBoxesLayout* actionBoxesLayout = new ActionBoxesLayout("Pinch", fingers, maxChecked, this) ;
     actionBoxesLayout->setRosPub (nh, "ros_end_effector/pinch", PINCH);
@@ -43,6 +44,14 @@ Window::Window(ros::NodeHandle *nh, QWidget *parent) : QWidget(parent) {
 
 void Window::getInfoServices() {
     
-    //ros::ServiceClient client = nh.serviceClient<> ( " " );
+    //ros::service::waitForService("rosee/ActionsInfo"); //blocking infinite wait, it also print
+    
+    rosee_msg::ActionsInfo actionsInfo;
+
+    if (ros::service::call ("rosee/ActionsInfo", actionsInfo)) { //change name it is not correct
+        //std::cout << "service on" << std::endl;
+    } else {
+        //error
+    }
     
 }
