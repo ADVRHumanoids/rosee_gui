@@ -46,8 +46,8 @@ ActionLayout::ActionLayout(std::string actionName, QWidget* parent) : QGroupBox(
     this->setLayout(grid);
 }
 
-int ActionLayout::getSpinBoxPercentage() {
-    return spinBox_percentage->value();
+double ActionLayout::getSpinBoxPercentage() {
+    return (spinBox_percentage->value()/100.0);
 }
 
 void ActionLayout::setRosPub (ros::NodeHandle * nh, std::string topicName, MsgType msgType) {
@@ -59,7 +59,7 @@ void ActionLayout::sendActionRos () {
     ros_end_effector::EEGraspControl msg;
     msg.seq = rosMsgSeq++;
     msg.stamp = ros::Time::now();
-    msg.percentage = spinBox_percentage->value();
+    msg.percentage = getSpinBoxPercentage();
     actionPub.publish(msg);
 
 }
@@ -72,7 +72,8 @@ void ActionLayout::slotSliderReceive(int value){
 
 void ActionLayout::sendBtnClicked() {
 
-    std::cout << "The value is " << spinBox_percentage->value() << std::endl;
+    
+    std::cout << "The value is " << getSpinBoxPercentage() << std::endl;
     std::cout << "Sending ROS message..." << std::endl;
     progressBar->setValue(1);
     sendActionRos();

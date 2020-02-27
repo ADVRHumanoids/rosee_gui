@@ -43,9 +43,9 @@ protected:
 
     /**
      * @brief getSpinBoxPercentage getter for derived class
-     * @return the percentage displayed in the spinBox. The spinBox and slider have a syncro-same value
+     * @return (0.0 - 1.0 double) the percentage displayed in the spinBox. The spinBox and slider have a syncro-same value
      */
-    int getSpinBoxPercentage();
+    double getSpinBoxPercentage();
 
 private:
     QSlider *slider_percentage;
