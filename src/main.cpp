@@ -6,7 +6,10 @@
 #include <rosee_gui/Window.h>
 #include <ros/ros.h>
 
-
+/**
+ * TODO una custom timed? with selectable inner actions (among all the others) and 
+ * insertable time margins and percentages of each inner.
+ */
 int main(int argc, char **argv)
 {
     QApplication app (argc, argv);

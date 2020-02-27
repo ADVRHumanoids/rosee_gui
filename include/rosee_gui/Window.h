@@ -9,6 +9,7 @@
 #include <rosee_gui/ActionTimedLayout.h>
 
 #include <rosee_msg/ActionsInfo.h>
+#include <rosee_msg/SelectablePairInfo.h>
 
 class Window : public QWidget
 {
@@ -18,7 +19,11 @@ public:
     
 private:
     ros::NodeHandle* nh;
+    std::vector <rosee_msg::ActionInfo> actionInfoVect;
+    
     void getInfoServices() ;
+    std::map < std::string, std::vector<std::string> > getPairMap(
+        std::string action_name, std::vector<std::string> elements);
 
 signals:
 
