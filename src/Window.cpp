@@ -3,6 +3,8 @@
 Window::Window(ros::NodeHandle *nh, QWidget *parent) : QWidget(parent) {
 
     this->nh = nh;
+    
+    // get (wait) for info from unviersalroseeExecutor about all the action parsed by it
     getInfoServices();
     
     QGridLayout *grid = new QGridLayout;
@@ -10,16 +12,30 @@ Window::Window(ros::NodeHandle *nh, QWidget *parent) : QWidget(parent) {
     int rowCol = 0;
     
     for (auto actInfo: actionInfoVect) {
+            
+        //TODO add a type in the info? or not and continue to use max_selectable as discriminant
+        //TODO use another identifier and not name as request?
         
         if (actInfo.max_selectable == 0) {
+
             ActionLayout* actionLayout = new ActionLayout(actInfo.action_name, this);
             actionLayout->setRosPub (nh, actInfo.topic_name);
             grid->addWidget (actionLayout, rowCol/4, rowCol%4);
             
+        } else if (actInfo.max_selectable == 1) {
+            
+            ActionBoxesLayout* actionBoxesLayout;
+            actionBoxesLayout = 
+                new ActionBoxesLayout(actInfo.action_name, actInfo.selectable_names, 
+                                      actInfo.max_selectable, this) ; 
+                                      
+            actionBoxesLayout->setRosPub (nh, actInfo.topic_name, MsgType::TRIG);
+            grid->addWidget (actionBoxesLayout, rowCol/4, rowCol%4);
+            
         } else if (actInfo.max_selectable == 2) {
-            //TODO add a type in the info? or not and continue to use max_selectable as info
-            //TODO use another identifier and not name as request?
         
+            // get (wait) for service that provide info of which element can be paired
+            // so in the gui we disable the not pairable checkboxes if one is checked
             std::map<std::string, std::vector<std::string>> pairedElementMap = 
                 getPairMap(actInfo.action_name, actInfo.selectable_names);
             
@@ -29,17 +45,24 @@ Window::Window(ros::NodeHandle *nh, QWidget *parent) : QWidget(parent) {
                 new ActionBoxesLayout(actInfo.action_name, pairedElementMap, this) ;
                 
             } else {
+                //version without disabling the not pairable checkboxes
                 actionBoxesLayout = 
                 new ActionBoxesLayout(actInfo.action_name, actInfo.selectable_names, 
                                       actInfo.max_selectable, this) ; 
             }
             //TODO handle the last argument... PINCH is for message type but can be used for 
             // any action that has 2 names to select
-            actionBoxesLayout->setRosPub (nh, actInfo.topic_name, PINCH);
+            actionBoxesLayout->setRosPub (nh, actInfo.topic_name, MsgType::PINCH);
             grid->addWidget (actionBoxesLayout, rowCol/4, rowCol%4);
             
+        } else {
+            //TODO still need the message to send 3 or more elements along with jointPos
+            ROS_WARN_STREAM ( "gui for a max_selectable == " << 
+                (unsigned)actInfo.max_selectable << " action still not implemented ");
+            rowCol--;
         } 
-        //other else for timed action...
+        
+        //TODO other else for timed action...
         
         rowCol++;
     }
@@ -71,7 +94,7 @@ Window::Window(ros::NodeHandle *nh, QWidget *parent) : QWidget(parent) {
     innerTimeMargins.push_back(std::make_pair(0.5, 0) );
     ActionTimedLayout* timed = new ActionTimedLayout("wide_grasp", innerActionNames, 
                                                      innerTimeMargins, this);
-    grid->addWidget(timed, 1, 0, 1, innerActionNames.size());
+    grid->addWidget(timed, rowCol/4, rowCol%4, 1, innerActionNames.size());
 
     setLayout(grid);
 
@@ -84,11 +107,9 @@ void Window::getInfoServices() {
     rosee_msg::ActionsInfo actionsInfo;
 
     if (ros::service::call ("ros_end_effector/ActionsInfo", actionsInfo)) {
-        for (auto actInfo: actionsInfo.response.actionsInfo) {
-            actionInfoVect.push_back(actInfo);
-        }
+        actionInfoVect = actionsInfo.response.actionsInfo;
     } else {
-        //error
+        ROS_ERROR_STREAM (" ros::service::call FAILED " );
     }
     
 }

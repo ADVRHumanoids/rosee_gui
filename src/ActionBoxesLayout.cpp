@@ -17,7 +17,7 @@ ActionBoxesLayout::ActionBoxesLayout (std::string actionName, std::vector<std::s
     boxes->setExclusive(false);
 
     std::string str = "Check " + std::to_string(maxChecked) + " checkboxe(s) before sending";
-    QString sendBtnTooltip = QString::fromStdString(str);
+    sendBtnTooltip = QString::fromStdString(str);
     /// father members
     //disable until we check the right number of checkboxes
     send_button->setEnabled(false);
@@ -28,6 +28,8 @@ ActionBoxesLayout::ActionBoxesLayout (std::string actionName, std::vector<std::s
     for (auto el : boxesNames) {
         QCheckBox* newBox =  new QCheckBox( QString::fromStdString(el));
         newBox->setChecked(false);
+        //tooltip on each checkbox so we can read if the label is cut becasue of no space
+        newBox->setToolTip(QString::fromStdString(el));
         boxes->addButton ( newBox, buttonId );
 
         boxesLayout->addWidget(newBox, buttonId/2, (buttonId%2));
@@ -47,7 +49,7 @@ ActionBoxesLayout::ActionBoxesLayout (std::string actionName,
                                       QWidget* parent) : 
                                       ActionLayout(actionName, parent) {
 
-    maxChecked = 2; //because we pass that map, this costructo is specific for this kind of action
+    maxChecked = 2; //because we pass that map, this costructor is specific for this kind of action
     if (maxChecked > pairedMap.size()){
         std::cerr << "[ERROR] maxChecked is " << maxChecked << " while you pass only " << pairedMap.size()
                   << " names for checkboxes" << std::endl;
@@ -61,7 +63,7 @@ ActionBoxesLayout::ActionBoxesLayout (std::string actionName,
     boxes->setExclusive(false);
 
     std::string str = "Check " + std::to_string(maxChecked) + " checkboxe(s) before sending";
-    QString sendBtnTooltip = QString::fromStdString(str);
+    sendBtnTooltip = QString::fromStdString(str);
     /// father members
     //disable until we check the right number of checkboxes
     send_button->setEnabled(false);
@@ -72,6 +74,8 @@ ActionBoxesLayout::ActionBoxesLayout (std::string actionName,
     for (auto el : pairedMap) {
         QCheckBox* newBox =  new QCheckBox( QString::fromStdString(el.first));
         newBox->setChecked(false);
+        //tooltip on each checkbox so we can read if the label is cut becasue of no space
+        newBox->setToolTip(QString::fromStdString(el.first));
         boxes->addButton ( newBox, buttonId );
 
         boxesLayout->addWidget(newBox, buttonId/2, (buttonId%2));
