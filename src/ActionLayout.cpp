@@ -54,6 +54,14 @@ void ActionLayout::setRosPub (ros::NodeHandle * nh, std::string topicName, MsgTy
     actionPub = nh->advertise<ros_end_effector::EEGraspControl>(topicName, 1);
 }
 
+void ActionLayout::setRosActionClient ( ros::NodeHandle * nh, std::string rosActionName) {
+    
+    action_client = 
+        std::make_shared <actionlib::SimpleActionClient <rosee_msg::ROSEECommandAction>>
+        (*nh, rosActionName);
+        //TODO send Action ROS -> sendGoal....
+}
+
 void ActionLayout::sendActionRos () {
 
     ros_end_effector::EEGraspControl msg;
@@ -72,7 +80,6 @@ void ActionLayout::slotSliderReceive(int value){
 
 void ActionLayout::sendBtnClicked() {
 
-    
     std::cout << "The value is " << getSpinBoxPercentage() << std::endl;
     std::cout << "Sending ROS message..." << std::endl;
     progressBar->setValue(1);
