@@ -16,38 +16,38 @@
 #include <memory.h>
 
 #include <ros/ros.h>
-#include <ros_end_effector/EEGraspControl.h>
+
 #include <rosee_msg/ROSEECommandAction.h>
+#include <rosee_msg/ActionInfo.h> //msg
+
 #include <actionlib/client/simple_action_client.h>
 
-//TODO or 0-box 1-box ?? if we have to send only a percentage and a certain number of string...
-enum MsgType {  GENERIC, TRIG, PINCH };
+//TODO take this from Action.h and remove here, now I can not add dependencies
+// from ros_end_effector
+enum ActionType {Primitive, Generic, Composed, Timed, None};
+enum PrimitiveType {PinchStrong, PinchWeak, MultiplePinchStrong, Trig, TipFlex, FingFlex, MoreTips, PrimitiveNone};
 
-//TODO: now graspmsg is used for GENERIC, but a better name should be generic msg (one where we only give the percentage)
+/**
+ * TODO better to pass a pub pointer to have only a single publisher for all gui?
+ */
 class ActionLayout: public QGroupBox
 {
     Q_OBJECT
 public:
-    explicit ActionLayout(std::string actionName, QWidget* parent=0);
-    
-    virtual void setRosPub (ros::NodeHandle * nh, std::string topicName, MsgType msgType = GENERIC);
-    
-    virtual void ActionLayout::setRosActionClient ( ros::NodeHandle * nh, std::string rosActionName);
-
-
-
+    explicit ActionLayout(ros::NodeHandle *nh, rosee_msg::ActionInfo, QWidget* parent=0);
+        
 protected:
     QGridLayout *grid;
     unsigned int rosMsgSeq;
+    std::string actionName;
+    ActionType actionType;
 
     QPushButton *send_button; //protected so derived class can enable/disable if necessary
-    ros::Publisher actionPub;
-    std::shared <actionlib::SimpleActionClient <rosee_msg::ROSEECommandAction>> action_client;
-    
-    /**
-     * @brief msgType for this class is always GENERIC, derived class will modified it in the setRosPub overriden function
-     */
-    MsgType msgType;
+    std::shared_ptr <actionlib::SimpleActionClient <rosee_msg::ROSEECommandAction> > action_client;
+    void doneCallback(const actionlib::SimpleClientGoalState& state,
+            const rosee_msg::ROSEECommandResultConstPtr& result);
+    void activeCallback();
+    void feedbackCallback(const rosee_msg::ROSEECommandFeedbackConstPtr& feedback);
 
     /**
      * @brief getSpinBoxPercentage getter for derived class
@@ -61,6 +61,10 @@ private:
     QProgressBar *progressBar;
 
     virtual void sendActionRos();
+    void setRosActionClient ( ros::NodeHandle * nh, std::string rosActionName);
+    
+
+
 
 signals:
 

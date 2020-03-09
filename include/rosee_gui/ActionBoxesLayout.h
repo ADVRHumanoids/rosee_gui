@@ -7,24 +7,22 @@
 #include <QGroupBox>
 #include <QCheckBox>
 #include <QButtonGroup>
+#include <ros/ros.h>
 
-#include <ros_end_effector/EETriggerControl.h>
-#include <ros_end_effector/EEPinchControl.h>
+#include <rosee_msg/ActionInfo.h> //msg
 
 class ActionBoxesLayout : public ActionLayout
 {
     Q_OBJECT
 public:
-    explicit ActionBoxesLayout(std::string actionName, std::vector<std::string> boxesNames, 
-                               unsigned int maxChecked,  QWidget* parent=0);
-    explicit ActionBoxesLayout(std::string actionName,
+    explicit ActionBoxesLayout(ros::NodeHandle* nh, rosee_msg::ActionInfo,  QWidget* parent=0);
+    explicit ActionBoxesLayout(ros::NodeHandle* nh, rosee_msg::ActionInfo,
                                std::map<std::string, std::vector<std::string>> pairedMap, QWidget* parent=0);
-
-    void setRosPub(ros::NodeHandle * nh, std::string topicName, MsgType msgType) override;
 
 private:
     QButtonGroup* boxes;
     unsigned int maxChecked;
+    PrimitiveType actionPrimitiveType;
     unsigned int actualChecked;
     QString sendBtnTooltip;
     

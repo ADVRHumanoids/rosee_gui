@@ -13,88 +13,68 @@ Window::Window(ros::NodeHandle *nh, QWidget *parent) : QWidget(parent) {
     
     for (auto actInfo: actionInfoVect) {
             
-        //TODO add a type in the info? or not and continue to use max_selectable as discriminant
-        //TODO use another identifier and not name as request?
+        switch (actInfo.action_type) {
         
-        if (actInfo.max_selectable == 0) {
-
-            ActionLayout* actionLayout = new ActionLayout(actInfo.action_name, this);
-            actionLayout->setRosPub (nh, actInfo.topic_name);
-            grid->addWidget (actionLayout, rowCol/4, rowCol%4);
-            
-        } else if (actInfo.max_selectable == 1) {
-            
-            ActionBoxesLayout* actionBoxesLayout;
-            actionBoxesLayout = 
-                new ActionBoxesLayout(actInfo.action_name, actInfo.selectable_names, 
-                                      actInfo.max_selectable, this) ; 
-                                      
-            actionBoxesLayout->setRosPub (nh, actInfo.topic_name, MsgType::TRIG);
-            grid->addWidget (actionBoxesLayout, rowCol/4, rowCol%4);
-            
-        } else if (actInfo.max_selectable == 2) {
-        
-            // get (wait) for service that provide info of which element can be paired
-            // so in the gui we disable the not pairable checkboxes if one is checked
-            std::map<std::string, std::vector<std::string>> pairedElementMap = 
-                getPairMap(actInfo.action_name, actInfo.selectable_names);
-            
-            ActionBoxesLayout* actionBoxesLayout;
-            if (pairedElementMap.size() != 0) {
-                actionBoxesLayout = 
-                new ActionBoxesLayout(actInfo.action_name, pairedElementMap, this) ;
+        case ActionType::Primitive :
+        {
+            if (actInfo.max_selectable == 2) {
+                // get (wait) for service that provide info of which element can be paired
+                // so in the gui we disable the not pairable checkboxes if one is checked
+                std::map<std::string, std::vector<std::string>> pairedElementMap = 
+                    getPairMap(actInfo.action_name, actInfo.selectable_names);
+                
+                ActionBoxesLayout* actionBoxesLayout;
+                if (pairedElementMap.size() != 0) {
+                    actionBoxesLayout = 
+                    new ActionBoxesLayout(nh, actInfo, pairedElementMap, this) ;
+                    
+                } else {
+                    //version without disabling the not pairable checkboxes
+                    actionBoxesLayout = 
+                    new ActionBoxesLayout(nh, actInfo, this) ; 
+                    
+                }
+                grid->addWidget (actionBoxesLayout, rowCol/4, rowCol%4);
                 
             } else {
-                //version without disabling the not pairable checkboxes
+                ActionBoxesLayout* actionBoxesLayout;
                 actionBoxesLayout = 
-                new ActionBoxesLayout(actInfo.action_name, actInfo.selectable_names, 
-                                      actInfo.max_selectable, this) ; 
+                    new ActionBoxesLayout(nh, actInfo, this) ; 
+                grid->addWidget (actionBoxesLayout, rowCol/4, rowCol%4);
             }
-            //TODO handle the last argument... PINCH is for message type but can be used for 
-            // any action that has 2 names to select
-            actionBoxesLayout->setRosPub (nh, actInfo.topic_name, MsgType::PINCH);
-            grid->addWidget (actionBoxesLayout, rowCol/4, rowCol%4);
+
+            break;
+        }
+        case ActionType::Generic : // same thing as composed
+        case ActionType::Composed :
+        {
+            ActionLayout* actionLayout = new ActionLayout(nh, actInfo, this);
+            grid->addWidget (actionLayout, rowCol/4, rowCol%4);
+            break;
+        }
+        case ActionType::Timed : {
+
+            ActionTimedLayout* timed = new ActionTimedLayout(nh, actInfo, this);
+            grid->addWidget(timed, rowCol/4, rowCol%4, 1, actInfo.inner_actions.size());
+
+            break;
+        }
+        case ActionType::None :
+        {
             
-        } else {
-            //TODO still need the message to send 3 or more elements along with jointPos
-            ROS_WARN_STREAM ( "gui for a max_selectable == " << 
-                (unsigned)actInfo.max_selectable << " action still not implemented ");
-            rowCol--;
+            ROS_ERROR_STREAM ("GUI ERROR, type NONE received for action " << actInfo.action_name);
+            throw "";
+            break;
+        }
+        default : {
+            ROS_ERROR_STREAM ("GUI ERROR, not recognized type " << actInfo.action_type
+            << " received for action " << actInfo.action_name);
+            throw "";
+        }
         } 
-        
-        //TODO other else for timed action...
         
         rowCol++;
     }
-
-    /*
-    ActionLayout* actionLayout = new ActionLayout("Generic", this);
-    actionLayout->setRosPub (nh, "ros_end_effector/grasp");
-
-    grid->addWidget (actionLayout,0,0);
-
-    std::vector <std::string> fingers;
-    fingers.push_back("thumb");
-    fingers.push_back("index");
-    fingers.push_back("middle");
-    fingers.push_back("ring");
-    fingers.push_back("pinky");
-    
-    unsigned int maxChecked = 2;
-    ActionBoxesLayout* actionBoxesLayout = new ActionBoxesLayout("Pinch", fingers, maxChecked, this) ;
-    actionBoxesLayout->setRosPub (nh, "ros_end_effector/pinch", PINCH);
-    grid->addWidget (actionBoxesLayout, 0, 1);
-    */
-    
-    std::vector<std::string> innerActionNames;
-    innerActionNames.push_back("spread_fing");
-    innerActionNames.push_back("grasp");
-    std::vector<std::pair<double,double>> innerTimeMargins;
-    innerTimeMargins.push_back(std::make_pair(0, 0.2) );
-    innerTimeMargins.push_back(std::make_pair(0.5, 0) );
-    ActionTimedLayout* timed = new ActionTimedLayout("wide_grasp", innerActionNames, 
-                                                     innerTimeMargins, this);
-    grid->addWidget(timed, rowCol/4, rowCol%4, 1, innerActionNames.size());
 
     setLayout(grid);
 
@@ -120,7 +100,12 @@ std::map < std::string, std::vector<std::string> > Window::getPairMap(
     
     std::map<std::string, std::vector<std::string>> pairedElementMap;
     
-    ros::service::waitForService("ros_end_effector/SelectablePairInfo");
+    ROS_INFO_STREAM ("waiting for ros_end_effector/SelectablePairInfo service for 5 seconds");
+    if (! ros::service::waitForService("ros_end_effector/SelectablePairInfo", 5000)) {
+        ROS_WARN_STREAM ("ros_end_effector/SelectablePairInfo not found");
+        return std::map < std::string, std::vector<std::string> >();
+    }
+    
     rosee_msg::SelectablePairInfo pairInfo;
     pairInfo.request.action_name = action_name;
 
@@ -131,7 +116,11 @@ std::map < std::string, std::vector<std::string> > Window::getPairMap(
             pairedElementMap.insert(std::make_pair(elementName, pairInfo.response.pair_elements) );
             
         } else {
-            //error
+            ROS_ERROR_STREAM ("ros_end_effector/SelectablePairInfo call failed with " << 
+                pairInfo.request.action_name << ", " << pairInfo.request.element_name <<
+                " as request");
+            return std::map < std::string, std::vector<std::string> >();
+
         }
     }
     return pairedElementMap;

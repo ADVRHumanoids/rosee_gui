@@ -33,10 +33,12 @@ class ActionTimedElement : public QGroupBox {
     
     Q_OBJECT
 public:
-    explicit ActionTimedElement(std::string actionName, std::pair<double, double> margins, QWidget* parent=0);
+    explicit ActionTimedElement(std::string actionName, double before, double after, QWidget* parent=0);
+    
+    void setProgressBarValue(double);
 
 private: 
-    std::vector<QProgressBar*> progressBars;
+    QProgressBar* bar;
 };
 
 #endif // ACTIONTIMEDELEMENT_H

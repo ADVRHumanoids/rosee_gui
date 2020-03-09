@@ -16,13 +16,22 @@
 
 #include <rosee_gui/ActionTimedLayout.h>
 
-ActionTimedLayout::ActionTimedLayout (std::string actionName, 
-                                      std::vector<std::string> innerActionNames,
-                                      std::vector<std::pair<double,double>> innerTimeMargins,
+ActionTimedLayout::ActionTimedLayout (ros::NodeHandle* nh, rosee_msg::ActionInfo actInfo,
                                       QWidget* parent) : QGroupBox(parent) {
     
-    if (innerActionNames.size() != innerTimeMargins.size() ) {
-        std::cerr << "[ERROR ActionTimedLayout costructor] different size of innerNames and innerTimeMargins: " << innerActionNames.size() << " and " << innerTimeMargins.size() << std::endl;
+    if (actInfo.inner_actions.size() == 0) {
+        ROS_ERROR_STREAM("[ActionTimed not valid: no inner actions selected");
+        throw "";
+    }
+    
+    unsigned int nInner = actInfo.inner_actions.size();
+    
+    if (nInner != actInfo.before_margins.size() ||
+        nInner != actInfo.after_margins.size() ) {
+        ROS_ERROR_STREAM("[ERROR ActionTimedLayout costructor] different size of innerNames and innerTimeMargins: " 
+        << nInner << " and " << actInfo.before_margins.size() <<
+        "(before marg), and " << actInfo.after_margins.size()
+        << "(after marg)");
         throw "";
     }                                                        
                                           
@@ -30,9 +39,7 @@ ActionTimedLayout::ActionTimedLayout (std::string actionName,
 
     grid = new QGridLayout;
     
-    unsigned int nInner = innerActionNames.size();
-    
-    windowLabel = new QLabel (QString::fromStdString(actionName));
+    windowLabel = new QLabel (QString::fromStdString(actInfo.action_name));
     windowLabel->setAlignment(Qt::AlignCenter);
     windowLabel->setStyleSheet("QLabel { font-size : 40px }");
     grid->addWidget(windowLabel, 0, 0, 1, nInner);
@@ -44,7 +51,8 @@ ActionTimedLayout::ActionTimedLayout (std::string actionName,
     
     for (int i =0; i<nInner; i++) {
         ActionTimedElement* element = 
-            new ActionTimedElement(innerActionNames.at(i), innerTimeMargins.at(i));
+            new ActionTimedElement(actInfo.inner_actions.at(i), actInfo.before_margins.at(i),
+                                   actInfo.after_margins.at(i), this);
         grid->addWidget(element, 2, i );
     }
     
@@ -54,5 +62,5 @@ ActionTimedLayout::ActionTimedLayout (std::string actionName,
 
 void ActionTimedLayout::sendBtnClicked() {
 
-    std::cout << "TODO, SEND ROS MESSAGE TO TIMED TOPIC" << std::endl;
+    ROS_WARN_STREAM ( "TODO, SEND ROS MESSAGE TO TIMED TOPIC" );
 }

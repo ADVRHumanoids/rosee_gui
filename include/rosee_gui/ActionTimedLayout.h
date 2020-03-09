@@ -23,8 +23,9 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QPushButton>
-
+#include <ros/ros.h>
 #include <rosee_gui/ActionTimedElement.h>
+#include <rosee_msg/ActionInfo.h>
 
 /**
  * @todo write docs
@@ -33,9 +34,7 @@ class ActionTimedLayout : public QGroupBox {
     
     Q_OBJECT
 public :
-    explicit ActionTimedLayout (std::string actionName,
-                                std::vector<std::string> innerActionNames,
-                                std::vector<std::pair<double,double>> innerTimeMargins,
+    explicit ActionTimedLayout (ros::NodeHandle* nh, rosee_msg::ActionInfo actInfo,
                                 QWidget* parent = 0);
 
 private: 
