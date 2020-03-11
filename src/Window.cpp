@@ -100,12 +100,13 @@ std::map < std::string, std::vector<std::string> > Window::getPairMap(
     
     std::map<std::string, std::vector<std::string>> pairedElementMap;
     
-    ROS_INFO_STREAM ("waiting for ros_end_effector/SelectablePairInfo service for 5 seconds");
+    ROS_INFO_STREAM ("waiting for ros_end_effector/SelectablePairInfo service for 5 seconds...");
     if (! ros::service::waitForService("ros_end_effector/SelectablePairInfo", 5000)) {
         ROS_WARN_STREAM ("ros_end_effector/SelectablePairInfo not found");
         return std::map < std::string, std::vector<std::string> >();
     }
-    
+    ROS_INFO_STREAM ("... service found, I will call it");
+
     rosee_msg::SelectablePairInfo pairInfo;
     pairInfo.request.action_name = action_name;
 

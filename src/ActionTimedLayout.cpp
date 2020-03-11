@@ -33,7 +33,12 @@ ActionTimedLayout::ActionTimedLayout (ros::NodeHandle* nh, rosee_msg::ActionInfo
         "(before marg), and " << actInfo.after_margins.size()
         << "(after marg)");
         throw "";
-    }                                                        
+    } 
+    
+    this->actionName = actInfo.action_name;
+    this->rosMsgSeq = 0;
+
+    setRosActionClient(nh, actInfo.ros_action_name);
                                           
     this->setMinimumSize(600,200);
 
@@ -53,6 +58,11 @@ ActionTimedLayout::ActionTimedLayout (ros::NodeHandle* nh, rosee_msg::ActionInfo
         ActionTimedElement* element = 
             new ActionTimedElement(actInfo.inner_actions.at(i), actInfo.before_margins.at(i),
                                    actInfo.after_margins.at(i), this);
+        //we set object name so we can retrieve later with this->getChild(name)
+        //TODO BUG problem when we have more action with same name.. can happen if they are
+        // of different type (eg 2 primitive cant have same name, but theoretically a primitive and
+        // a composed yes
+        element->setObjectName(QString::fromStdString(actInfo.inner_actions.at(i)));
         grid->addWidget(element, 2, i );
     }
     
@@ -62,5 +72,74 @@ ActionTimedLayout::ActionTimedLayout (ros::NodeHandle* nh, rosee_msg::ActionInfo
 
 void ActionTimedLayout::sendBtnClicked() {
 
-    ROS_WARN_STREAM ( "TODO, SEND ROS MESSAGE TO TIMED TOPIC" );
+    ROS_INFO_STREAM( "[ActionTimedLayout " << actionName << "] Sending ROS message..." ) ;
+    sendActionRos();
+    ROS_INFO_STREAM( "[ActionTimedLayout " << actionName << "] ... sent" ) ;
+
 }
+
+void ActionTimedLayout::setRosActionClient(ros::NodeHandle* nh, std::string rosActionName) {
+    
+    action_client = 
+        std::make_shared <actionlib::SimpleActionClient <rosee_msg::ROSEECommandAction>>
+        (*nh, rosActionName, false);
+        //false because we handle the thread
+}
+
+void ActionTimedLayout::sendActionRos () {
+
+    rosee_msg::ROSEECommandGoal goal;
+    goal.goal_action.seq = rosMsgSeq++ ;
+    goal.goal_action.stamp = ros::Time::now();
+    //goal.goal_action.percentage not used for timed
+    goal.goal_action.action_name = actionName;
+    //actionLAyout can be generic or composed, but it do not change what we put in type
+    //because the server will act on them equally
+    goal.goal_action.action_type = ActionType::Timed ;
+    goal.goal_action.actionPrimitive_type = PrimitiveType::PrimitiveNone ;
+    //goal.goal_action.selectable_items left empty 
+
+    action_client->sendGoal (goal, boost::bind(&ActionTimedLayout::doneCallback, this, _1, _2),
+        boost::bind(&ActionTimedLayout::activeCallback, this), boost::bind(&ActionTimedLayout::feedbackCallback, this, _1)) ;
+
+}
+
+void ActionTimedLayout::doneCallback(const actionlib::SimpleClientGoalState& state,
+            const rosee_msg::ROSEECommandResultConstPtr& result) {
+    
+    ROS_INFO_STREAM("[ActionTimedLayout " << actionName << "] Finished in state "<<  state.toString().c_str());
+    //progressBar->setValue(100);
+    
+}
+
+void ActionTimedLayout::activeCallback() {
+    
+    ROS_INFO_STREAM("[ActionTimedLayout " << actionName << "] Goal just went active");
+    
+}
+
+void ActionTimedLayout::feedbackCallback(
+    const rosee_msg::ROSEECommandFeedbackConstPtr& feedback) {
+    
+    ROS_INFO_STREAM("[ActionTimedLayout " << actionName << "] Got Feedback: " <<
+        feedback->action_name_current << " , "  << feedback->completation_percentage);    
+
+    ActionTimedElement* el = this->findChild <ActionTimedElement*> (
+            QString::fromStdString(feedback->action_name_current));
+    
+    if (el == NULL ){ 
+        ROS_ERROR_STREAM (feedback->action_name_current << " not a child of this action layout");        
+        ROS_ERROR_STREAM ("Child Are:");
+        for (auto child : findChildren<QWidget *>()) {
+            if (! child->objectName().isNull() ) {
+                ROS_WARN_STREAM (  qPrintable(child->objectName()) );
+
+            } else {
+                ROS_WARN_STREAM ( "nullName" );
+            }
+        }
+    }
+    el->setProgressBarValue(feedback->completation_percentage);
+   
+}
+

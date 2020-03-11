@@ -10,7 +10,11 @@
 
 void rosSpin_func() {
 
-    ros::spin();
+    ros::Rate r(100); //100 hz
+    while (ros::ok()) {
+        ros::spinOnce();
+        r.sleep();
+    }
 }
 
 

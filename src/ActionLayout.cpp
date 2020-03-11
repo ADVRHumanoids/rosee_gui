@@ -7,6 +7,8 @@ ActionLayout::ActionLayout(ros::NodeHandle* nh, rosee_msg::ActionInfo actInfo, Q
     this->setMinimumSize(300,200);
     this->actionName = actInfo.action_name;
     this->actionType = static_cast<ActionType> (actInfo.action_type);
+    this->rosMsgSeq = 0;
+
     setRosActionClient(nh, actInfo.ros_action_name);
 
     grid = new QGridLayout;
@@ -43,8 +45,6 @@ ActionLayout::ActionLayout(ros::NodeHandle* nh, rosee_msg::ActionInfo actInfo, Q
     send_button->setGeometry ( 100, 140, 100, 40 );
     QObject::connect(send_button, SIGNAL ( clicked()), this, SLOT (sendBtnClicked() ) );
     grid->addWidget(send_button, 4, 0);
-
-    this->rosMsgSeq = 0;
 
     this->setStyleSheet("QGroupBox { border: 2px solid black;}");
     this->setLayout(grid);
@@ -97,7 +97,6 @@ void ActionLayout::feedbackCallback(
     
     ROS_INFO_STREAM("[ActionLayout " << actionName << "] Got Feedback: " << feedback->completation_percentage);
     progressBar->setValue(feedback->completation_percentage);
-
 }
 
 
@@ -111,7 +110,6 @@ void ActionLayout::sendBtnClicked() {
 
     ROS_INFO_STREAM( "[ActionLayout " << actionName << "] The value is " << getSpinBoxPercentage() );
     ROS_INFO_STREAM( "Sending ROS message..." ) ;
-    progressBar->setValue(1);
     sendActionRos();
 }
 

@@ -33,7 +33,7 @@ class ActionTimedElement : public QGroupBox {
     
     Q_OBJECT
 public:
-    explicit ActionTimedElement(std::string actionName, double before, double after, QWidget* parent=0);
+    explicit ActionTimedElement(std::string actionName, double before, double after, QWidget* parent);
     
     void setProgressBarValue(double);
 
