@@ -15,7 +15,7 @@ Window::Window(ros::NodeHandle *nh, QWidget *parent) : QWidget(parent) {
             
         switch (actInfo.action_type) {
         
-        case ActionType::Primitive :
+        case ROSEE::Action::Type::Primitive :
         {
             if (actInfo.max_selectable == 2) {
                 // get (wait) for service that provide info of which element can be paired
@@ -45,21 +45,21 @@ Window::Window(ros::NodeHandle *nh, QWidget *parent) : QWidget(parent) {
 
             break;
         }
-        case ActionType::Generic : // same thing as composed
-        case ActionType::Composed :
+        case ROSEE::Action::Type::Generic : // same thing as composed
+        case ROSEE::Action::Type::Composed :
         {
             ActionLayout* actionLayout = new ActionLayout(nh, actInfo, this);
             grid->addWidget (actionLayout, rowCol/4, rowCol%4);
             break;
         }
-        case ActionType::Timed : {
-
+        case ROSEE::Action::Type::Timed : 
+        {
             ActionTimedLayout* timed = new ActionTimedLayout(nh, actInfo, this);
             grid->addWidget(timed, rowCol/4, rowCol%4, 1, actInfo.inner_actions.size());
 
             break;
         }
-        case ActionType::None :
+        case ROSEE::Action::Type::None :
         {
             
             ROS_ERROR_STREAM ("GUI ERROR, type NONE received for action " << actInfo.action_name);

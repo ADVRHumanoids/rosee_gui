@@ -93,10 +93,8 @@ void ActionTimedLayout::sendActionRos () {
     goal.goal_action.stamp = ros::Time::now();
     //goal.goal_action.percentage not used for timed
     goal.goal_action.action_name = actionName;
-    //actionLAyout can be generic or composed, but it do not change what we put in type
-    //because the server will act on them equally
-    goal.goal_action.action_type = ActionType::Timed ;
-    goal.goal_action.actionPrimitive_type = PrimitiveType::PrimitiveNone ;
+    goal.goal_action.action_type = ROSEE::Action::Type::Timed ;
+    goal.goal_action.actionPrimitive_type = ROSEE::ActionPrimitive::Type::None ;
     //goal.goal_action.selectable_items left empty 
 
     action_client->sendGoal (goal, boost::bind(&ActionTimedLayout::doneCallback, this, _1, _2),

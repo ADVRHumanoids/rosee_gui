@@ -11,7 +11,7 @@ ActionBoxesLayout::ActionBoxesLayout (ros::NodeHandle* nh,
     }
 
     this->maxChecked = actInfo.max_selectable;
-    this->actionPrimitiveType = static_cast<PrimitiveType> (actInfo.actionPrimitive_type);
+    this->actionPrimitiveType = static_cast<ROSEE::ActionPrimitive::Type> (actInfo.actionPrimitive_type);
 
     this->actualChecked = 0;
 
@@ -67,7 +67,7 @@ ActionBoxesLayout::ActionBoxesLayout (ros::NodeHandle* nh,
     }
     
     this->maxChecked = actInfo.max_selectable; //which is always 2 for now
-    this->actionPrimitiveType = static_cast<PrimitiveType> (actInfo.actionPrimitive_type);
+    this->actionPrimitiveType = static_cast<ROSEE::ActionPrimitive::Type> (actInfo.actionPrimitive_type);
 
     this->actualChecked = 0;
     

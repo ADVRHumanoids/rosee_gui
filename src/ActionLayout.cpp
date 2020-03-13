@@ -6,7 +6,7 @@ ActionLayout::ActionLayout(ros::NodeHandle* nh, rosee_msg::ActionInfo actInfo, Q
 
     this->setMinimumSize(300,200);
     this->actionName = actInfo.action_name;
-    this->actionType = static_cast<ActionType> (actInfo.action_type);
+    this->actionType = static_cast<ROSEE::Action::Type> (actInfo.action_type);
     this->rosMsgSeq = 0;
 
     setRosActionClient(nh, actInfo.ros_action_name);
@@ -70,10 +70,9 @@ void ActionLayout::sendActionRos () {
     goal.goal_action.stamp = ros::Time::now();
     goal.goal_action.percentage = getSpinBoxPercentage();
     goal.goal_action.action_name = actionName;
-    //actionLAyout can be generic or composed, but it do not change what we put in type
-    //because the server will act on them equally
-    goal.goal_action.action_type = ActionType::Generic ;
-    goal.goal_action.actionPrimitive_type = PrimitiveType::PrimitiveNone ;
+    goal.goal_action.action_type = actionType ;
+    //action layout is never for primitives, primitives always use actionBoxesLayout
+    goal.goal_action.actionPrimitive_type = ROSEE::ActionPrimitive::None ;
     //goal.goal_action.selectable_items left empty 
     action_client->sendGoal (goal, boost::bind(&ActionLayout::doneCallback, this, _1, _2),
         boost::bind(&ActionLayout::activeCallback, this), boost::bind(&ActionLayout::feedbackCallback, this, _1)) ;

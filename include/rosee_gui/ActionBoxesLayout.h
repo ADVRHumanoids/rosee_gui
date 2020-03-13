@@ -10,6 +10,7 @@
 #include <ros/ros.h>
 
 #include <rosee_msg/ActionInfo.h> //msg
+#include <ROSEndEffector/ActionPrimitive.h>
 
 class ActionBoxesLayout : public ActionLayout
 {
@@ -22,7 +23,7 @@ public:
 private:
     QButtonGroup* boxes;
     unsigned int maxChecked;
-    PrimitiveType actionPrimitiveType;
+    ROSEE::ActionPrimitive::Type actionPrimitiveType;
     unsigned int actualChecked;
     QString sendBtnTooltip;
     

@@ -19,13 +19,10 @@
 
 #include <rosee_msg/ROSEECommandAction.h>
 #include <rosee_msg/ActionInfo.h> //msg
+#include <ROSEndEffector/Action.h>
+#include <ROSEndEffector/ActionPrimitive.h>
 
 #include <actionlib/client/simple_action_client.h>
-
-//TODO take this from Action.h and remove here, now I can not add dependencies
-// from ros_end_effector
-enum ActionType {Primitive, Generic, Composed, Timed, None};
-enum PrimitiveType {PinchStrong, PinchWeak, MultiplePinchStrong, Trig, TipFlex, FingFlex, MoreTips, PrimitiveNone};
 
 /**
  * TODO better to pass a pub pointer to have only a single publisher for all gui?
@@ -40,7 +37,7 @@ protected:
     QGridLayout *grid;
     unsigned int rosMsgSeq;
     std::string actionName;
-    ActionType actionType;
+    ROSEE::Action::Type actionType;
 
     QPushButton *send_button; //protected so derived class can enable/disable if necessary
     std::shared_ptr <actionlib::SimpleActionClient <rosee_msg::ROSEECommandAction> > action_client;
