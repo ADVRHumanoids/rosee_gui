@@ -4,19 +4,8 @@
 #include <QPushButton>
 
 #include <rosee_gui/Window.h>
+#include <rosee_gui/TimerHandler.h>
 #include <ros/ros.h>
-
-#include <thread>
-
-void rosSpin_func() {
-
-    ros::Rate r(100); //100 hz
-    while (ros::ok()) {
-        ros::spinOnce();
-        r.sleep();
-    }
-}
-
 
 int main(int argc, char **argv)
 {
@@ -24,19 +13,16 @@ int main(int argc, char **argv)
 
     ros::init (argc, argv, "rosee_GUI");
     ros::NodeHandle nh;
+    
+    TimerHandler tHandler(10);
 
     Window window(&nh);
 
     window.show();
     
-    //TODO IS IT SAFE?? IS IT CORRECT?
-    //BUG with this, the gui crash when we send an action and the previous one
-    // was not completed
-    std::thread rosSpinner(rosSpin_func);
     int appReturn = app.exec();
-
     //app.exec is blocking
-    rosSpinner.join();
+    
     ros::shutdown();
 
     return appReturn;
