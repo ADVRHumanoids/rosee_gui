@@ -14,31 +14,21 @@
  * limitations under the License.
  */
 
-#ifndef ACTIONTIMEDELEMENT_H
-#define ACTIONTIMEDELEMENT_H
+#ifndef TIMERHANDLER_H
+#define TIMERHANDLER_H
 
-#include <QGroupBox>
-#include <QGridLayout>
-#include <QLabel>
-#include <QProgressBar>
+#include <QTimer>
+#include <ros/ros.h>
 
-//to set precision of double when converting to string
-#include <sstream> 
-#include <iomanip>
-
-/**
- * @todo write docs
- */
-class ActionTimedElement : public QGroupBox {
-    
+class TimerHandler : public QObject
+{
     Q_OBJECT
 public:
-    explicit ActionTimedElement(std::string actionName, double before, double after, QWidget* parent);
-    
-    void setProgressBarValue(double);
+    TimerHandler(int msec = 100);
+    QTimer *timer;
 
-private: 
-    QProgressBar* bar;
+public slots:
+    void timerSlot();
 };
 
-#endif // ACTIONTIMEDELEMENT_H
+#endif // TIMERHANDLER_H

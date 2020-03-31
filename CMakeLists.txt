@@ -17,8 +17,9 @@ add_compile_options(-std=c++11)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
     roscpp
-    ros_end_effector #for msgs
+    ros_end_effector #for action type 
     rosee_msg
+    actionlib
 )
 
 #not catkin packages
@@ -129,6 +130,7 @@ catkin_package(
 include_directories(
     include
     ${catkin_INCLUDE_DIRS}
+    ${ros_end_effector_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -158,6 +160,10 @@ add_library(${PROJECT_NAME}_ActionTimedElement SHARED
     include/rosee_gui/ActionTimedElement.h
 )
 
+add_library(${PROJECT_NAME}_TimerHandler SHARED
+    src/TimerHandler.cpp
+    include/rosee_gui/TimerHandler.h
+)
 
 
 ## Add cmake target dependencies of the library
@@ -186,6 +192,7 @@ target_link_libraries(${PROJECT_NAME}_gui_main
     ${catkin_LIBRARIES}
     Qt5::Widgets
     ${PROJECT_NAME}_Window
+    ${PROJECT_NAME}_TimerHandler
 )
 
 target_link_libraries(${PROJECT_NAME}_Window
@@ -213,6 +220,11 @@ target_link_libraries(${PROJECT_NAME}_ActionTimedLayout
 )
 
 target_link_libraries(${PROJECT_NAME}_ActionTimedElement
+    ${catkin_LIBRARIES}
+    Qt5::Widgets
+)
+
+target_link_libraries(${PROJECT_NAME}_TimerHandler
     ${catkin_LIBRARIES}
     Qt5::Widgets
 )

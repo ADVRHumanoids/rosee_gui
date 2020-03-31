@@ -1,16 +1,18 @@
 #include <rosee_gui/ActionBoxesLayout.h>
 
-ActionBoxesLayout::ActionBoxesLayout (std::string actionName, std::vector<std::string> boxesNames,
-                                      unsigned int maxChecked, QWidget* parent) : 
-                                      ActionLayout(actionName, parent) {
+ActionBoxesLayout::ActionBoxesLayout (ros::NodeHandle* nh, 
+                                      rosee_msg::ActionInfo actInfo, QWidget* parent) : 
+                                      ActionLayout(nh, actInfo, parent) {
 
-    if (maxChecked > boxesNames.size()){
-        std::cerr << "[ERROR] maxChecked is " << maxChecked << " while you pass only " << boxesNames.size()
+    if (actInfo.max_selectable > actInfo.selectable_names.size()){
+        std::cerr << "[ERROR] max_selectable is " << actInfo.max_selectable << " while you pass only " << actInfo.selectable_names.size()
                   << " names for checkboxes" << std::endl;
         throw "";
     }
 
-    this->maxChecked = maxChecked;
+    this->maxChecked = actInfo.max_selectable;
+    this->actionPrimitiveType = static_cast<ROSEE::ActionPrimitive::Type> (actInfo.actionPrimitive_type);
+
     this->actualChecked = 0;
 
     boxes = new QButtonGroup(this);
@@ -25,7 +27,7 @@ ActionBoxesLayout::ActionBoxesLayout (std::string actionName, std::vector<std::s
 
     QGridLayout *boxesLayout = new QGridLayout;
     unsigned int buttonId = 0;
-    for (auto el : boxesNames) {
+    for (auto el : actInfo.selectable_names) {
         QCheckBox* newBox =  new QCheckBox( QString::fromStdString(el));
         newBox->setChecked(false);
         //tooltip on each checkbox so we can read if the label is cut becasue of no space
@@ -44,19 +46,31 @@ ActionBoxesLayout::ActionBoxesLayout (std::string actionName, std::vector<std::s
 
 }
 
-ActionBoxesLayout::ActionBoxesLayout (std::string actionName,
+ActionBoxesLayout::ActionBoxesLayout (ros::NodeHandle* nh, 
+                                      rosee_msg::ActionInfo actInfo,
                                       std::map<std::string, std::vector<std::string>> pairedMap,
                                       QWidget* parent) : 
-                                      ActionLayout(actionName, parent) {
+                                      ActionLayout(nh, actInfo, parent) {
 
-    maxChecked = 2; //because we pass that map, this costructor is specific for this kind of action
-    if (maxChecked > pairedMap.size()){
+    if (actInfo.max_selectable != 2) {
+        std::cerr << "[ERROR] max_selectable is " << actInfo.max_selectable << 
+        " this costructor is only for primitive with selectable pairs (for now)" 
+        << std::endl;
+        
+        throw "";
+    }
+    
+    if (actInfo.max_selectable > pairedMap.size()){
         std::cerr << "[ERROR] maxChecked is " << maxChecked << " while you pass only " << pairedMap.size()
                   << " names for checkboxes" << std::endl;
         throw "";
     }
+    
+    this->maxChecked = actInfo.max_selectable; //which is always 2 for now
+    this->actionPrimitiveType = static_cast<ROSEE::ActionPrimitive::Type> (actInfo.actionPrimitive_type);
 
     this->actualChecked = 0;
+    
     this->pairedMap = pairedMap;
 
     boxes = new QButtonGroup(this);
@@ -71,11 +85,11 @@ ActionBoxesLayout::ActionBoxesLayout (std::string actionName,
 
     QGridLayout *boxesLayout = new QGridLayout;
     unsigned int buttonId = 0;
-    for (auto el : pairedMap) {
-        QCheckBox* newBox =  new QCheckBox( QString::fromStdString(el.first));
+    for (auto el : actInfo.selectable_names) {
+        QCheckBox* newBox =  new QCheckBox( QString::fromStdString(el));
         newBox->setChecked(false);
         //tooltip on each checkbox so we can read if the label is cut becasue of no space
-        newBox->setToolTip(QString::fromStdString(el.first));
+        newBox->setToolTip(QString::fromStdString(el));
         boxes->addButton ( newBox, buttonId );
 
         boxesLayout->addWidget(newBox, buttonId/2, (buttonId%2));
@@ -90,93 +104,28 @@ ActionBoxesLayout::ActionBoxesLayout (std::string actionName,
 
 }
 
-void ActionBoxesLayout::setRosPub(ros::NodeHandle *nh, std::string topicName, MsgType msgType) {
-
-    this->msgType = msgType;
-    switch (msgType) {
-    case GENERIC: {
-        std::cerr << "ERROR, calling setRosPub of a checkboxed layout, Generic should be used only for ActionLayout"
-                  << "Please insert a valid type of MsgType as third argument" <<std::endl;
-        return;
-        break;
-    }
-    case TRIG: {
-        if (maxChecked != 1) {
-            std::cerr << "ERROR, calling setRosPub for a Trig action, but maxChecked passed before in the costructor"
-                      << "is " << maxChecked << " (should be 1)" <<std::endl;
-            return;
+void ActionBoxesLayout::sendActionRos () {
+    
+    rosee_msg::ROSEECommandGoal goal;
+    goal.goal_action.seq = rosMsgSeq++ ;
+    goal.goal_action.stamp = ros::Time::now();
+    goal.goal_action.percentage = getSpinBoxPercentage();
+    goal.goal_action.action_name = actionName;
+    //actionLAyout can be generic or composed, but it do not change what we put in type
+    //because the server will act on them equally
+    goal.goal_action.action_type = actionType ;
+    goal.goal_action.actionPrimitive_type = actionPrimitiveType ;
+    
+    //now fill selectable items with the label of all checkboxes checked
+    for (auto box : boxes->buttons()) {
+        if (box->isChecked()) {
+            
+            goal.goal_action.selectable_items.push_back(box->text().toUtf8().constData());
         }
-        actionPub = nh->advertise<ros_end_effector::EETriggerControl>(topicName, 1);
-        break;
     }
-    case PINCH : {
-        if (maxChecked != 2) {
-            std::cerr << "ERROR, calling setRosPub for a Pinch action, but maxChecked passed before in the costructor"
-                      << "is " << maxChecked << " (should be 2)" <<std::endl;
-            return;
-        }
-        actionPub = nh->advertise<ros_end_effector::EEPinchControl>(topicName, 1);
-        break;
-    }
-    default : {
-        std::cerr << "ERROR " << msgType << " action type not know by GUI" << std::endl;
-        return;
-
-    }
-    }
-}
-
-void ActionBoxesLayout::sendActionRos() {
-    switch (msgType) {
-    case GENERIC: {
-        std::cerr << "ERROR, sending an action from ActionCheckBoxes but the msg type is GENERIC"
-                  << std::endl;
-        return;
-
-    }
-    case TRIG: {
-        ros_end_effector::EETriggerControl msg;
-        msg.seq = rosMsgSeq++;
-        msg.stamp = ros::Time::now();
-        msg.percentage = getSpinBoxPercentage();
-        msg.finger_trigger = boxes->checkedButton()->text().toUtf8().constData();
-
-        actionPub.publish(msg);
-
-        break;
-    }
-    case PINCH : {
-        ros_end_effector::EEPinchControl msg;
-        msg.seq = rosMsgSeq++;
-        msg.stamp = ros::Time::now();
-        msg.percentage = getSpinBoxPercentage();
-        unsigned int nFillFinger = 0;
-        for (auto box : boxes->buttons()) {
-            //we are sure here only two are set, because we checked in setrospub that maxChecked == 2
-            if (box->isChecked()) {
-                if (nFillFinger == 0) {
-                    msg.finger_pinch_1 = box->text().toUtf8().constData();
-                } else if (nFillFinger == 1) {
-                    msg.finger_pinch_2 = box->text().toUtf8().constData();
-                } else {
-                    std::cerr << "[ERROR]" << std::endl; //should never been here for previous checks
-                    return;
-                }
-                nFillFinger++;
-            }
-        }
-
-        actionPub.publish(msg);
-
-        break;
-    }
-    default : {
-        std::cerr << "ERROR " << msgType << " action type not know by GUI" << std::endl;
-        return;
-
-    }
-    }
-
+    
+    action_client->sendGoal (goal, boost::bind(&ActionBoxesLayout::doneCallback, this, _1, _2),
+        boost::bind(&ActionBoxesLayout::activeCallback, this), boost::bind(&ActionBoxesLayout::feedbackCallback, this, _1));
 
 }
 

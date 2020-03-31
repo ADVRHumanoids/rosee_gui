@@ -1,8 +1,15 @@
 #include <rosee_gui/ActionLayout.h>
 
-ActionLayout::ActionLayout(std::string actionName, QWidget* parent) : QGroupBox(parent) {
+//TODO add as sub-label the type?
+ActionLayout::ActionLayout(ros::NodeHandle* nh, rosee_msg::ActionInfo actInfo, QWidget* parent) :
+    QGroupBox(parent) {
 
     this->setMinimumSize(300,200);
+    this->actionName = actInfo.action_name;
+    this->actionType = static_cast<ROSEE::Action::Type> (actInfo.action_type);
+    this->rosMsgSeq = 0;
+
+    setRosActionClient(nh, actInfo.ros_action_name);
 
     grid = new QGridLayout;
 
@@ -23,7 +30,7 @@ ActionLayout::ActionLayout(std::string actionName, QWidget* parent) : QGroupBox(
 
     spinBox_percentage = new QSpinBox();
     spinBox_percentage->setRange(0,100);
-    spinBox_percentage->setSuffix ( " %");
+    spinBox_percentage->setSuffix ( " %" );
 
     //connect slider to spinBox
     QObject::connect(slider_percentage, SIGNAL (valueChanged(int)), spinBox_percentage, SLOT (setValue(int)));
@@ -39,9 +46,6 @@ ActionLayout::ActionLayout(std::string actionName, QWidget* parent) : QGroupBox(
     QObject::connect(send_button, SIGNAL ( clicked()), this, SLOT (sendBtnClicked() ) );
     grid->addWidget(send_button, 4, 0);
 
-    this->rosMsgSeq = 0;
-    this->msgType = GENERIC;
-
     this->setStyleSheet("QGroupBox { border: 2px solid black;}");
     this->setLayout(grid);
 }
@@ -50,19 +54,50 @@ double ActionLayout::getSpinBoxPercentage() {
     return (spinBox_percentage->value()/100.0);
 }
 
-void ActionLayout::setRosPub (ros::NodeHandle * nh, std::string topicName, MsgType msgType) {
-    actionPub = nh->advertise<ros_end_effector::EEGraspControl>(topicName, 1);
+
+void ActionLayout::setRosActionClient ( ros::NodeHandle * nh, std::string rosActionName) {
+    
+    action_client = 
+        std::make_shared <actionlib::SimpleActionClient <rosee_msg::ROSEECommandAction>>
+        (*nh, rosActionName, false);
+        //false because we handle the thread
 }
 
 void ActionLayout::sendActionRos () {
 
-    ros_end_effector::EEGraspControl msg;
-    msg.seq = rosMsgSeq++;
-    msg.stamp = ros::Time::now();
-    msg.percentage = getSpinBoxPercentage();
-    actionPub.publish(msg);
+    rosee_msg::ROSEECommandGoal goal;
+    goal.goal_action.seq = rosMsgSeq++ ;
+    goal.goal_action.stamp = ros::Time::now();
+    goal.goal_action.percentage = getSpinBoxPercentage();
+    goal.goal_action.action_name = actionName;
+    goal.goal_action.action_type = actionType ;
+    //action layout is never for primitives, primitives always use actionBoxesLayout
+    goal.goal_action.actionPrimitive_type = ROSEE::ActionPrimitive::None ;
+    //goal.goal_action.selectable_items left empty 
+    action_client->sendGoal (goal, boost::bind(&ActionLayout::doneCallback, this, _1, _2),
+        boost::bind(&ActionLayout::activeCallback, this), boost::bind(&ActionLayout::feedbackCallback, this, _1)) ;
 
 }
+
+void ActionLayout::doneCallback(const actionlib::SimpleClientGoalState& state,
+            const rosee_msg::ROSEECommandResultConstPtr& result) {
+    
+    ROS_INFO_STREAM("[ActionLayout " << actionName << "] Finished in state "<<  state.toString().c_str());
+    progressBar->setValue(100);
+    
+}
+
+void ActionLayout::activeCallback() {
+    ROS_INFO_STREAM("[ActionLayout " << actionName << "] Goal just went active");
+}
+
+void ActionLayout::feedbackCallback(
+    const rosee_msg::ROSEECommandFeedbackConstPtr& feedback) {
+    
+    ROS_INFO_STREAM("[ActionLayout " << actionName << "] Got Feedback: " << feedback->completation_percentage);
+    progressBar->setValue(feedback->completation_percentage);
+}
+
 
 void ActionLayout::slotSliderReceive(int value){
 
@@ -72,10 +107,8 @@ void ActionLayout::slotSliderReceive(int value){
 
 void ActionLayout::sendBtnClicked() {
 
-    
-    std::cout << "The value is " << getSpinBoxPercentage() << std::endl;
-    std::cout << "Sending ROS message..." << std::endl;
-    progressBar->setValue(1);
+    ROS_INFO_STREAM( "[ActionLayout " << actionName << "] The value is " << getSpinBoxPercentage() );
+    ROS_INFO_STREAM( "Sending ROS message..." ) ;
     sendActionRos();
 }
 

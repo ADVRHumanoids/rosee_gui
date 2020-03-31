@@ -23,8 +23,15 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QPushButton>
-
+#include <ros/ros.h>
 #include <rosee_gui/ActionTimedElement.h>
+
+#include <rosee_msg/ROSEECommandAction.h>
+#include <rosee_msg/ActionInfo.h> //msg
+
+#include <actionlib/client/simple_action_client.h>
+
+#include <rosee_gui/ActionLayout.h> //TODO remove when solve problem with type from rosee pkg
 
 /**
  * @todo write docs
@@ -33,15 +40,25 @@ class ActionTimedLayout : public QGroupBox {
     
     Q_OBJECT
 public :
-    explicit ActionTimedLayout (std::string actionName,
-                                std::vector<std::string> innerActionNames,
-                                std::vector<std::pair<double,double>> innerTimeMargins,
+    explicit ActionTimedLayout (ros::NodeHandle* nh, rosee_msg::ActionInfo actInfo,
                                 QWidget* parent = 0);
+    
+    std::shared_ptr <actionlib::SimpleActionClient <rosee_msg::ROSEECommandAction> > action_client;
+    void doneCallback(const actionlib::SimpleClientGoalState& state,
+            const rosee_msg::ROSEECommandResultConstPtr& result);
+    void activeCallback();
+    void feedbackCallback(const rosee_msg::ROSEECommandFeedbackConstPtr& feedback);
 
 private: 
     QGridLayout *grid;
     QLabel* windowLabel;
     QPushButton *send_button;
+    
+    unsigned int rosMsgSeq;
+    std::string actionName;
+    
+    virtual void sendActionRos();
+    void setRosActionClient ( ros::NodeHandle * nh, std::string rosActionName);
 
 private slots:
     void sendBtnClicked();
