@@ -165,6 +165,11 @@ add_library(${PROJECT_NAME}_TimerHandler SHARED
     include/rosee_gui/TimerHandler.h
 )
 
+add_library(${PROJECT_NAME}_JointStateTable SHARED
+    src/JointStateTable.cpp
+    include/rosee_gui/JointStateTable.h
+)
+
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -200,6 +205,7 @@ target_link_libraries(${PROJECT_NAME}_Window
     ${PROJECT_NAME}_ActionLayout
     ${PROJECT_NAME}_ActionBoxesLayout
     ${PROJECT_NAME}_ActionTimedLayout
+    ${PROJECT_NAME}_JointStateTable
 )
 
 
@@ -225,6 +231,11 @@ target_link_libraries(${PROJECT_NAME}_ActionTimedElement
 )
 
 target_link_libraries(${PROJECT_NAME}_TimerHandler
+    ${catkin_LIBRARIES}
+    Qt5::Widgets
+)
+
+target_link_libraries(${PROJECT_NAME}_JointStateTable
     ${catkin_LIBRARIES}
     Qt5::Widgets
 )

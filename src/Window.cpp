@@ -7,8 +7,43 @@ Window::Window(ros::NodeHandle *nh, QWidget *parent) : QWidget(parent) {
     // get (wait) for info from unviersalroseeExecutor about all the action parsed by it
     getInfoServices();
     
-    QGridLayout *grid = new QGridLayout;
+    createActionGroupBox();
+    createJointStateTable();
     
+    QGridLayout *windowGrid = new QGridLayout;
+    windowGrid->addWidget(actionGroupBox, 0, 0);
+    windowGrid->addWidget(jointStateTable, 0, 1);
+    setLayout(windowGrid);
+    
+  
+
+}
+
+void Window::createJointStateTable() {
+    
+    jointStateTable = new JointStateTable(0,0, this);
+    jointStateTable->setRowCount(1);
+    jointStateTable->setColumnCount(1);
+    
+    QStringList headerLabels;
+    headerLabels.append("asd");
+    jointStateTable->setHorizontalHeaderLabels(headerLabels);
+    
+    jointStateTable->setRowCount(2);
+    jointStateTable->setColumnCount(2);
+    
+    
+}
+
+void Window::createActionGroupBox() {
+    
+    //the group box where the actionLayout will be set.
+    //This groupbox will be added with addWidget in Window costructor
+    actionGroupBox = new QGroupBox;
+    
+    // the layout that contain all the actions
+    actionContainerLayout = new QGridLayout();
+
     int rowCol = 0;
     
     for (auto actInfo: actionInfoVect) {
@@ -34,13 +69,13 @@ Window::Window(ros::NodeHandle *nh, QWidget *parent) : QWidget(parent) {
                     new ActionBoxesLayout(nh, actInfo, this) ; 
                     
                 }
-                grid->addWidget (actionBoxesLayout, rowCol/4, rowCol%4);
+                actionContainerLayout->addWidget (actionBoxesLayout, rowCol/4, rowCol%4);
                 
             } else {
                 ActionBoxesLayout* actionBoxesLayout;
                 actionBoxesLayout = 
                     new ActionBoxesLayout(nh, actInfo, this) ; 
-                grid->addWidget (actionBoxesLayout, rowCol/4, rowCol%4);
+                actionContainerLayout->addWidget (actionBoxesLayout, rowCol/4, rowCol%4);
             }
 
             break;
@@ -49,13 +84,13 @@ Window::Window(ros::NodeHandle *nh, QWidget *parent) : QWidget(parent) {
         case ROSEE::Action::Type::Composed :
         {
             ActionLayout* actionLayout = new ActionLayout(nh, actInfo, this);
-            grid->addWidget (actionLayout, rowCol/4, rowCol%4);
+            actionContainerLayout->addWidget (actionLayout, rowCol/4, rowCol%4);
             break;
         }
         case ROSEE::Action::Type::Timed : 
         {
             ActionTimedLayout* timed = new ActionTimedLayout(nh, actInfo, this);
-            grid->addWidget(timed, rowCol/4, rowCol%4, 1, actInfo.inner_actions.size());
+            actionContainerLayout->addWidget(timed, rowCol/4, rowCol%4, 1, actInfo.inner_actions.size());
 
             break;
         }
@@ -76,8 +111,8 @@ Window::Window(ros::NodeHandle *nh, QWidget *parent) : QWidget(parent) {
         rowCol++;
     }
 
-    setLayout(grid);
-
+    actionGroupBox->setLayout(actionContainerLayout);
+    
 }
 
 void Window::getInfoServices() {
