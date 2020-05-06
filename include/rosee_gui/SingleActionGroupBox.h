@@ -1,5 +1,5 @@
-#ifndef ACTIONLAYOUT_H
-#define ACTIONLAYOUT_H
+#ifndef SINGLEACTIONGROUPBOX_H
+#define SINGLEACTIONGROUPBOX_H
 
 #include <QWidget>
 #include <QPushButton>
@@ -27,11 +27,13 @@
 /**
  * TODO better to pass a pub pointer to have only a single publisher for all gui?
  */
-class ActionLayout: public QGroupBox
+class SingleActionGroupBox: public QGroupBox
 {
     Q_OBJECT
 public:
-    explicit ActionLayout(ros::NodeHandle *nh, rosee_msg::ActionInfo, QWidget* parent=0);
+    explicit SingleActionGroupBox(ros::NodeHandle *nh, rosee_msg::ActionInfo, QWidget* parent=0);
+    
+    virtual void resetAll();
         
 protected:
     QGridLayout *grid;
@@ -41,6 +43,7 @@ protected:
 
     QPushButton *send_button; //protected so derived class can enable/disable if necessary
     std::shared_ptr <actionlib::SimpleActionClient <rosee_msg::ROSEECommandAction> > action_client;
+
     void doneCallback(const actionlib::SimpleClientGoalState& state,
             const rosee_msg::ROSEECommandResultConstPtr& result);
     void activeCallback();
@@ -51,6 +54,7 @@ protected:
      * @return (0.0 - 1.0 double) the percentage displayed in the spinBox. The spinBox and slider have a syncro-same value
      */
     double getSpinBoxPercentage();
+    
 
 private:
     QSlider *slider_percentage;
@@ -61,15 +65,12 @@ private:
     void setRosActionClient ( ros::NodeHandle * nh, std::string rosActionName);
     
 
-
-
 signals:
 
 private slots:
     void slotSliderReceive(int value);
     void sendBtnClicked();
 
-
 };
 
-#endif // ACTIONLAYOUT_H
+#endif // SINGLEACTIONGROUPBOX_H

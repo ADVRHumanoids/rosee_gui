@@ -14,32 +14,30 @@
  * limitations under the License.
  */
 
-#ifndef JOINTSTATETABLE_H
-#define JOINTSTATETABLE_H
+#ifndef JOINTSTATECONTAINER_H
+#define JOINTSTATECONTAINER_H
 
 #include <QWidget>
-#include <QTableWidget>
+#include <QVBoxLayout>
+#include <QCheckBox>
+#include <QGridLayout>
+
+#include <rosee_gui/JointStateTable.h>
 
 #include <ros/ros.h>
-#include <sensor_msgs/JointState.h>
 
 /**
  * @todo write docs
  */
-class JointStateTable : public QTableWidget
+class JointStateContainer : public QVBoxLayout
 {
     Q_OBJECT
     
 public:
-    explicit JointStateTable(ros::NodeHandle* nh, int rows = 0 , int columns = 0, QWidget *parent = nullptr);
+    explicit JointStateContainer(ros::NodeHandle* nh, QWidget *parent = nullptr);
     
-private:
-    bool setJointStateSub(ros::NodeHandle* nh);
-    void jointStateClbk ( const sensor_msgs::JointStateConstPtr& msg );
-    
-    ros::Subscriber jointPosSub;
-    sensor_msgs::JointState jointStateMsg;
-    
+private: 
+    JointStateTable* jointStateTable;
 };
 
-#endif // JOINTSTATETABLE_H
+#endif // JOINTSTATECONTAINER_H

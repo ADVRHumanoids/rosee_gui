@@ -1,7 +1,7 @@
-#include <rosee_gui/ActionLayout.h>
+#include <rosee_gui/SingleActionGroupBox.h>
 
 //TODO add as sub-label the type?
-ActionLayout::ActionLayout(ros::NodeHandle* nh, rosee_msg::ActionInfo actInfo, QWidget* parent) :
+SingleActionGroupBox::SingleActionGroupBox(ros::NodeHandle* nh, rosee_msg::ActionInfo actInfo, QWidget* parent) :
     QGroupBox(parent) {
 
     this->setMinimumSize(300,200);
@@ -50,12 +50,12 @@ ActionLayout::ActionLayout(ros::NodeHandle* nh, rosee_msg::ActionInfo actInfo, Q
     this->setLayout(grid);
 }
 
-double ActionLayout::getSpinBoxPercentage() {
+double SingleActionGroupBox::getSpinBoxPercentage() {
     return (spinBox_percentage->value()/100.0);
 }
 
 
-void ActionLayout::setRosActionClient ( ros::NodeHandle * nh, std::string rosActionName) {
+void SingleActionGroupBox::setRosActionClient ( ros::NodeHandle * nh, std::string rosActionName) {
     
     action_client = 
         std::make_shared <actionlib::SimpleActionClient <rosee_msg::ROSEECommandAction>>
@@ -63,7 +63,7 @@ void ActionLayout::setRosActionClient ( ros::NodeHandle * nh, std::string rosAct
         //false because we handle the thread
 }
 
-void ActionLayout::sendActionRos () {
+void SingleActionGroupBox::sendActionRos () {
 
     rosee_msg::ROSEECommandGoal goal;
     goal.goal_action.seq = rosMsgSeq++ ;
@@ -71,44 +71,48 @@ void ActionLayout::sendActionRos () {
     goal.goal_action.percentage = getSpinBoxPercentage();
     goal.goal_action.action_name = actionName;
     goal.goal_action.action_type = actionType ;
-    //action layout is never for primitives, primitives always use actionBoxesLayout
+    //action layout is never for primitives, primitives always use singleActionBoxesGroupBox
     goal.goal_action.actionPrimitive_type = ROSEE::ActionPrimitive::None ;
     //goal.goal_action.selectable_items left empty 
-    action_client->sendGoal (goal, boost::bind(&ActionLayout::doneCallback, this, _1, _2),
-        boost::bind(&ActionLayout::activeCallback, this), boost::bind(&ActionLayout::feedbackCallback, this, _1)) ;
+    action_client->sendGoal (goal, boost::bind(&SingleActionGroupBox::doneCallback, this, _1, _2),
+        boost::bind(&SingleActionGroupBox::activeCallback, this), boost::bind(&SingleActionGroupBox::feedbackCallback, this, _1)) ;
 
 }
 
-void ActionLayout::doneCallback(const actionlib::SimpleClientGoalState& state,
+void SingleActionGroupBox::doneCallback(const actionlib::SimpleClientGoalState& state,
             const rosee_msg::ROSEECommandResultConstPtr& result) {
     
-    ROS_INFO_STREAM("[ActionLayout " << actionName << "] Finished in state "<<  state.toString().c_str());
+    ROS_INFO_STREAM("[SingleActionGroupBox " << actionName << "] Finished in state "<<  state.toString().c_str());
     progressBar->setValue(100);
     
 }
 
-void ActionLayout::activeCallback() {
-    ROS_INFO_STREAM("[ActionLayout " << actionName << "] Goal just went active");
+void SingleActionGroupBox::activeCallback() {
+    ROS_INFO_STREAM("[SingleActionGroupBox " << actionName << "] Goal just went active");
 }
 
-void ActionLayout::feedbackCallback(
+void SingleActionGroupBox::feedbackCallback(
     const rosee_msg::ROSEECommandFeedbackConstPtr& feedback) {
     
-    ROS_INFO_STREAM("[ActionLayout " << actionName << "] Got Feedback: " << feedback->completation_percentage);
+    ROS_INFO_STREAM("[SingleActionGroupBox " << actionName << "] Got Feedback: " << feedback->completation_percentage);
     progressBar->setValue(feedback->completation_percentage);
 }
 
 
-void ActionLayout::slotSliderReceive(int value){
+void SingleActionGroupBox::slotSliderReceive(int value){
 
     slider_percentage->setValue(value);
 
 }
 
-void ActionLayout::sendBtnClicked() {
+void SingleActionGroupBox::sendBtnClicked() {
 
-    ROS_INFO_STREAM( "[ActionLayout " << actionName << "] The value is " << getSpinBoxPercentage() );
+    ROS_INFO_STREAM( "[SingleActionGroupBox " << actionName << "] The value is " << getSpinBoxPercentage() );
     ROS_INFO_STREAM( "Sending ROS message..." ) ;
     sendActionRos();
 }
 
+void SingleActionGroupBox::resetAll() {
+    progressBar->setValue(0);
+    slider_percentage->setValue(0);
+}

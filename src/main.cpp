@@ -14,7 +14,7 @@ int main(int argc, char **argv)
     ros::init (argc, argv, "rosee_GUI");
     ros::NodeHandle nh;
     
-    TimerHandler tHandler(10);
+    TimerHandler tHandler(100);
 
     Window window(&nh);
 

@@ -52,3 +52,8 @@ ActionTimedElement::ActionTimedElement(std::string actionName,
 void ActionTimedElement::setProgressBarValue(double value) {
     bar->setValue(value);
 }
+
+void ActionTimedElement::resetAll() {
+    bar->setValue(0);
+}
+

@@ -140,19 +140,19 @@ add_library(${PROJECT_NAME}_Window SHARED
     include/rosee_gui/Window.h
 )
 
-add_library(${PROJECT_NAME}_ActionLayout SHARED
-    src/ActionLayout.cpp
-    include/rosee_gui/ActionLayout.h
+add_library(${PROJECT_NAME}_SingleActionGroupBox SHARED
+    src/SingleActionGroupBox.cpp
+    include/rosee_gui/SingleActionGroupBox.h
 )
 
-add_library(${PROJECT_NAME}_ActionBoxesLayout SHARED
-    src/ActionBoxesLayout.cpp
-    include/rosee_gui/ActionBoxesLayout.h
+add_library(${PROJECT_NAME}_SingleActionBoxesGroupBox SHARED
+    src/SingleActionBoxesGroupBox.cpp
+    include/rosee_gui/SingleActionBoxesGroupBox.h
 )
 
-add_library(${PROJECT_NAME}_ActionTimedLayout SHARED
-    src/ActionTimedLayout.cpp
-    include/rosee_gui/ActionTimedLayout.h
+add_library(${PROJECT_NAME}_SingleActionTimedGroupBox SHARED
+    src/SingleActionTimedGroupBox.cpp
+    include/rosee_gui/SingleActionTimedGroupBox.h
 )
 
 add_library(${PROJECT_NAME}_ActionTimedElement SHARED
@@ -168,6 +168,16 @@ add_library(${PROJECT_NAME}_TimerHandler SHARED
 add_library(${PROJECT_NAME}_JointStateTable SHARED
     src/JointStateTable.cpp
     include/rosee_gui/JointStateTable.h
+)
+
+add_library(${PROJECT_NAME}_JointStateContainer SHARED
+    src/JointStateContainer.cpp
+    include/rosee_gui/JointStateContainer.h 
+)
+
+add_library(${PROJECT_NAME}_ContainerActionGroupBox SHARED
+    src/ContainerActionGroupBox.cpp
+    include/rosee_gui/ContainerActionGroupBox.h 
 )
 
 
@@ -202,24 +212,22 @@ target_link_libraries(${PROJECT_NAME}_gui_main
 
 target_link_libraries(${PROJECT_NAME}_Window
     ${catkin_LIBRARIES}
-    ${PROJECT_NAME}_ActionLayout
-    ${PROJECT_NAME}_ActionBoxesLayout
-    ${PROJECT_NAME}_ActionTimedLayout
-    ${PROJECT_NAME}_JointStateTable
+    ${PROJECT_NAME}_ContainerActionGroupBox
+    ${PROJECT_NAME}_JointStateContainer
 )
 
 
-target_link_libraries(${PROJECT_NAME}_ActionLayout
+target_link_libraries(${PROJECT_NAME}_SingleActionGroupBox
     ${catkin_LIBRARIES}
     Qt5::Widgets
 )
 
-target_link_libraries(${PROJECT_NAME}_ActionBoxesLayout
+target_link_libraries(${PROJECT_NAME}_SingleActionBoxesGroupBox
     ${catkin_LIBRARIES}
     Qt5::Widgets
 )
 
-target_link_libraries(${PROJECT_NAME}_ActionTimedLayout
+target_link_libraries(${PROJECT_NAME}_SingleActionTimedGroupBox
     ${catkin_LIBRARIES}
     Qt5::Widgets
     ${PROJECT_NAME}_ActionTimedElement
@@ -240,8 +248,18 @@ target_link_libraries(${PROJECT_NAME}_JointStateTable
     Qt5::Widgets
 )
 
-
-
+target_link_libraries(${PROJECT_NAME}_JointStateContainer
+    ${catkin_LIBRARIES}
+    Qt5::Widgets
+    ${PROJECT_NAME}_JointStateTable
+)
+target_link_libraries(${PROJECT_NAME}_ContainerActionGroupBox
+    ${catkin_LIBRARIES}
+    Qt5::Widgets
+    ${PROJECT_NAME}_SingleActionGroupBox
+    ${PROJECT_NAME}_SingleActionBoxesGroupBox
+    ${PROJECT_NAME}_SingleActionTimedGroupBox
+)
 
 #############
 ## Install ##

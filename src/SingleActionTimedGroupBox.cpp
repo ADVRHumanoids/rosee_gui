@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#include <rosee_gui/ActionTimedLayout.h>
+#include <rosee_gui/SingleActionTimedGroupBox.h>
 
-ActionTimedLayout::ActionTimedLayout (ros::NodeHandle* nh, rosee_msg::ActionInfo actInfo,
+SingleActionTimedGroupBox::SingleActionTimedGroupBox (ros::NodeHandle* nh, rosee_msg::ActionInfo actInfo,
                                       QWidget* parent) : QGroupBox(parent) {
     
     if (actInfo.inner_actions.size() == 0) {
@@ -28,7 +28,7 @@ ActionTimedLayout::ActionTimedLayout (ros::NodeHandle* nh, rosee_msg::ActionInfo
     
     if (nInner != actInfo.before_margins.size() ||
         nInner != actInfo.after_margins.size() ) {
-        ROS_ERROR_STREAM("[ERROR ActionTimedLayout costructor] different size of innerNames and innerTimeMargins: " 
+        ROS_ERROR_STREAM("[ERROR SingleActionTimedGroupBox costructor] different size of innerNames and innerTimeMargins: " 
         << nInner << " and " << actInfo.before_margins.size() <<
         "(before marg), and " << actInfo.after_margins.size()
         << "(after marg)");
@@ -70,15 +70,15 @@ ActionTimedLayout::ActionTimedLayout (ros::NodeHandle* nh, rosee_msg::ActionInfo
     this->setLayout(grid);
 }
 
-void ActionTimedLayout::sendBtnClicked() {
+void SingleActionTimedGroupBox::sendBtnClicked() {
 
-    ROS_INFO_STREAM( "[ActionTimedLayout " << actionName << "] Sending ROS message..." ) ;
+    ROS_INFO_STREAM( "[SingleActionTimedGroupBox " << actionName << "] Sending ROS message..." ) ;
     sendActionRos();
-    ROS_INFO_STREAM( "[ActionTimedLayout " << actionName << "] ... sent" ) ;
+    ROS_INFO_STREAM( "[SingleActionTimedGroupBox " << actionName << "] ... sent" ) ;
 
 }
 
-void ActionTimedLayout::setRosActionClient(ros::NodeHandle* nh, std::string rosActionName) {
+void SingleActionTimedGroupBox::setRosActionClient(ros::NodeHandle* nh, std::string rosActionName) {
     
     action_client = 
         std::make_shared <actionlib::SimpleActionClient <rosee_msg::ROSEECommandAction>>
@@ -86,7 +86,7 @@ void ActionTimedLayout::setRosActionClient(ros::NodeHandle* nh, std::string rosA
         //false because we handle the thread
 }
 
-void ActionTimedLayout::sendActionRos () {
+void SingleActionTimedGroupBox::sendActionRos () {
 
     rosee_msg::ROSEECommandGoal goal;
     goal.goal_action.seq = rosMsgSeq++ ;
@@ -97,29 +97,29 @@ void ActionTimedLayout::sendActionRos () {
     goal.goal_action.actionPrimitive_type = ROSEE::ActionPrimitive::Type::None ;
     //goal.goal_action.selectable_items left empty 
 
-    action_client->sendGoal (goal, boost::bind(&ActionTimedLayout::doneCallback, this, _1, _2),
-        boost::bind(&ActionTimedLayout::activeCallback, this), boost::bind(&ActionTimedLayout::feedbackCallback, this, _1)) ;
+    action_client->sendGoal (goal, boost::bind(&SingleActionTimedGroupBox::doneCallback, this, _1, _2),
+        boost::bind(&SingleActionTimedGroupBox::activeCallback, this), boost::bind(&SingleActionTimedGroupBox::feedbackCallback, this, _1)) ;
 
 }
 
-void ActionTimedLayout::doneCallback(const actionlib::SimpleClientGoalState& state,
+void SingleActionTimedGroupBox::doneCallback(const actionlib::SimpleClientGoalState& state,
             const rosee_msg::ROSEECommandResultConstPtr& result) {
     
-    ROS_INFO_STREAM("[ActionTimedLayout " << actionName << "] Finished in state "<<  state.toString().c_str());
+    ROS_INFO_STREAM("[SingleActionTimedGroupBox " << actionName << "] Finished in state "<<  state.toString().c_str());
     //progressBar->setValue(100);
     
 }
 
-void ActionTimedLayout::activeCallback() {
+void SingleActionTimedGroupBox::activeCallback() {
     
-    ROS_INFO_STREAM("[ActionTimedLayout " << actionName << "] Goal just went active");
+    ROS_INFO_STREAM("[SingleActionTimedGroupBox " << actionName << "] Goal just went active");
     
 }
 
-void ActionTimedLayout::feedbackCallback(
+void SingleActionTimedGroupBox::feedbackCallback(
     const rosee_msg::ROSEECommandFeedbackConstPtr& feedback) {
     
-    ROS_INFO_STREAM("[ActionTimedLayout " << actionName << "] Got Feedback: " <<
+    ROS_INFO_STREAM("[SingleActionTimedGroupBox " << actionName << "] Got Feedback: " <<
         feedback->action_name_current << " , "  << feedback->completation_percentage);    
 
     ActionTimedElement* el = this->findChild <ActionTimedElement*> (
@@ -141,3 +141,12 @@ void ActionTimedLayout::feedbackCallback(
    
 }
 
+//TODO or it is better to store the child and not look for them each time?
+void SingleActionTimedGroupBox::resetAll() {
+    
+    QList<ActionTimedElement *> childElements = this->findChildren<ActionTimedElement *>();
+    
+    for (auto it : childElements) {
+        it->resetAll();
+    }
+}

@@ -1,7 +1,7 @@
-#ifndef ACTIONBOXESLAYOUT_H
-#define ACTIONBOXESLAYOUT_H
+#ifndef SINGLEACTIONBOXESGROUPBOX_H
+#define SINGLEACTIONBOXESGROUPBOX_H
 
-#include <rosee_gui/ActionLayout.h>
+#include <rosee_gui/SingleActionGroupBox.h>
 
 #include <QWidget>
 #include <QGroupBox>
@@ -12,13 +12,15 @@
 #include <rosee_msg/ActionInfo.h> //msg
 #include <ROSEndEffector/ActionPrimitive.h>
 
-class ActionBoxesLayout : public ActionLayout
+class SingleActionBoxesGroupBox : public SingleActionGroupBox
 {
     Q_OBJECT
 public:
-    explicit ActionBoxesLayout(ros::NodeHandle* nh, rosee_msg::ActionInfo,  QWidget* parent=0);
-    explicit ActionBoxesLayout(ros::NodeHandle* nh, rosee_msg::ActionInfo,
+    explicit SingleActionBoxesGroupBox(ros::NodeHandle* nh, rosee_msg::ActionInfo,  QWidget* parent=0);
+    explicit SingleActionBoxesGroupBox(ros::NodeHandle* nh, rosee_msg::ActionInfo,
                                std::map<std::string, std::vector<std::string>> pairedMap, QWidget* parent=0);
+        
+    virtual void resetAll() override;
 
 private:
     QButtonGroup* boxes;
@@ -45,4 +47,4 @@ private slots:
 
 };
 
-#endif // ACTIONBOXESLAYOUT_H
+#endif // SINGLEACTIONBOXESGROUPBOX_H

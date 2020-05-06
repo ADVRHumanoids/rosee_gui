@@ -16,9 +16,46 @@
 
 #include <rosee_gui/JointStateTable.h>
 
-JointStateTable::JointStateTable (int rows, int columns, QWidget *parent) :
+JointStateTable::JointStateTable (ros::NodeHandle* nh, int rows, int columns, QWidget *parent) :
     QTableWidget(rows, columns, parent) {
         
-        
+    if (setJointStateSub(nh)) {
+        this->setMinimumSize(500,600);
+        //table not editable
+        setEditTriggers(QAbstractItemView::NoEditTriggers);
+        this->setColumnCount(3); //pos vel effort
+
+        QStringList headerLabels;
+        headerLabels.append("Position");
+        headerLabels.append("Velocity");
+        headerLabels.append("Effort");
+        setHorizontalHeaderLabels(headerLabels);
+
+    }
         
 }
+
+bool JointStateTable::setJointStateSub(ros::NodeHandle* nh) {
+    
+    
+    //to get joint state from gazebo, if used
+    std::string jsTopic;
+    nh->param<std::string>("/rosee/joint_states_topic", jsTopic, "/ros_end_effector/joint_states");
+    
+    ROS_INFO_STREAM ( "Getting joint pos from '" << jsTopic << "'" );
+    
+    jointPosSub = nh->subscribe (jsTopic, 1, &JointStateTable::jointStateClbk, this);
+}
+
+void JointStateTable::jointStateClbk(const sensor_msgs::JointStateConstPtr& msg) {
+    
+    //in the callback we store in member the joint state. Then we will update in the gui, but not here
+    //TODO set the row and the joint names only once, and not in callback
+    this->setRowCount(msg->name.size());
+    for (int i = 0; i < msg->name.size(); i++){
+        this->setItem (i, 0, new QTableWidgetItem ( QString::number(msg->position.at(i), 'f', 2) ) );
+        this->setItem (i, 1, new QTableWidgetItem ( QString::number(msg->velocity.at(i), 'f', 2) ) );
+        this->setItem (i, 2, new QTableWidgetItem ( QString::number(msg->effort.at(i)  , 'f', 2) ) );
+    }
+}
+

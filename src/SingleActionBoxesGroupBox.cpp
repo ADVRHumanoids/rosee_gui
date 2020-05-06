@@ -1,8 +1,8 @@
-#include <rosee_gui/ActionBoxesLayout.h>
+#include <rosee_gui/SingleActionBoxesGroupBox.h>
 
-ActionBoxesLayout::ActionBoxesLayout (ros::NodeHandle* nh, 
+SingleActionBoxesGroupBox::SingleActionBoxesGroupBox (ros::NodeHandle* nh, 
                                       rosee_msg::ActionInfo actInfo, QWidget* parent) : 
-                                      ActionLayout(nh, actInfo, parent) {
+                                      SingleActionGroupBox(nh, actInfo, parent) {
 
     if (actInfo.max_selectable > actInfo.selectable_names.size()){
         std::cerr << "[ERROR] max_selectable is " << actInfo.max_selectable << " while you pass only " << actInfo.selectable_names.size()
@@ -46,11 +46,11 @@ ActionBoxesLayout::ActionBoxesLayout (ros::NodeHandle* nh,
 
 }
 
-ActionBoxesLayout::ActionBoxesLayout (ros::NodeHandle* nh, 
+SingleActionBoxesGroupBox::SingleActionBoxesGroupBox (ros::NodeHandle* nh, 
                                       rosee_msg::ActionInfo actInfo,
                                       std::map<std::string, std::vector<std::string>> pairedMap,
                                       QWidget* parent) : 
-                                      ActionLayout(nh, actInfo, parent) {
+                                      SingleActionGroupBox(nh, actInfo, parent) {
 
     if (actInfo.max_selectable != 2) {
         std::cerr << "[ERROR] max_selectable is " << actInfo.max_selectable << 
@@ -104,14 +104,14 @@ ActionBoxesLayout::ActionBoxesLayout (ros::NodeHandle* nh,
 
 }
 
-void ActionBoxesLayout::sendActionRos () {
+void SingleActionBoxesGroupBox::sendActionRos () {
     
     rosee_msg::ROSEECommandGoal goal;
     goal.goal_action.seq = rosMsgSeq++ ;
     goal.goal_action.stamp = ros::Time::now();
     goal.goal_action.percentage = getSpinBoxPercentage();
     goal.goal_action.action_name = actionName;
-    //actionLAyout can be generic or composed, but it do not change what we put in type
+    //singleActionGroupBox can be generic or composed, but it do not change what we put in type
     //because the server will act on them equally
     goal.goal_action.action_type = actionType ;
     goal.goal_action.actionPrimitive_type = actionPrimitiveType ;
@@ -124,12 +124,12 @@ void ActionBoxesLayout::sendActionRos () {
         }
     }
     
-    action_client->sendGoal (goal, boost::bind(&ActionBoxesLayout::doneCallback, this, _1, _2),
-        boost::bind(&ActionBoxesLayout::activeCallback, this), boost::bind(&ActionBoxesLayout::feedbackCallback, this, _1));
+    action_client->sendGoal (goal, boost::bind(&SingleActionBoxesGroupBox::doneCallback, this, _1, _2),
+        boost::bind(&SingleActionBoxesGroupBox::activeCallback, this), boost::bind(&SingleActionBoxesGroupBox::feedbackCallback, this, _1));
 
 }
 
-void ActionBoxesLayout::clickCheckBoxSlot (QAbstractButton* button) {
+void SingleActionBoxesGroupBox::clickCheckBoxSlot (QAbstractButton* button) {
 
     if (button->isChecked()) { //if I clicked to check it...
         actualChecked++;
@@ -159,7 +159,7 @@ void ActionBoxesLayout::clickCheckBoxSlot (QAbstractButton* button) {
 
 }
 
-void ActionBoxesLayout::clickPairCheckBoxSlot (QAbstractButton* button) {
+void SingleActionBoxesGroupBox::clickPairCheckBoxSlot (QAbstractButton* button) {
 
     if (button->isChecked()) { //if I clicked to check it...
         actualChecked++;
@@ -199,7 +199,7 @@ void ActionBoxesLayout::clickPairCheckBoxSlot (QAbstractButton* button) {
     }
 }
 
-void ActionBoxesLayout::disableNotPairedBoxes( std::string boxName ){
+void SingleActionBoxesGroupBox::disableNotPairedBoxes( std::string boxName ){
     
      for (auto box : boxes->buttons()) {
                 
@@ -220,4 +220,12 @@ void ActionBoxesLayout::disableNotPairedBoxes( std::string boxName ){
     }
 }
 
+void SingleActionBoxesGroupBox::resetAll() {
+    
+    SingleActionGroupBox::resetAll();
+    for (auto box : boxes->buttons()) {
+        box->setEnabled(true);
+        box->setChecked(false);
+    }
+}
 

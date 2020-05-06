@@ -3,15 +3,11 @@
 
 #include <QWidget>
 #include <QGridLayout>
+#include <QGroupBox>
 
-#include <rosee_gui/ActionBoxesLayout.h>
-#include <rosee_gui/ActionLayout.h>
-#include <rosee_gui/ActionTimedLayout.h>
-#include <rosee_gui/JointStateTable.h>
 
-#include <rosee_msg/ActionsInfo.h>
-#include <rosee_msg/SelectablePairInfo.h>
-#include <ROSEndEffector/Action.h>
+#include <rosee_gui/JointStateContainer.h>
+#include <rosee_gui/ContainerActionGroupBox.h>
 
 class Window : public QWidget
 {
@@ -21,18 +17,16 @@ public:
     
 private:
     ros::NodeHandle* nh;
-    std::vector <rosee_msg::ActionInfo> actionInfoVect;
+    ContainerActionGroupBox* containerActionGroupBox;
     
-    QGridLayout* actionContainerLayout;
     QGroupBox* actionGroupBox;
     void createActionGroupBox();
     
-    JointStateTable* jointStateTable;
-    void createJointStateTable();
+    JointStateContainer* jointStateContainer;
+    void createJointStateContainer();
     
-    void getInfoServices() ;
-    std::map < std::string, std::vector<std::string> > getPairMap(
-        std::string action_name, std::vector<std::string> elements);
+
+
 
 signals:
 

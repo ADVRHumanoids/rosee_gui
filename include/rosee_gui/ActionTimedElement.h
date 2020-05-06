@@ -36,6 +36,8 @@ public:
     explicit ActionTimedElement(std::string actionName, double before, double after, QWidget* parent);
     
     void setProgressBarValue(double);
+    
+    void resetAll();
 
 private: 
     QProgressBar* bar;
