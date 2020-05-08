@@ -10,7 +10,7 @@
 
 #include <rosee_msg/ActionsInfo.h>
 #include <rosee_msg/SelectablePairInfo.h>
-#include <ROSEndEffector/Action.h>
+#include <ros_end_effector/Action.h>
 
 class Window : public QWidget
 {

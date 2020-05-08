@@ -19,8 +19,8 @@
 
 #include <rosee_msg/ROSEECommandAction.h>
 #include <rosee_msg/ActionInfo.h> //msg
-#include <ROSEndEffector/Action.h>
-#include <ROSEndEffector/ActionPrimitive.h>
+#include <ros_end_effector/Action.h>
+#include <ros_end_effector/ActionPrimitive.h>
 
 #include <actionlib/client/simple_action_client.h>
 
