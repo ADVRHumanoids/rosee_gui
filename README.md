@@ -3,7 +3,6 @@ This package is a tool for [ROS End-Effector](https://advrhumanoids.github.io/RO
 
 The ROS End-Effector main documentation is here: https://advrhumanoids.github.io/ROSEndEffectorDocs/, where you can find information about this GUI.
 
-Doxygen-generated documentation about the API of ROS End-Effector can be found here: https://advrhumanoids.github.io/ROSEndEffector/index.html
 
 ***
 <!-- 
