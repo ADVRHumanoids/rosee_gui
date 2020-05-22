@@ -1,6 +1,6 @@
-#include <rosee_gui/Window.h>
+#include <rosee_gui/TabAction.h>
 
-Window::Window(ros::NodeHandle *nh, QWidget *parent) : QWidget(parent) {
+TabAction::TabAction(ros::NodeHandle *nh, QWidget *parent) : QWidget(parent) {
 
     this->nh = nh;
 
@@ -17,16 +17,16 @@ Window::Window(ros::NodeHandle *nh, QWidget *parent) : QWidget(parent) {
 }
 
 
-void Window::createJointStateContainer() {
+void TabAction::createJointStateContainer() {
     
     jointStateContainer = new JointStateContainer(nh);
     
 }
 
-void Window::createActionGroupBox() {
+void TabAction::createActionGroupBox() {
     
     //the group box where the singleActionGroupBox will be set.
-    //This groupbox will be added with addWidget in Window costructor
+    //This groupbox will be added with addWidget in TabAction costructor
     containerActionGroupBox = new ContainerActionGroupBox(nh, this);
     
 }

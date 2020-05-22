@@ -21,7 +21,7 @@
 #include <QWidget>
 #include <QTabWidget>
 #include <QVBoxLayout>
-#include <rosee_gui/Window.h>
+#include <rosee_gui/TabAction.h>
 
 /**
  * @todo write docs

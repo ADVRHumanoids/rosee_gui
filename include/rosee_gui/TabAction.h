@@ -1,5 +1,5 @@
-#ifndef WINDOW_H
-#define WINDOW_H
+#ifndef TABACTION_H
+#define TABACTION_H
 
 #include <QWidget>
 #include <QGridLayout>
@@ -8,11 +8,11 @@
 #include <rosee_gui/JointStateContainer.h>
 #include <rosee_gui/ContainerActionGroupBox.h>
 
-class Window : public QWidget
+class TabAction : public QWidget
 {
     Q_OBJECT
 public:
-    explicit Window(ros::NodeHandle* nh, QWidget *parent = 0);
+    explicit TabAction(ros::NodeHandle* nh, QWidget *parent = 0);
     
 private:
     ros::NodeHandle* nh;
@@ -34,4 +34,4 @@ public slots:
     
 };
 
-#endif // WINDOW_H
+#endif // TABACTION_H

@@ -140,9 +140,9 @@ add_library(${PROJECT_NAME}_MainWindow SHARED
     include/rosee_gui/MainWindow.h
 )
 
-add_library(${PROJECT_NAME}_Window SHARED
-    src/Window.cpp
-    include/rosee_gui/Window.h
+add_library(${PROJECT_NAME}_TabAction SHARED
+    src/TabAction.cpp
+    include/rosee_gui/TabAction.h
 )
 
 add_library(${PROJECT_NAME}_SingleActionGroupBox SHARED
@@ -218,11 +218,11 @@ target_link_libraries(${PROJECT_NAME}_gui_main
 target_link_libraries(${PROJECT_NAME}_MainWindow
     ${catkin_LIBRARIES}
     Qt5::Widgets
-    ${PROJECT_NAME}_Window
+    ${PROJECT_NAME}_TabAction
 
 )
 
-target_link_libraries(${PROJECT_NAME}_Window
+target_link_libraries(${PROJECT_NAME}_TabAction
     ${catkin_LIBRARIES}
     Qt5::Widgets
     ${PROJECT_NAME}_ContainerActionGroupBox

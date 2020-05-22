@@ -18,9 +18,9 @@
 
 MainWindow::MainWindow(ros::NodeHandle *nh, QWidget *parent) : QTabWidget(parent) {
 
-    addTab(new Window(nh, parent), tr("Action"));
+    addTab(new TabAction(nh, parent), tr("Action"));
     
-    addTab(new Window(nh, parent), tr("RobotState"));
+    addTab(new TabAction(nh, parent), tr("RobotState"));
 
 }
 
