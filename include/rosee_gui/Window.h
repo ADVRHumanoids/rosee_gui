@@ -5,15 +5,8 @@
 #include <QGridLayout>
 #include <QGroupBox>
 
-
-<<<<<<< HEAD
 #include <rosee_gui/JointStateContainer.h>
 #include <rosee_gui/ContainerActionGroupBox.h>
-=======
-#include <rosee_msg/ActionsInfo.h>
-#include <rosee_msg/SelectablePairInfo.h>
-#include <ros_end_effector/Action.h>
->>>>>>> bc173cb... refactor to a single package name convention (with underscores)
 
 class Window : public QWidget
 {
