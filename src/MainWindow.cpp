@@ -16,18 +16,11 @@
 
 #include <rosee_gui/MainWindow.h>
 
-MainWindow::MainWindow(ros::NodeHandle *nh, QWidget *parent) : QWidget(parent) {
+MainWindow::MainWindow(ros::NodeHandle *nh, QWidget *parent) : QTabWidget(parent) {
 
-    tabWidget = new QTabWidget;
+    addTab(new Window(nh, parent), tr("Action"));
     
-    tabWidget->addTab(new Window(nh, parent), tr("General"));
-    tabWidget->addTab(new Window(nh, parent), tr("tab2"));
-    
-    QVBoxLayout* layout = new QVBoxLayout;
-    layout->addWidget(tabWidget);
-    setLayout(layout);
-
-  
+    addTab(new Window(nh, parent), tr("RobotState"));
 
 }
 

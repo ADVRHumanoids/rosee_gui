@@ -25,8 +25,14 @@
 
 /**
  * @todo write docs
+ * 
+ * We declare directly the main window as the qtab widget. 
+ * The alternative would be declare it as QWidget and then use a QTabWidget
+ * as a member, then creating a layout... Not necessary now, because we only have one
+ * son. In future, if we want to add something external to the tab widget, we will
+ * use this approach (that is more similar to the qdialog qt tutorial)
  */
-class MainWindow : public  QWidget
+class MainWindow : public  QTabWidget
 {
     Q_OBJECT
     
@@ -34,7 +40,6 @@ public:
     explicit MainWindow(ros::NodeHandle* nh, QWidget *parent = 0);
 
 private:
-    QTabWidget *tabWidget;
 
 };
 
