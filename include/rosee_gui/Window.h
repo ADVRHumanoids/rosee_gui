@@ -5,7 +5,6 @@
 #include <QGridLayout>
 #include <QGroupBox>
 
-
 #include <rosee_gui/JointStateContainer.h>
 #include <rosee_gui/ContainerActionGroupBox.h>
 

@@ -10,7 +10,7 @@
 #include <ros/ros.h>
 
 #include <rosee_msg/ActionInfo.h> //msg
-#include <ROSEndEffector/ActionPrimitive.h>
+#include <ros_end_effector/ActionPrimitive.h>
 
 class SingleActionBoxesGroupBox : public SingleActionGroupBox
 {
