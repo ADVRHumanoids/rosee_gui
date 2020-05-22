@@ -218,6 +218,7 @@ target_link_libraries(${PROJECT_NAME}_gui_main
 target_link_libraries(${PROJECT_NAME}_MainWindow
     ${catkin_LIBRARIES}
     Qt5::Widgets
+    ${PROJECT_NAME}_Window
 
 )
 

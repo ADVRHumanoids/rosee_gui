@@ -21,7 +21,11 @@ MainWindow::MainWindow(ros::NodeHandle *nh, QWidget *parent) : QWidget(parent) {
     tabWidget = new QTabWidget;
     
     tabWidget->addTab(new Window(nh, parent), tr("General"));
-    tabWidget->addTab(new Window(nh, parent), tr("Culoooo"));
+    tabWidget->addTab(new Window(nh, parent), tr("tab2"));
+    
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->addWidget(tabWidget);
+    setLayout(layout);
 
   
 

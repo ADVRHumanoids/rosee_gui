@@ -20,6 +20,7 @@
 #include <ros/ros.h>
 #include <QWidget>
 #include <QTabWidget>
+#include <QVBoxLayout>
 #include <rosee_gui/Window.h>
 
 /**
