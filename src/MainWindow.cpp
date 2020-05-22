@@ -20,7 +20,7 @@ MainWindow::MainWindow(ros::NodeHandle *nh, QWidget *parent) : QTabWidget(parent
 
     addTab(new TabAction(nh, parent), tr("Action"));
     
-    addTab(new TabAction(nh, parent), tr("RobotState"));
+    addTab(new JointMonitorWidget (nh, parent), tr("RobotState"));
 
 }
 

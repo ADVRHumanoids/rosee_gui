@@ -22,6 +22,7 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 #include <rosee_gui/TabAction.h>
+#include "../../src/joint_state_gui/joint_monitor_widget.h"
 
 /**
  * @todo write docs

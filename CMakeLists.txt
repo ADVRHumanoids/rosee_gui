@@ -12,6 +12,8 @@ endif()
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
 
+
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -21,6 +23,9 @@ find_package(catkin REQUIRED COMPONENTS
     rosee_msg
     actionlib
 )
+
+## qt5.12 path to be declared
+set(QT5_PATH "/usr/lib/x86_64-linux-gnu/Qt5.12.8/5.12.8/gcc_64")
 
 #not catkin packages
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
@@ -122,6 +127,11 @@ catkin_package(
 #  DEPENDS system_lib
 )
 
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+add_subdirectory(src/chart/)
+add_subdirectory(src/joint_state_gui/)
+
 ###########
 ## Build ##
 ###########
@@ -213,6 +223,8 @@ target_link_libraries(${PROJECT_NAME}_gui_main
     Qt5::Widgets
     ${PROJECT_NAME}_MainWindow
     ${PROJECT_NAME}_TimerHandler
+    joint_bar_ui
+
 )
 
 target_link_libraries(${PROJECT_NAME}_MainWindow
@@ -315,6 +327,12 @@ target_link_libraries(${PROJECT_NAME}_ContainerActionGroupBox
 #   # myfile2
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
+# Mark executables and/or libraries for installation
+#install(TARGETS ${PROJECT_NAME}_gui_main
+#    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+#    )
 
 #############
 ## Testing ##
