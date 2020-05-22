@@ -135,6 +135,11 @@ include_directories(
 
 ## Declare a C++ library
 # needed also the .h for qt automoc things
+add_library(${PROJECT_NAME}_MainWindow SHARED
+    src/MainWindow.cpp
+    include/rosee_gui/MainWindow.h
+)
+
 add_library(${PROJECT_NAME}_Window SHARED
     src/Window.cpp
     include/rosee_gui/Window.h
@@ -206,12 +211,19 @@ set_target_properties(${PROJECT_NAME}_gui_main PROPERTIES OUTPUT_NAME "gui_main"
 target_link_libraries(${PROJECT_NAME}_gui_main
     ${catkin_LIBRARIES}
     Qt5::Widgets
-    ${PROJECT_NAME}_Window
+    ${PROJECT_NAME}_MainWindow
     ${PROJECT_NAME}_TimerHandler
+)
+
+target_link_libraries(${PROJECT_NAME}_MainWindow
+    ${catkin_LIBRARIES}
+    Qt5::Widgets
+
 )
 
 target_link_libraries(${PROJECT_NAME}_Window
     ${catkin_LIBRARIES}
+    Qt5::Widgets
     ${PROJECT_NAME}_ContainerActionGroupBox
     ${PROJECT_NAME}_JointStateContainer
 )

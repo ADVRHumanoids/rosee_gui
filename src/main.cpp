@@ -3,7 +3,7 @@
 #include <QSlider>
 #include <QPushButton>
 
-#include <rosee_gui/Window.h>
+#include <rosee_gui/MainWindow.h>
 #include <rosee_gui/TimerHandler.h>
 #include <ros/ros.h>
 
@@ -15,10 +15,11 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
     
     TimerHandler tHandler(100);
+    
+    
+    MainWindow mainwindow(&nh);
 
-    Window window(&nh);
-
-    window.show();
+    mainwindow.show();
     
     int appReturn = app.exec();
     //app.exec is blocking
