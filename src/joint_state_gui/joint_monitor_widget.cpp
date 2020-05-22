@@ -270,7 +270,7 @@ void JointMonitorWidget::on_jstate_recv(const sensor_msgs::JointStateConstPtr& m
         //     wid->setDanger();
         //}
 
-
+            
         if(barplot_wid->getFieldType() == "Joint Effort")
         {
             auto wid = barplot_wid->wid_map.at(msg->name[i]);
@@ -283,10 +283,13 @@ void JointMonitorWidget::on_jstate_recv(const sensor_msgs::JointStateConstPtr& m
         else if(barplot_wid->getFieldType() == "Joint Position")
         {
             auto wid = barplot_wid->wid_map.at(msg->name[i]);
-            wid->setValue(msg->position[i]);
+            //set range want only integer... so I multiply by 100 everything,
+            // but the text will be written correct.
+            // if we getValue, we will need to divide it by 100
+            wid->setValue(msg->position[i]*100, msg->position[i]);
             double qmin = _urdf->getJoint(msg->name[i])->limits->lower;
             double qmax = _urdf->getJoint(msg->name[i])->limits->upper;
-            wid->setRange(qmin, qmax);
+            wid->setRange(qmin*100, qmax*100);
         }
         
         else if(barplot_wid->getFieldType() == "Joint Velocity")

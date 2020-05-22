@@ -69,13 +69,16 @@ void JointBarWidget::setRange(double min, double max)
 void JointBarWidget::setValue(double x)
 {
     _bar->setValue(x);
-    _bar->setFormat(QString("%1").arg(x, 5,'f',1));
+    //%1 is the placeholder for the arg.
+    //arg values: first is value printed (x), 5 is a sort of padding with respect to 
+    //the 5 arg ('' by default). 'f' is format, 1 is precision
+    _bar->setFormat(QString("%1").arg(x, 5,'f',2));
 }
 
 void JointBarWidget::setValue(double xbar, double xtext)
 {
     _bar->setValue(xbar);
-    _bar->setFormat(QString("%1").arg(xtext, 5,'f',1));
+    _bar->setFormat(QString("%1").arg(xtext, 5,'f',2));
 }
 
 void JointBarWidget::setStatus(QString status)

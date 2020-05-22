@@ -56,16 +56,16 @@ JointStateWidget::JointStateWidget(QWidget * parent):
     jointVel        ->setRange(-1e9, 1e9);
     jointEff     ->setRange(-1e9, 1e9);
 
-    auto plot_link_pos = findChild<QPushButton *>("plotJointPos");
-    connect(plot_link_pos, &QPushButton::released,
+    auto plot_joint_pos = findChild<QPushButton *>("plotJointPos");
+    connect(plot_joint_pos, &QPushButton::released,
             [this](){ emit plotAdded("joint_pos");});
 
-    auto plot_ref_pos = findChild<QPushButton *>("plotJointVel");
-    connect(plot_ref_pos, &QPushButton::released,
+    auto plot_joint_vel = findChild<QPushButton *>("plotJointVel");
+    connect(plot_joint_vel, &QPushButton::released,
             [this](){ emit plotAdded("joint_vel");});
 
-    auto plot_moto_pos = findChild<QPushButton *>("plotJointEff");
-    connect(plot_moto_pos, &QPushButton::released,
+    auto plot_joint_eff = findChild<QPushButton *>("plotJointEff");
+    connect(plot_joint_eff, &QPushButton::released,
             [this](){ emit plotAdded("joint_effort");});
 
 }
