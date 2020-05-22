@@ -163,26 +163,14 @@ std::map < std::string, std::vector<std::string> > ContainerActionGroupBox::getP
 void ContainerActionGroupBox::resetButtonClicked() {
     
     auto singleActionGroupBoxs = this->findChildren<SingleActionGroupBox *>();
-    std::cout << "aaaaaaaaaaaaaaaaaaaaaaaaa" << std::endl;
-    ROS_ERROR_STREAM ("Child Are:");
-        for (auto child : findChildren<QWidget *>()) {
-            if (! child->objectName().isNull() ) {
-                ROS_WARN_STREAM (  qPrintable(child->objectName()) );
-
-            } else {
-                ROS_WARN_STREAM ( "nullName" );
-            }
-        }
 
     for (auto it : singleActionGroupBoxs) {
-        std::cout << "BOHOHOHOHO" << std::endl;
         it->resetAll();
     }
     
     auto singleActionTimedGros = this->findChildren<SingleActionTimedGroupBox *>();
     
     for (auto it : singleActionTimedGros) {
-        std::cout << "MAAAAAAAAAAAAAAAA" << std::endl;
 
         it->resetAll();
     }
