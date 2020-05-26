@@ -4,5 +4,5 @@
 
      <node unless="$(arg gdb)" type="gui_main" name="gui_main" pkg="rosee_gui" output="screen"/> 
      
-     <node if="$(arg gdb)" type="gui_main" name="gui_main" pkg="rosee_gui" output="screen" launch-prefix="xterm -e gdb --args"/>
+     <node if="$(arg gdb)" type="gui_main" name="gui_main" pkg="rosee_gui" output="screen" launch-prefix="gdb -ex run --args"/>
 </launch>
