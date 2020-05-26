@@ -1,17 +1,26 @@
 # rosee_gui
-Gui things for [ROSEE](https://github.com/ADVRHumanoids/ROSEndEffector) project
+This package is a tool for [ROS End-Effector](https://advrhumanoids.github.io/ROSEndEffector/) framework
 
-## Requisite
-QT5
+The ROS End-Effector main documentation is here: https://advrhumanoids.github.io/ROSEndEffectorDocs/, where you can find information about this GUI.
 
-## To launch
-~~~~bash
-roslaunch rosee_gui gui.launch
-~~~~
 
-### How it works - code structure (obviously improvable)
-- **main.cpp** : It handles ROS (creating the nodehandle) and the Qapplication. It creates the Window object
-- **Window.cpp** a *QWidget* derived class which refers to the gui Window. It has as member a *QGridLayout*, and it creates all the inner *QGridLayout* (one for each action)
-- **ActionLayout.cpp** *QGridLayout* derived class, which contain labels buttons and other widgets. It also send message to ros topic, handling a ros publisher with a nodehandle passed to its costructor
-- **ActionBoxesLayout.cpp** Derived class from above, it includes checkboxes to select finger/joint and send them also with topics. 
-- **ActionTimedLayout.cpp**, **ActionTimedElement.cpp** Container and element for the timed action, which per definition is composed by other actions executed one after another with some time margins. Each element has three progress bar so in the future we can take feedback and display a progress of the action execution, included time margins
+***
+<!-- 
+    ROSIN acknowledgement from the ROSIN press kit
+    @ https://github.com/rosin-project/press_kit
+-->
+
+<a href="http://rosin-project.eu">
+  <img src="http://rosin-project.eu/wp-content/uploads/rosin_ack_logo_wide.png" 
+       alt="rosin_logo" height="60" >
+</a>
+
+Supported by ROSIN - ROS-Industrial Quality-Assured Robot Software Components.  
+More information: <a href="http://rosin-project.eu">rosin-project.eu</a>
+
+<img src="http://rosin-project.eu/wp-content/uploads/rosin_eu_flag.jpg" 
+     alt="eu_flag" height="45" align="left" >  
+
+This project has received funding from the European Union’s Horizon 2020  
+research and innovation programme under grant agreement no. 732287. 
+
