@@ -90,7 +90,9 @@ union centAC_fault_t{
     BIT_FAULT bit;
 };
 
-JointMonitorWidget::JointMonitorWidget(ros::NodeHandle* nh, QWidget *parent) :
+JointMonitorWidget::JointMonitorWidget(ros::NodeHandle* nh, 
+                                       std::shared_ptr<RobotDescriptionHandler> robotDescriptionHandler, 
+                                       QWidget *parent) :
     QWidget(parent),
     _valid_msg_recv(false),
     _widget_started(false)
@@ -101,16 +103,9 @@ JointMonitorWidget::JointMonitorWidget(ros::NodeHandle* nh, QWidget *parent) :
     _jstate_sub = nh->subscribe(jsTopic, 10, &JointMonitorWidget::on_jstate_recv, this);
     ROS_INFO_STREAM ( "[2nd Tab] Getting joint pos from '" << jsTopic << "'" );
 
+    this->_robotDescriptionHandler = robotDescriptionHandler;
 
-    std::string urdf_str;
-    nh->getParam("robot_description", urdf_str);
-
-    if(urdf_str.empty())
-    {
-        throw std::runtime_error("Unable to read robot_description from parameter server");
-    }
-
-    _urdf = urdf::parseURDF(urdf_str);
+    _urdf = _robotDescriptionHandler->getUrdfModel();
 
     while(!_valid_msg_recv)
     {

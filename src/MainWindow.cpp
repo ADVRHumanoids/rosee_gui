@@ -17,10 +17,17 @@
 #include <rosee_gui/MainWindow.h>
 
 MainWindow::MainWindow(ros::NodeHandle *nh, QWidget *parent) : QTabWidget(parent) {
-
-    addTab(new TabAction(nh, parent), tr("Action"));
     
-    addTab(new JointMonitorWidget (nh, parent), tr("RobotState"));
+    std::string urdf_file, srdf_file;
+    
+    nh->getParam("robot_description", urdf_file);
+    nh->getParam("robot_description_semantic", srdf_file);
+
+    robotDescriptionHandler = std::make_shared<RobotDescriptionHandler>(urdf_file, srdf_file);
+
+    addTab(new TabAction(nh, robotDescriptionHandler,  parent), tr("Action"));
+    
+    addTab(new JointMonitorWidget (nh, robotDescriptionHandler,  parent), tr("RobotState"));
 
 }
 

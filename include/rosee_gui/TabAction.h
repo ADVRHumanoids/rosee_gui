@@ -7,12 +7,13 @@
 
 #include <rosee_gui/JointStateContainer.h>
 #include <rosee_gui/ContainerActionGroupBox.h>
+#include <rosee_gui/RobotDescriptionHandler.h>
 
 class TabAction : public QWidget
 {
     Q_OBJECT
 public:
-    explicit TabAction(ros::NodeHandle* nh, QWidget *parent = 0);
+    explicit TabAction(ros::NodeHandle* nh, std::shared_ptr<RobotDescriptionHandler>,  QWidget *parent = 0);
     
 private:
     ros::NodeHandle* nh;

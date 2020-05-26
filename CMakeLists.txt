@@ -22,6 +22,7 @@ find_package(catkin REQUIRED COMPONENTS
     ros_end_effector #for action type 
     rosee_msg
     actionlib
+    srdfdom
 )
 
 ## qt5.12 path to be declared
@@ -195,6 +196,11 @@ add_library(${PROJECT_NAME}_ContainerActionGroupBox SHARED
     include/rosee_gui/ContainerActionGroupBox.h 
 )
 
+add_library(${PROJECT_NAME}_RobotDescriptionHandler SHARED
+    src/RobotDescriptionHandler.cpp
+    include/rosee_gui/RobotDescriptionHandler.h 
+)
+
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -231,6 +237,7 @@ target_link_libraries(${PROJECT_NAME}_MainWindow
     ${catkin_LIBRARIES}
     Qt5::Widgets
     ${PROJECT_NAME}_TabAction
+    ${PROJECT_NAME}_RobotDescriptionHandler
 
 )
 
@@ -239,6 +246,7 @@ target_link_libraries(${PROJECT_NAME}_TabAction
     Qt5::Widgets
     ${PROJECT_NAME}_ContainerActionGroupBox
     ${PROJECT_NAME}_JointStateContainer
+    ${PROJECT_NAME}_RobotDescriptionHandler
 )
 
 
@@ -277,6 +285,7 @@ target_link_libraries(${PROJECT_NAME}_JointStateContainer
     ${catkin_LIBRARIES}
     Qt5::Widgets
     ${PROJECT_NAME}_JointStateTable
+    ${PROJECT_NAME}_RobotDescriptionHandler
 )
 target_link_libraries(${PROJECT_NAME}_ContainerActionGroupBox
     ${catkin_LIBRARIES}
@@ -284,6 +293,9 @@ target_link_libraries(${PROJECT_NAME}_ContainerActionGroupBox
     ${PROJECT_NAME}_SingleActionGroupBox
     ${PROJECT_NAME}_SingleActionBoxesGroupBox
     ${PROJECT_NAME}_SingleActionTimedGroupBox
+)
+target_link_libraries(${PROJECT_NAME}_RobotDescriptionHandler
+    ${catkin_LIBRARIES}
 )
 
 #############

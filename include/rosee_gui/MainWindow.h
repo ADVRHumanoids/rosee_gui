@@ -22,6 +22,10 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 #include <rosee_gui/TabAction.h>
+
+#include <rosee_gui/RobotDescriptionHandler.h>
+
+//TODO solve this
 #include "../../src/joint_state_gui/joint_monitor_widget.h"
 
 /**
@@ -41,6 +45,7 @@ public:
     explicit MainWindow(ros::NodeHandle* nh, QWidget *parent = 0);
 
 private:
+    std::shared_ptr<RobotDescriptionHandler> robotDescriptionHandler;
 
 };
 

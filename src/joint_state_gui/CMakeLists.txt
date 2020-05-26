@@ -18,7 +18,7 @@ add_library(joint_bar_ui STATIC
     ui_resources.qrc)
 
 target_link_libraries(joint_bar_ui chart_widget
-    Qt5::Widgets Qt5::UiTools ${catkin_LIBRARIES} yaml-cpp)
+    Qt5::Widgets Qt5::UiTools ${catkin_LIBRARIES} yaml-cpp ${PROJECT_NAME}_RobotDescriptionHandler)
 
 
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
