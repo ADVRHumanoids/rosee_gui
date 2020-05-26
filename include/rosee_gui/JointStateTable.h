@@ -23,6 +23,8 @@
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
 
+#include <rosee_gui/RobotDescriptionHandler.h>
+
 /**
  * @todo write docs
  */
@@ -31,7 +33,9 @@ class JointStateTable : public QTableWidget
     Q_OBJECT
     
 public:
-    explicit JointStateTable(ros::NodeHandle* nh, int rows = 0 , int columns = 0, QWidget *parent = nullptr);
+    explicit JointStateTable(ros::NodeHandle* nh, 
+                             std::shared_ptr<RobotDescriptionHandler> robotDescriptionHandler, 
+                             QWidget *parent = nullptr);
     
 private:
     bool setJointStateSub(ros::NodeHandle* nh);
@@ -39,6 +43,8 @@ private:
     
     ros::Subscriber jointPosSub;
     sensor_msgs::JointState jointStateMsg;
+    
+    std::map <std::string, int> jointNameRowMap;
     
 };
 

@@ -22,6 +22,13 @@
 #include <urdf_parser/urdf_parser.h>
 #include <srdfdom/model.h>
 
+
+namespace ROSEE {
+    //for parsing thing of main package, a joint can be OR passive OR mimic, not both
+    //PASSIVE is simply a not actuated joint that other actuated one will not influence
+    enum JointActuatedType { ACTUATED, MIMIC, PASSIVE };
+}
+
 /**
  * @todo write docs
  */
@@ -30,23 +37,28 @@ class RobotDescriptionHandler
     
 public:
     //RobotDescriptorHandler();
-    RobotDescriptionHandler(std::string urdfFile );
+    //RobotDescriptionHandler(std::string urdfFile );
     RobotDescriptionHandler(std::string urdfFile, std::string srdfFile );
     
     urdf::ModelInterfaceSharedPtr getUrdfModel();
     srdf::ModelSharedPtr getSrdfModel();
-    
     std::string getUrdfFile();
     std::string getSrdfFile();
     
+    std::map <std::string, ROSEE::JointActuatedType> getActuatedJointsMap();
+    
 private:
     
+    void look4ActuatedJoints();
+
     std::string _urdfFile;
     std::string _srdfFile;
-    
     urdf::ModelInterfaceSharedPtr _urdfModel;
     srdf::ModelSharedPtr _srdfModel;
     
+    std::map <std::string, ROSEE::JointActuatedType> _actuatedJointsMap;
+    
+
 };
 
 #endif // ROBOTDESCRIPTIONHANDLER_H

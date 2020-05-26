@@ -16,6 +16,7 @@
 
 #include <rosee_gui/RobotDescriptionHandler.h>
 
+/**
 RobotDescriptionHandler::RobotDescriptionHandler(std::string urdfFile) {
     
     this->_urdfFile = urdfFile;
@@ -29,6 +30,7 @@ RobotDescriptionHandler::RobotDescriptionHandler(std::string urdfFile) {
     
     _urdfModel = urdf::parseURDF(_urdfFile);
 }
+**/
 
 RobotDescriptionHandler::RobotDescriptionHandler(std::string urdfFile, std::string srdfFile) {
     
@@ -53,6 +55,8 @@ RobotDescriptionHandler::RobotDescriptionHandler(std::string urdfFile, std::stri
     //initFile takes instead the flename. We have the file xml content in the param server
     _srdfModel = boost::make_shared<srdf::Model>();
     _srdfModel->initString ( *_urdfModel, _srdfFile );
+    
+    look4ActuatedJoints();
 
 }
 
@@ -74,9 +78,43 @@ std::string RobotDescriptionHandler::getUrdfFile() {
 std::string RobotDescriptionHandler::getSrdfFile() {
     
     return _srdfFile;
+
+}
+
+std::map<std::string, ROSEE::JointActuatedType> RobotDescriptionHandler::getActuatedJointsMap() {
+    
+    return _actuatedJointsMap;
 }
 
 
+
+void RobotDescriptionHandler::look4ActuatedJoints(){
+    
+    
+    for (auto it : _urdfModel->joints_) { //this contains all joints
+        
+        if (it.second->type == urdf::Joint::FIXED) {
+            continue; //we do not want to display status of fixed
+        }
+        
+        if (it.second->mimic == nullptr) { //not a mimic joint...
+            
+            _actuatedJointsMap[it.second->name] = ROSEE::JointActuatedType::ACTUATED;
+            
+        } else {
+           
+            _actuatedJointsMap[it.second->name] = ROSEE::JointActuatedType::MIMIC;
+        }
+    }
+    
+    //now we look for passive. If any found, the entry in the map will be overwritten with
+    //the value PASSIVE
+    for (auto it : _srdfModel->getPassiveJoints()) {
+        _actuatedJointsMap[it.name_] = ROSEE::JointActuatedType::PASSIVE;
+    }
+    
+    
+}
 
 
 

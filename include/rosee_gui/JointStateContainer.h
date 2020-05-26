@@ -41,9 +41,13 @@ public slots:
     void showPositionCol (int);
     void showVelocityCol (int);
     void showEffortCol (int);
+    void showActuatedJoints(int);
+    void showMimicJoints(int);
+    void showPassiveJoints (int);
     
 private: 
     JointStateTable* jointStateTable;
+    std::shared_ptr<RobotDescriptionHandler> robotDescriptionHandler;
 };
 
 #endif // JOINTSTATECONTAINER_H

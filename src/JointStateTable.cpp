@@ -11,23 +11,25 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License.
+ * limitations under th0e License.
  */
 
 #include <rosee_gui/JointStateTable.h>
 #include <qheaderview.h> //to modify font size
 
-JointStateTable::JointStateTable (ros::NodeHandle* nh, int rows, int columns, QWidget *parent) :
-    QTableWidget(rows, columns, parent) {
+JointStateTable::JointStateTable (ros::NodeHandle* nh, 
+                                  std::shared_ptr<RobotDescriptionHandler> robotDescriptionHandler, QWidget *parent) :
+    QTableWidget(0, 0, parent) {
         
     if (setJointStateSub(nh)) {
         this->setMinimumSize(600,600);
         
         //table not editable
         setEditTriggers(QAbstractItemView::NoEditTriggers);
+        //scroll on the horizontal by pixel, otherwise bad visualization occur when scrolling
+        setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
         
         this->setColumnCount(3); //pos vel effort
-
         QStringList headerLabels;
         headerLabels.append("Position");
         headerLabels.append("Velocity");
@@ -36,17 +38,42 @@ JointStateTable::JointStateTable (ros::NodeHandle* nh, int rows, int columns, QW
         
         QFont verticalFont = this->verticalHeader()->font();
         QFont horizontalFont = this->horizontalHeader()->font();
-        
         verticalFont.setPointSize( 8 );
         this->verticalHeader()->setFont( verticalFont );
-        
         horizontalFont.setPointSize(8);
         this->horizontalHeader()->setFont(horizontalFont);
+
+        auto actuatedJointMap = robotDescriptionHandler->getActuatedJointsMap();
+        this->setRowCount(actuatedJointMap.size());
         
-        //scroll on the horizontal by pixel, otherwise bad visualization occur when scrolling
-        setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
-        
-        
+        int row = 0;
+        for (auto mapEl : actuatedJointMap) {
+            
+            QTableWidgetItem* labelWidget = new QTableWidgetItem(QString::fromStdString(mapEl.first));
+            
+            if (mapEl.second == ROSEE::JointActuatedType::ACTUATED) {
+                labelWidget->setBackground(Qt::green);
+                
+            } else if (mapEl.second == ROSEE::JointActuatedType::MIMIC) {
+                labelWidget->setBackground(Qt::yellow);     
+                
+            } else {
+                labelWidget->setBackground(Qt::red);
+            }
+
+            setVerticalHeaderItem(row, labelWidget);
+            
+            //create the cell here once, in clbk only the text will be updated
+            this->setItem (row, 0, new QTableWidgetItem (  ) );
+            this->setItem (row, 1, new QTableWidgetItem (  ) );
+            this->setItem (row, 2, new QTableWidgetItem (  ) );
+
+            
+            //we need this to update the correct row in the callback
+            jointNameRowMap[mapEl.first] = row;
+            row++;
+        }
+  
 
     } else {
         //TODO ERROR
@@ -67,21 +94,20 @@ bool JointStateTable::setJointStateSub(ros::NodeHandle* nh) {
 }
 
 void JointStateTable::jointStateClbk(const sensor_msgs::JointStateConstPtr& msg) {
-    
-    //in the callback we store in member the joint state. Then we will update in the gui, but not here
-    //TODO set the row and the joint names only once, and not in callback? 
-    //but if the message change the joint names? or some joint names at some point are not present?
-    this->setRowCount(msg->name.size());
-    QStringList jointNamesLabels;
-    jointNamesLabels.reserve (msg->name.size());
+       
     for (int i = 0; i < msg->name.size(); i++){
-        this->setItem (i, 0, new QTableWidgetItem ( QString::number(msg->position.at(i), 'f', 2) ) );
-        this->setItem (i, 1, new QTableWidgetItem ( QString::number(msg->velocity.at(i), 'f', 2) ) );
-        this->setItem (i, 2, new QTableWidgetItem ( QString::number(msg->effort.at(i)  , 'f', 2) ) );
-        jointNamesLabels.insert(i, QString::fromStdString(msg->name.at(i)));
+        
+        auto mapEl = jointNameRowMap.find(msg->name[i]);
+        
+        if (mapEl == jointNameRowMap.end()){
+            ROS_WARN_STREAM (__func__ << " '" << msg->name[i] << "' not found in the table of joint states" );
+        
+        } else {
+            int row = mapEl->second;
+            this->item(row, 0) -> setText(QString::number(msg->position.at(i), 'f', 2) );
+            this->item(row, 1) -> setText(QString::number(msg->velocity.at(i), 'f', 2) );
+            this->item(row, 2) -> setText(QString::number(msg->effort.at(i), 'f', 2) );
+        }
     }
-    
-    setVerticalHeaderLabels(jointNamesLabels);
-    
 }
 
