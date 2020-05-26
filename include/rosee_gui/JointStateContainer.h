@@ -23,6 +23,7 @@
 #include <QGridLayout>
 
 #include <rosee_gui/JointStateTable.h>
+#include <rosee_gui/RobotDescriptionHandler.h>
 
 #include <ros/ros.h>
 
@@ -34,7 +35,12 @@ class JointStateContainer : public QVBoxLayout
     Q_OBJECT
     
 public:
-    explicit JointStateContainer(ros::NodeHandle* nh, QWidget *parent = nullptr);
+    explicit JointStateContainer(ros::NodeHandle* nh,  std::shared_ptr<RobotDescriptionHandler>, QWidget *parent = nullptr);
+    
+public slots:
+    void showPositionCol (int);
+    void showVelocityCol (int);
+    void showEffortCol (int);
     
 private: 
     JointStateTable* jointStateTable;

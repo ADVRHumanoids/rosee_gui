@@ -15,14 +15,17 @@
  */
 
 #include <rosee_gui/JointStateTable.h>
+#include <qheaderview.h> //to modify font size
 
 JointStateTable::JointStateTable (ros::NodeHandle* nh, int rows, int columns, QWidget *parent) :
     QTableWidget(rows, columns, parent) {
         
     if (setJointStateSub(nh)) {
-        this->setMinimumSize(500,600);
+        this->setMinimumSize(600,600);
+        
         //table not editable
         setEditTriggers(QAbstractItemView::NoEditTriggers);
+        
         this->setColumnCount(3); //pos vel effort
 
         QStringList headerLabels;
@@ -30,7 +33,23 @@ JointStateTable::JointStateTable (ros::NodeHandle* nh, int rows, int columns, QW
         headerLabels.append("Velocity");
         headerLabels.append("Effort");
         setHorizontalHeaderLabels(headerLabels);
+        
+        QFont verticalFont = this->verticalHeader()->font();
+        QFont horizontalFont = this->horizontalHeader()->font();
+        
+        verticalFont.setPointSize( 8 );
+        this->verticalHeader()->setFont( verticalFont );
+        
+        horizontalFont.setPointSize(8);
+        this->horizontalHeader()->setFont(horizontalFont);
+        
+        //scroll on the horizontal by pixel, otherwise bad visualization occur when scrolling
+        setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+        
+        
 
+    } else {
+        //TODO ERROR
     }
         
 }
@@ -50,12 +69,19 @@ bool JointStateTable::setJointStateSub(ros::NodeHandle* nh) {
 void JointStateTable::jointStateClbk(const sensor_msgs::JointStateConstPtr& msg) {
     
     //in the callback we store in member the joint state. Then we will update in the gui, but not here
-    //TODO set the row and the joint names only once, and not in callback
+    //TODO set the row and the joint names only once, and not in callback? 
+    //but if the message change the joint names? or some joint names at some point are not present?
     this->setRowCount(msg->name.size());
+    QStringList jointNamesLabels;
+    jointNamesLabels.reserve (msg->name.size());
     for (int i = 0; i < msg->name.size(); i++){
         this->setItem (i, 0, new QTableWidgetItem ( QString::number(msg->position.at(i), 'f', 2) ) );
         this->setItem (i, 1, new QTableWidgetItem ( QString::number(msg->velocity.at(i), 'f', 2) ) );
         this->setItem (i, 2, new QTableWidgetItem ( QString::number(msg->effort.at(i)  , 'f', 2) ) );
+        jointNamesLabels.insert(i, QString::fromStdString(msg->name.at(i)));
     }
+    
+    setVerticalHeaderLabels(jointNamesLabels);
+    
 }
 

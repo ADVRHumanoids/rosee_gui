@@ -16,28 +16,73 @@
 
 #include <rosee_gui/JointStateContainer.h>
 
-JointStateContainer::JointStateContainer (ros::NodeHandle* nh, QWidget *parent) : QVBoxLayout(parent) {
+JointStateContainer::JointStateContainer (ros::NodeHandle* nh,
+                                          std::shared_ptr<RobotDescriptionHandler> robotDescriptionHandler,
+                                          QWidget *parent) : QVBoxLayout(parent) {
  
     jointStateTable = new JointStateTable(nh, 0,0, parent);
     QGridLayout* jointStateTableOptions = new QGridLayout;
     
     QCheckBox* posBox = new QCheckBox ( "position");
     posBox->setToolTip("Check to show position of joints");
+    posBox->setChecked(true);
+    QObject::connect( posBox, SIGNAL (stateChanged(int)), 
+                      this,   SLOT(showPositionCol(int)) );
+    
     QCheckBox* velBox = new QCheckBox ( "velocity");
-    posBox->setToolTip("Check to show velocity of joints");
+    velBox->setToolTip("Check to show velocity of joints");
+    velBox->setChecked(true);
+    QObject::connect( velBox, SIGNAL (stateChanged(int)), 
+                      this,   SLOT(showVelocityCol(int)) );
+    
     QCheckBox* effBox = new QCheckBox ( "effort");
-    posBox->setToolTip("Check to show effort of joints");
-    QCheckBox* actBox = new QCheckBox ( "not actuated joints");
-    posBox->setToolTip("Check to show also the state of not actuated joints");
+    effBox->setToolTip("Check to show effort of joints");
+    effBox->setChecked(true);
+    QObject::connect( effBox, SIGNAL (stateChanged(int)), 
+                      this,   SLOT(showEffortCol(int)) );
+    
+    QCheckBox* nonActBox = new QCheckBox ( "not actuated joints");
+    nonActBox->setToolTip("Check to show also the state of not actuated joints");
+    nonActBox->setChecked(true);
     
     jointStateTableOptions->addWidget(posBox, 0, 0);
     jointStateTableOptions->addWidget(velBox, 0, 1);
     jointStateTableOptions->addWidget(effBox, 0, 2);
-    jointStateTableOptions->addWidget(actBox, 1, 0, 1, 3); //spawn so it is in the middle
+    jointStateTableOptions->addWidget(nonActBox, 1, 0, 1, 3); //spawn so it is in the middle
 
     this->addWidget(jointStateTable);
     this->addLayout(jointStateTableOptions);
     
-    
 }
+
+void JointStateContainer::showPositionCol(int state) {
+    
+    if (state == Qt::Checked) {
+        jointStateTable->setColumnHidden(0, false);
+        
+    } else {
+        jointStateTable->setColumnHidden(0, true);
+    }
+}
+
+void JointStateContainer::showVelocityCol(int state) {
+    
+    if (state == Qt::Checked) {
+        jointStateTable->setColumnHidden(1, false);
+        
+    } else {
+        jointStateTable->setColumnHidden(1, true);
+    }
+}
+
+void JointStateContainer::showEffortCol(int state) {
+    
+    if (state == Qt::Checked) {
+        jointStateTable->setColumnHidden(2, false);
+        
+    } else {
+        jointStateTable->setColumnHidden(2, true);
+    }
+}
+
 
