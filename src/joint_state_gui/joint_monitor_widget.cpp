@@ -163,9 +163,36 @@ JointMonitorWidget::JointMonitorWidget(ros::NodeHandle* nh,
                               "/" +
                               QString::fromStdString(barplot_wid->getFieldShortType()));
         });
+        
+        //color the joint names accordingly to actuated type
+        auto mapEl = robotDescriptionHandler->getActuatedJointsMap().find(p.first);
+        if (mapEl == robotDescriptionHandler->getActuatedJointsMap().end()){
+            ROS_WARN_STREAM (__func__ << " '" << p.first << "' not found in the table of joint states" );
+        
+        } else {
+            
+            if (mapEl->second == ROSEE::JointActuatedType::ACTUATED) {
+                //setStylesheet cant be used because is used already in joint_bar_widget.cpp
+                //to make bold or not when double clicked, and it would ovewrite the color
+                p.second->findChild<QLabel *>("JointLabel")->setText(
+                    p.second->findChild<QLabel *>("JointLabel")->text()
+                        .prepend("<p style='background-color: rgba(0,255,0,0.3)'>")
+                        .append("</p>"));
+                
+            } else if (mapEl->second == ROSEE::JointActuatedType::MIMIC) {
+                p.second->findChild<QLabel *>("JointLabel")->setText(
+                    p.second->findChild<QLabel *>("JointLabel")->text()
+                        .prepend("<p style='background-color: rgba(255,255,0,0.3)'>")
+                        .append("</p>"));
+                
+            } else {
+                p.second->findChild<QLabel *>("JointLabel")->setText(
+                    p.second->findChild<QLabel *>("JointLabel")->text()
+                        .prepend("<p style='background-color: rgba(255,0,0,0.3)'>")
+                        .append("</p>"));
+            }
+        }
     }
-
-
 
     _chart = new ChartWidget;
     _chart->setMinimumSize(640, 400);
