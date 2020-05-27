@@ -5,6 +5,7 @@ SingleActionGroupBox::SingleActionGroupBox(ros::NodeHandle* nh, rosee_msg::Actio
     QGroupBox(parent) {
 
     this->setMinimumSize(300,200);
+    this->setMaximumHeight(400);
     this->actionName = actInfo.action_name;
     this->actionType = static_cast<ROSEE::Action::Type> (actInfo.action_type);
     this->rosMsgSeq = 0;
@@ -16,6 +17,7 @@ SingleActionGroupBox::SingleActionGroupBox(ros::NodeHandle* nh, rosee_msg::Actio
     QLabel* titleLabel  = new QLabel (QString::fromStdString(actionName));
     titleLabel->setAlignment(Qt::AlignCenter);
     titleLabel->setStyleSheet("QLabel { font-size :30px }");
+    titleLabel->setMaximumHeight(40);
     grid->addWidget(titleLabel, 0, 0);
     
     progressBar = new QProgressBar();

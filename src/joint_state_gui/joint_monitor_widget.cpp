@@ -170,28 +170,19 @@ JointMonitorWidget::JointMonitorWidget(ros::NodeHandle* nh,
             
         if (type == ROSEE::JointActuatedType::ACTUATED) {
             
-            //setStylesheet cant be used because is used already in joint_bar_widget.cpp
-            //to make bold or not when double clicked, and it would ovewrite the color
-            p.second->findChild<QLabel *>("JointLabel")->setText(
-                p.second->findChild<QLabel *>("JointLabel")->text()
-                    .prepend("<p style='background-color: rgba(0,255,0,0.3)'>")
-                    .append("</p>"));
+            p.second->findChild<QLabel *>("JointLabel")->setStyleSheet(
+                "background-color: rgba(0,255,0,0.5)");
 
         } else if (type == ROSEE::JointActuatedType::MIMIC) {
 
-            p.second->findChild<QLabel *>("JointLabel")->setText(
-                p.second->findChild<QLabel *>("JointLabel")->text()
-                    .prepend("<p style='background-color: rgba(255,255,0,0.3)'>")
-                    .append("</p>"));
+            p.second->findChild<QLabel *>("JointLabel")->setStyleSheet(
+                "background-color: rgba(255,255,0,0.5)");
             
         } else {
             
-            p.second->findChild<QLabel *>("JointLabel")->setText(
-                p.second->findChild<QLabel *>("JointLabel")->text()
-                    .prepend("<p style='background-color: rgba(255,0,0,0.3)'>")
-                    .append("</p>"));
+            p.second->findChild<QLabel *>("JointLabel")->setStyleSheet(
+                "background-color: rgba(255,0,0,0.5)");
         }
-
     }
 
     _chart = new ChartWidget;
@@ -199,12 +190,9 @@ JointMonitorWidget::JointMonitorWidget(ros::NodeHandle* nh,
 
     auto layout = new QHBoxLayout(this);
     layout->addWidget(barplot_wid);
-
+    
     auto vlayout = new QVBoxLayout(this);
-    auto hlayout = new QHBoxLayout(this);
-    hlayout->addWidget(jstate_wid);
-
-    vlayout->addLayout(hlayout);
+    vlayout->addWidget(jstate_wid);
     vlayout->addWidget(_chart);
 
     layout->addLayout(vlayout);

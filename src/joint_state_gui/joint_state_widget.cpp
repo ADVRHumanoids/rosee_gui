@@ -66,7 +66,7 @@ JointStateWidget::JointStateWidget(QWidget * parent):
 
     auto plot_joint_eff = findChild<QPushButton *>("plotJointEff");
     connect(plot_joint_eff, &QPushButton::released,
-            [this](){ emit plotAdded("joint_effort");});
+            [this](){ emit plotAdded("joint_eff");});
 
 }
 

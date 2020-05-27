@@ -116,12 +116,19 @@ void JointBarWidget::setDanger(bool force)
 
 void JointBarWidget::setActive()
 {
-    _jname->setStyleSheet("font-weight: bold");
+    //not with stylesheet so we do not overwite highlight colors
+    //_jname->setStyleSheet("font-weight: bold");
+    auto font = _jname->font();
+    font.setBold(true);
+    _jname->setFont(font);
 }
 
 void JointBarWidget::setInactive()
 {
-    _jname->setStyleSheet("font-weight: normal");
+    //_jname->setStyleSheet("font-weight: normal");
+    auto font = _jname->font();
+    font.setBold(false);
+    _jname->setFont(font);
 }
 
 QString JointBarWidget::getJointName() const
