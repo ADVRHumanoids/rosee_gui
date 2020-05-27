@@ -19,7 +19,8 @@
 ActionTimedElement::ActionTimedElement(std::string actionName, 
                                        double before, double after, QWidget* parent ) : QGroupBox(parent) {
     
-    this->setMinimumSize(200,180);
+    this->setMinimumSize(130,130);
+    this->setMaximumSize(200,200);
     
     QGridLayout *grid;
     grid = new QGridLayout();
@@ -27,7 +28,7 @@ ActionTimedElement::ActionTimedElement(std::string actionName,
     QLabel* titleLabel;
     titleLabel = new QLabel (QString::fromStdString(actionName));
     titleLabel->setAlignment(Qt::AlignCenter);
-    titleLabel->setStyleSheet("QLabel { font-size :25px }");
+    titleLabel->setStyleSheet("QLabel { font-size :20px }");
     grid->addWidget(titleLabel, 0, 0);
     
     std::ostringstream beforeStream, afterStream;

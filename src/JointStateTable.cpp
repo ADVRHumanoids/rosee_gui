@@ -22,14 +22,20 @@ JointStateTable::JointStateTable (ros::NodeHandle* nh,
     QTableWidget(0, 0, parent) {
         
     if (setJointStateSub(nh)) {
-        this->setMinimumSize(600,600);
+        //this->setMinimumSize(1,1);
         
         //table not editable
         setEditTriggers(QAbstractItemView::NoEditTriggers);
         //scroll on the horizontal by pixel, otherwise bad visualization occur when scrolling
         setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+        setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
         
+        horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::Stretch);
+        horizontalHeader()->setSectionsMovable(true); 
+        verticalHeader()->setSectionsMovable(true); 
+                
         this->setColumnCount(3); //pos vel effort
+
         QStringList headerLabels;
         headerLabels.append("Position");
         headerLabels.append("Velocity");
@@ -73,7 +79,6 @@ JointStateTable::JointStateTable (ros::NodeHandle* nh,
             jointNameRowMap[mapEl.first] = row;
             row++;
         }
-  
 
     } else {
         //TODO ERROR
@@ -82,7 +87,6 @@ JointStateTable::JointStateTable (ros::NodeHandle* nh,
 }
 
 bool JointStateTable::setJointStateSub(ros::NodeHandle* nh) {
-    
     
     //to get joint state from gazebo, if used
     std::string jsTopic;

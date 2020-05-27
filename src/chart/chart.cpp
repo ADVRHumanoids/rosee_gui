@@ -46,6 +46,9 @@ ChartWidget::ChartWidget(QWidget * parent):
     /* Chart */
     _chart = new QChart;
     _chart->legend()->setAlignment(Qt::AlignRight);
+    
+    //show name in tooltip when it is too long to be visualized
+    _chart->legend()->setShowToolTips(true);
 
     /* Axes */
     _axis_x = new QValueAxis;
@@ -136,7 +139,6 @@ void ChartWidget::addSeries(QString name)
     series->attachAxis(_axis_x);
     series->attachAxis(_axis_y);
 
-
     _series[name] = series;
 
     auto markers = _chart->legend()->markers(series);
@@ -148,7 +150,6 @@ void ChartWidget::addSeries(QString name)
 
         connect(m, &QLegendMarker::clicked,
                 this, &ChartWidget::legend_marker_clicked);
-
     }
 
     reset_view();

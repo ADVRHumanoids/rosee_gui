@@ -4,8 +4,8 @@
 SingleActionGroupBox::SingleActionGroupBox(ros::NodeHandle* nh, rosee_msg::ActionInfo actInfo, QWidget* parent) :
     QGroupBox(parent) {
 
-    this->setMinimumSize(300,200);
-    this->setMaximumHeight(400);
+    this->setMinimumSize(120,140);
+    this->setMaximumSize(300,400);
     this->actionName = actInfo.action_name;
     this->actionType = static_cast<ROSEE::Action::Type> (actInfo.action_type);
     this->rosMsgSeq = 0;
@@ -16,8 +16,9 @@ SingleActionGroupBox::SingleActionGroupBox(ros::NodeHandle* nh, rosee_msg::Actio
 
     QLabel* titleLabel  = new QLabel (QString::fromStdString(actionName));
     titleLabel->setAlignment(Qt::AlignCenter);
-    titleLabel->setStyleSheet("QLabel { font-size :30px }");
+    titleLabel->setStyleSheet("QLabel { font-size :27px }");
     titleLabel->setMaximumHeight(40);
+    titleLabel->setToolTip(QString::fromStdString(actionName));
     grid->addWidget(titleLabel, 0, 0);
     
     progressBar = new QProgressBar();
@@ -44,7 +45,7 @@ SingleActionGroupBox::SingleActionGroupBox(ros::NodeHandle* nh, rosee_msg::Actio
     grid->addLayout(percentageLayout, 3, 0);
 
     send_button = new QPushButton ( "SEND", this );
-    send_button->setGeometry ( 100, 140, 100, 40 );
+    send_button->setMinimumSize(50,20);
     QObject::connect(send_button, SIGNAL ( clicked()), this, SLOT (sendBtnClicked() ) );
     grid->addWidget(send_button, 4, 0);
 
