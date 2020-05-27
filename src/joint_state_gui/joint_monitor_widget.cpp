@@ -1,8 +1,4 @@
 #include "joint_monitor_widget.h"
-#include "bar_plot_widget.h"
-#include <QHBoxLayout>
-
-#include <urdf_parser/urdf_parser.h>
 
 struct BIT_FAULT {
 

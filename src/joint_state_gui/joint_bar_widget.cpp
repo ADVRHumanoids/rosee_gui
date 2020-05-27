@@ -1,8 +1,6 @@
 #include "joint_bar_widget.h"
 #include "circle_widget.h"
 
-#include <iostream>
-
 #include <QUiLoader>
 #include <QFile>
 #include <QVBoxLayout>

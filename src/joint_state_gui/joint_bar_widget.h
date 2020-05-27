@@ -7,6 +7,9 @@
 #include <QLabel>
 #include <QTimer>
 
+#include <iostream>
+
+
 class JointBarWidget;
 
 class Blinker : public QObject
