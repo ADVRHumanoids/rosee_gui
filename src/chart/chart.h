@@ -2,18 +2,11 @@
 #define CHART_H
 
 #include <QWidget>
-//TODO fix this
-//#include <QChart>
-//#include <QChartView>
-//#include <QLineSeries>
-//#include <QValueAxis>
-#include "/usr/lib/x86_64-linux-gnu/Qt5.12.8/5.12.8/gcc_64/include/QtCharts/qchart.h"
-#include "/usr/lib/x86_64-linux-gnu/Qt5.12.8/5.12.8/gcc_64/include/QtCharts/qchartview.h"
-#include "/usr/lib/x86_64-linux-gnu/Qt5.12.8/5.12.8/gcc_64/include/QtCharts/qlineseries.h"
-#include "/usr/lib/x86_64-linux-gnu/Qt5.12.8/5.12.8/gcc_64/include/QtCharts/qvalueaxis.h"
-
+#include <QtCharts/QChart>
+#include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QValueAxis>
 #include <QLabel>
-
 
 QT_CHARTS_USE_NAMESPACE
 
