@@ -30,6 +30,7 @@ MainWindow::MainWindow(ros::NodeHandle *nh, QWidget *parent) : QTabWidget(parent
     
     std::vector<std::string> sensorTopics;
     sensorTopics.push_back("/js_publisher/joint_states"); //TODO take this from a config file
+    sensorTopics.push_back("/ros_end_effector/action_command/feedback"); //TODO take this from a config file
     addTab(new TabSensorsState (nh, sensorTopics, parent), tr("SensorState"));
 
 }

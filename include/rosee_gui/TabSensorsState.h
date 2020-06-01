@@ -18,10 +18,9 @@
 #define TABSENSORSSTATE_H
 
 #include <QWidget>
-#include <QTableWidget>
+#include <QGridLayout>
+#include <rosee_gui/SensorStateTable.h>
 #include <ros/ros.h>
-
-#include <ros_msg_parser/ros_parser.hpp>
 
 
 /**
@@ -36,13 +35,7 @@ public:
                                QWidget* parent = 0);
     
 private: 
-    std::map<std::string, QTableWidget*> _tables ;
-    std::vector<ros::Subscriber> _subscribers;
-    
-    void topicCallback(const RosMsgParser::ShapeShifter& msg,
-                   const std::string &topic_name,
-                   RosMsgParser::ParsersCollection& rosIntroParsers);
-
+    std::map<std::string, SensorStateTable*> _tables ;
 
 };
 

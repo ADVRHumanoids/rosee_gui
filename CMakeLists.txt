@@ -27,7 +27,8 @@ find_package(catkin REQUIRED COMPONENTS
     rosee_msg
     actionlib
     srdfdom
-    ros_msg_parser
+    ros_type_introspection
+    topic_tools #needed to use type introspection
 )
 
 
@@ -145,7 +146,6 @@ include_directories(
     include
     ${catkin_INCLUDE_DIRS}
     ${ros_end_effector_INCLUDE_DIRS}
-    ${ros_msg_parser_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -208,6 +208,11 @@ add_library(${PROJECT_NAME}_RobotDescriptionHandler SHARED
 add_library(${PROJECT_NAME}_TabSensorsState SHARED
     src/TabSensorsState.cpp
     include/rosee_gui/TabSensorsState.h 
+)
+
+add_library(${PROJECT_NAME}_SensorStateTable SHARED
+    src/SensorStateTable.cpp
+    include/rosee_gui/SensorStateTable.h
 )
 
 
@@ -309,6 +314,12 @@ target_link_libraries(${PROJECT_NAME}_RobotDescriptionHandler
 )
 
 target_link_libraries(${PROJECT_NAME}_TabSensorsState
+    ${catkin_LIBRARIES}
+    Qt5::Widgets
+    ${PROJECT_NAME}_SensorStateTable
+)
+
+target_link_libraries(${PROJECT_NAME}_SensorStateTable
     ${catkin_LIBRARIES}
     Qt5::Widgets
 )
