@@ -20,8 +20,7 @@ TabSensorsState::TabSensorsState ( ros::NodeHandle* nh, std::vector <std::string
                                    QWidget* parent ) : QWidget(parent) {
     
     QGridLayout *windowGrid = new QGridLayout;
-    //better to create all the tables before... so message does not arrive while table still need 
-    //to be created
+
     unsigned int iTable = 0;
     for (const auto name: topicNames) {
         
