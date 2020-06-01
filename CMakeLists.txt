@@ -27,6 +27,7 @@ find_package(catkin REQUIRED COMPONENTS
     rosee_msg
     actionlib
     srdfdom
+    ros_msg_parser
 )
 
 
@@ -144,6 +145,7 @@ include_directories(
     include
     ${catkin_INCLUDE_DIRS}
     ${ros_end_effector_INCLUDE_DIRS}
+    ${ros_msg_parser_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -203,6 +205,11 @@ add_library(${PROJECT_NAME}_RobotDescriptionHandler SHARED
     include/rosee_gui/RobotDescriptionHandler.h 
 )
 
+add_library(${PROJECT_NAME}_TabSensorsState SHARED
+    src/TabSensorsState.cpp
+    include/rosee_gui/TabSensorsState.h 
+)
+
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -240,6 +247,7 @@ target_link_libraries(${PROJECT_NAME}_MainWindow
     Qt5::Widgets
     ${PROJECT_NAME}_TabAction
     ${PROJECT_NAME}_RobotDescriptionHandler
+    ${PROJECT_NAME}_TabSensorsState
 
 )
 
@@ -298,6 +306,11 @@ target_link_libraries(${PROJECT_NAME}_ContainerActionGroupBox
 )
 target_link_libraries(${PROJECT_NAME}_RobotDescriptionHandler
     ${catkin_LIBRARIES}
+)
+
+target_link_libraries(${PROJECT_NAME}_TabSensorsState
+    ${catkin_LIBRARIES}
+    Qt5::Widgets
 )
 
 #############

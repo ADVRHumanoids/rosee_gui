@@ -18,21 +18,31 @@
 #define TABSENSORSSTATE_H
 
 #include <QWidget>
+#include <QTableWidget>
+#include <ros/ros.h>
+
+#include <ros_msg_parser/ros_parser.hpp>
+
 
 /**
  * @todo write docs
  */
-class TabSensorsState :  public QWidget
+class TabSensorsState : public QWidget
 {
     Q_OBJECT
 public:
-    /**
-     * Constructor
-     *
-     * @param parent TODO
-     * @param f TODO
-     */
-    explicit TabSensorsState ( QWidget* parent = 0);
+    
+    explicit TabSensorsState ( ros::NodeHandle* nh, std::vector<std::string> topicNames,
+                               QWidget* parent = 0);
+    
+private: 
+    std::map<std::string, QTableWidget*> _tables ;
+    std::vector<ros::Subscriber> _subscribers;
+    
+    void topicCallback(const RosMsgParser::ShapeShifter& msg,
+                   const std::string &topic_name,
+                   RosMsgParser::ParsersCollection& rosIntroParsers);
+
 
 };
 

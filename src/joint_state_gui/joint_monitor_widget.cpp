@@ -95,9 +95,17 @@ JointMonitorWidget::JointMonitorWidget(ros::NodeHandle* nh,
 {
     
     std::string jsTopic;
-    nh->param<std::string>("/rosee/joint_states_topic", jsTopic, "/ros_end_effector/joint_states");
+    if (nh->getParam("/rosee/joint_states_topic", jsTopic)) {
+    
+        ROS_INFO_STREAM ( "[2nd Tab] Getting joint pos from '" << jsTopic << "'" );
+        
+    } else {
+        
+        ROS_ERROR_STREAM ( "[2nd Tab] Param '/rosee/joint_states_topic' not set in parameter server");
+        return ;
+    }
+    
     _jstate_sub = nh->subscribe(jsTopic, 10, &JointMonitorWidget::on_jstate_recv, this);
-    ROS_INFO_STREAM ( "[2nd Tab] Getting joint pos from '" << jsTopic << "'" );
 
     this->_robotDescriptionHandler = robotDescriptionHandler;
 

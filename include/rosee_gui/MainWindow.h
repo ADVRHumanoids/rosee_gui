@@ -22,6 +22,7 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 #include <rosee_gui/TabAction.h>
+#include <rosee_gui/TabSensorsState.h>
 
 #include <rosee_gui/RobotDescriptionHandler.h>
 

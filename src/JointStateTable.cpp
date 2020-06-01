@@ -90,9 +90,15 @@ bool JointStateTable::setJointStateSub(ros::NodeHandle* nh) {
     
     //to get joint state from gazebo, if used
     std::string jsTopic;
-    nh->param<std::string>("/rosee/joint_states_topic", jsTopic, "/ros_end_effector/joint_states");
+    if (nh->getParam("/rosee/joint_states_topic", jsTopic)) {
     
-    ROS_INFO_STREAM ( "Getting joint pos from '" << jsTopic << "'" );
+        ROS_INFO_STREAM ( "Getting joint pos from '" << jsTopic << "'" );
+        
+    } else {
+        
+        ROS_ERROR_STREAM ( "Param '/rosee/joint_states_topic' not set in parameter server");
+        return false;
+    }
     
     jointPosSub = nh->subscribe (jsTopic, 1, &JointStateTable::jointStateClbk, this);
 }
