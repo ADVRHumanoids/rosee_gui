@@ -85,8 +85,8 @@ void SensorStateTable::topicCallback(const topic_tools::ShapeShifter::ConstPtr& 
         for (auto it: flat_container.name)
         {
             
-            std::cout << it.first.toStdString() << std::endl;
-            std::cout << it.second << std::endl;
+            //std::cout << it.first.toStdString() << std::endl;
+           // std::cout << it.second << std::endl;
                     
             QTableWidgetItem* labelWidget = new QTableWidgetItem(QString::fromStdString(it.second));
             //it.first.index_array[0] contains the #, eg  for /js_publisher/joint_states/name.13 is 13
@@ -129,11 +129,15 @@ void SensorStateTable::topicCallback(const topic_tools::ShapeShifter::ConstPtr& 
         
     } else {
         
+        
         for (auto it: flat_container.value)
         {
 
             const std::string& key = it.first.toStdString();
             const RosIntrospection::Variant& value  = it.second;
+            
+            //std::cout << key << std::endl;
+            //std::cout << value.convert<double>() << std::endl;
             
             //TODO with new ros msg parse probably we can easily take the leaf of key     
             for (int i = 0; i < opt.columnNames.size(); i++) {

@@ -29,7 +29,7 @@ TabSensorsState::TabSensorsState ( ros::NodeHandle* nh, QWidget* parent ) : QWid
     }
     
     if (! parseConfigYaml(configFileName)) {
-        //TODO print error?
+        //error prints are already in the function
         return;
     }
     
