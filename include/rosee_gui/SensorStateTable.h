@@ -25,22 +25,28 @@
 #include <ros_type_introspection/ros_introspection.hpp>
 #include <topic_tools/shape_shifter.h> //necessary for introspection
 
+struct SensorsStateOption {
+    std::string topicName;
+    std::vector <std::string> columnNames;
+    std::string rowLabel;
+};
+
 /**
  * @todo write docs
  */
 class SensorStateTable :  public QTableWidget
 {
 public:
-    explicit SensorStateTable(ros::NodeHandle* nh, std::string topicName, QWidget* parent = 0);
+
+    explicit SensorStateTable(ros::NodeHandle* nh, SensorsStateOption opt, QWidget* parent = 0);
     
 private:
     bool initialized;
     ros::Subscriber _subscriber;
     RosIntrospection::Parser rosIntroParser;
+    SensorsStateOption opt;
     
-    void topicCallback(const topic_tools::ShapeShifter::ConstPtr& msg,
-                   const std::string &topic_name,
-                   RosIntrospection::Parser& parser);
+    void topicCallback(const topic_tools::ShapeShifter::ConstPtr& msg);
 
 
 };

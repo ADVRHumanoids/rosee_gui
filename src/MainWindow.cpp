@@ -27,11 +27,8 @@ MainWindow::MainWindow(ros::NodeHandle *nh, QWidget *parent) : QTabWidget(parent
     addTab(new TabAction(nh, robotDescriptionHandler,  parent), tr("Action"));
     
     addTab(new JointMonitorWidget (nh, robotDescriptionHandler,  parent), tr("RobotState"));
-    
-    std::vector<std::string> sensorTopics;
-    sensorTopics.push_back("/js_publisher/joint_states"); //TODO take this from a config file
-    sensorTopics.push_back("/js_publisher/joint_states"); //TODO take this from a config file
-    addTab(new TabSensorsState (nh, sensorTopics, parent), tr("SensorState"));
+
+    addTab(new TabSensorsState (nh, parent), tr("SensorState"));
 
 }
 

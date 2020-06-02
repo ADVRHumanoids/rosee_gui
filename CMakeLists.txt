@@ -317,6 +317,8 @@ target_link_libraries(${PROJECT_NAME}_TabSensorsState
     ${catkin_LIBRARIES}
     Qt5::Widgets
     ${PROJECT_NAME}_SensorStateTable
+    yaml-cpp
+
 )
 
 target_link_libraries(${PROJECT_NAME}_SensorStateTable

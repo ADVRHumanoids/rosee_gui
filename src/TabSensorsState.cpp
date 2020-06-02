@@ -16,25 +16,70 @@
 
 #include <rosee_gui/TabSensorsState.h>
 
-TabSensorsState::TabSensorsState ( ros::NodeHandle* nh, std::vector <std::string> topicNames,
-                                   QWidget* parent ) : QWidget(parent) {
+TabSensorsState::TabSensorsState ( ros::NodeHandle* nh, QWidget* parent ) : QWidget(parent) {
     
     QGridLayout *windowGrid = new QGridLayout;
-
+    
+    std::string configFileName;
+    
+    if (! nh->getParam("/ros_ee_config_path", configFileName) ) {
+        ROS_ERROR_STREAM ("[ERROR TabSensorsState]: parameter '/ros_ee_config_path'" <<
+            " not loaded on parameter server");
+        return;
+    }
+    
+    if (! parseConfigYaml(configFileName)) {
+        //TODO print error?
+        return;
+    }
+    
     unsigned int iTable = 0;
-    for (const auto name: topicNames) {
+    for (const auto opt: options) {
         
-        _tables[name] = new SensorStateTable(nh, name, parent);
+        _tables[opt.topicName] = new SensorStateTable(nh, opt, parent);
         
-        windowGrid->addWidget(_tables[name], iTable/2, iTable%2);
+        windowGrid->addWidget(_tables[opt.topicName], iTable/2, iTable%2);
 
         iTable++;
     }
     
     setLayout(windowGrid);
-  
 
+}
+
+bool TabSensorsState::parseConfigYaml(std::string filename) {
     
+    YAML::Node node = YAML::LoadFile(filename);
+    
+    if ( ! node["rosee_gui"] ) {
+        ROS_ERROR_STREAM ("[ERROR TabSensorsState]: Not found the node 'rosee_gui' in the config file '" << filename << "' , or the file is missing" );
+            return false;
+    }
+    
+    if (! node["rosee_gui"]["sensors_state_widget"] ) {
+        ROS_ERROR_STREAM ("[ERROR TabSensorsState]: Not found the child node 'sensors_state_widget' of 'rosee_gui' in the config file '" << filename);
+            return false;    
+    }
+    
+    for ( const auto element : node["rosee_gui"]["sensors_state_widget"] ) {
+    //one element for each table to build
+    
+        
+        SensorsStateOption opt;
+        opt.topicName = element["topic_name"].as<std::string>();
+
+        for ( const auto col : element["column_names"] ) {
+            opt.columnNames.push_back( col.first.as<std::string>() );
+        }
+        
+        if ( element["row_name"] ) {
+            opt.rowLabel = element["row_name"].as<std::string>();
+        }
+        
+        options.push_back(opt);
+    }
+    
+    return true;    
 }
 
 

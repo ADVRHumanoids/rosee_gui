@@ -16,11 +16,20 @@
 
 #include <rosee_gui/SensorStateTable.h>
 
-SensorStateTable::SensorStateTable(ros::NodeHandle* nh, std::string topicName, QWidget* parent)
+SensorStateTable::SensorStateTable(ros::NodeHandle* nh, SensorsStateOption opt, QWidget* parent)
     : QTableWidget(0,0, parent) {
        
     initialized = false;    
     setMinimumSize(1000,1000);
+    this->opt = opt;
+    setColumnCount ( opt.columnNames.size() );
+    
+    QStringList headerLabels;
+    for ( const auto col : opt.columnNames ) {
+    
+        headerLabels.append(QString::fromStdString(col));
+    }
+    setHorizontalHeaderLabels(headerLabels);
     
      //table not editable
     setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -32,35 +41,26 @@ SensorStateTable::SensorStateTable(ros::NodeHandle* nh, std::string topicName, Q
     horizontalHeader()->setSectionsMovable(true); 
     verticalHeader()->setSectionsMovable(true); 
     
-    //TODO take info somewhere
-    setColumnCount(3);
-    QStringList headerLabels;
-    headerLabels.append("Position");
-    headerLabels.append("Velocity");
-    headerLabels.append("Effort");
-    setHorizontalHeaderLabels(headerLabels);
-    
+
     //who is afraid of lambdas and boost::functions ?
     boost::function<void(const topic_tools::ShapeShifter::ConstPtr&) > callback;
-    callback = [this, topicName](const topic_tools::ShapeShifter::ConstPtr& msg) -> void
+    callback = [this](const topic_tools::ShapeShifter::ConstPtr& msg) -> void
     {
-        this->topicCallback(msg, topicName, rosIntroParser) ;
+        this->topicCallback(msg) ;
     };
-    _subscriber =  nh->subscribe(topicName, 1, callback) ; 
+    _subscriber =  nh->subscribe(opt.topicName, 1, callback) ; 
         
         
 }
 
 
-void SensorStateTable::topicCallback(const topic_tools::ShapeShifter::ConstPtr& msg,
-                   const std::string &topic_name,
-                   RosIntrospection::Parser& rosIntroParser) {
+void SensorStateTable::topicCallback(const topic_tools::ShapeShifter::ConstPtr& msg) {
     
     const std::string&  datatype   =  msg->getDataType();
     const std::string&  definition =  msg->getMessageDefinition();
 
     // don't worry if you do this more than once: already registered message are not overwritten.
-    rosIntroParser.registerMessageDefinition( topic_name,
+    rosIntroParser.registerMessageDefinition( opt.topicName,
                                       RosIntrospection::ROSType(datatype),
                                       definition );
     
@@ -68,7 +68,7 @@ void SensorStateTable::topicCallback(const topic_tools::ShapeShifter::ConstPtr& 
     static std::vector<uint8_t> buffer;
     static std::map<std::string,RosIntrospection::FlatMessage>   flat_containers;
 
-    RosIntrospection::FlatMessage&   flat_container = flat_containers[topic_name];
+    RosIntrospection::FlatMessage&   flat_container = flat_containers[opt.topicName];
 
     // copy raw memory into the buffer
     buffer.resize( msg->size() );
@@ -77,7 +77,7 @@ void SensorStateTable::topicCallback(const topic_tools::ShapeShifter::ConstPtr& 
 
 
     // deserialize and rename the vectors
-    rosIntroParser.deserializeIntoFlatContainer( topic_name, RosIntrospection::Span<uint8_t>(buffer),
+    rosIntroParser.deserializeIntoFlatContainer( opt.topicName, RosIntrospection::Span<uint8_t>(buffer),
                                                  &flat_container, 100);
 
     if (initialized == false) {
@@ -135,47 +135,26 @@ void SensorStateTable::topicCallback(const topic_tools::ShapeShifter::ConstPtr& 
             const std::string& key = it.first.toStdString();
             const RosIntrospection::Variant& value  = it.second;
             
-            //TODO take this from config file
-            //find the substring "position"
-            if (key.find("position") != std::string::npos) {
+            //TODO with new ros msg parse probably we can easily take the leaf of key     
+            for (int i = 0; i < opt.columnNames.size(); i++) {
                 
-                if (it.first.index_array.size()>0){
+                std::string col = opt.columnNames.at(i);
+                
+                if (key.find(col) != std::string::npos) {
+                    
+                    if (it.first.index_array.size()>0){
 
-                    item(it.first.index_array[0], 0) -> //TODO col not hardcoded but take position
-                        setText(QString::number(value.convert<double>(), 'f', 2) );
+                        item(it.first.index_array[0], i) ->
+                            setText(QString::number(value.convert<double>(), 'f', 2) );
                         
-                } else {
-                    item(0, 0) -> //TODO col not hardcoded but take position
-                        setText(QString::number(value.convert<double>(), 'f', 2) ); 
-                }
-                
-                
-            } else if (key.find("velocity") != std::string::npos) {
-                
-                if (it.first.index_array.size()>0){
-
-                    this->item(it.first.index_array[0], 1) -> //TODO col not hardcoded but take position
-                        setText(QString::number(value.convert<double>(), 'f', 2) );
-                        
-                } else {
-                    item(0, 0) -> //TODO col not hardcoded but take position
-                        setText(QString::number(value.convert<double>(), 'f', 2) ); 
-                }
-                
-                
-            } else if (key.find("effort") != std::string::npos) {
-                
-                if (it.first.index_array.size()>0){
-
-                    this->item(it.first.index_array[0], 2) -> //TODO col not hardcoded but take position
-                        setText(QString::number(value.convert<double>(), 'f', 2) );
-                        
-                } else {
-                    item(0, 0) -> //TODO col not hardcoded but take position
-                        setText(QString::number(value.convert<double>(), 'f', 2) ); 
-                }
-                
-            }  
+                    } else {
+                        item(0, i) -> 
+                            setText(QString::number(value.convert<double>(), 'f', 2) ); 
+                    }
+                    
+                    continue; //no need to go on with the for loop
+                }        
+            }           
         }
     }
 }

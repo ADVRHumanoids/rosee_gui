@@ -21,6 +21,7 @@
 #include <QGridLayout>
 #include <rosee_gui/SensorStateTable.h>
 #include <ros/ros.h>
+#include <yaml-cpp/yaml.h>
 
 
 /**
@@ -31,11 +32,13 @@ class TabSensorsState : public QWidget
     Q_OBJECT
 public:
     
-    explicit TabSensorsState ( ros::NodeHandle* nh, std::vector<std::string> topicNames,
-                               QWidget* parent = 0);
+    explicit TabSensorsState ( ros::NodeHandle* nh, QWidget* parent = 0);
     
 private: 
     std::map<std::string, SensorStateTable*> _tables ;
+    bool parseConfigYaml (std::string filename);
+    
+    std::vector<SensorsStateOption> options;
 
 };
 
