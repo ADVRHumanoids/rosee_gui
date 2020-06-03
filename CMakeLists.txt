@@ -34,8 +34,8 @@ find_package(catkin REQUIRED COMPONENTS
 
 
 #not catkin packages
-find_package(Qt5Widgets REQUIRED)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
+
 
 
 ## System dependencies are found with CMake's conventions
