@@ -34,6 +34,11 @@
   <!-- Use depend as a shortcut for packages that are both build and exec dependencies -->
     <depend>roscpp</depend>
     <depend>ros_end_effector</depend>
+    <depend>rosee_msg</depend>
+    <depend>actionlib</depend>
+    <depend>srdfdom</depend>
+    <depend>rqt_gui</depend>
+    <depend>rqt_gui_cpp</depend>
   <!--   Note that this is equivalent to the following: -->
   <!--   <build_depend>roscpp</build_depend> -->
   <!--   <exec_depend>roscpp</exec_depend> -->
@@ -51,10 +56,9 @@
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
 
-
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->
-
+    <rqt_gui plugin="${prefix}/plugin.xml"/>
   </export>
 </package>

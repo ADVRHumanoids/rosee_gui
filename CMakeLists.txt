@@ -27,10 +27,14 @@ find_package(catkin REQUIRED COMPONENTS
     rosee_msg
     actionlib
     srdfdom
+    # rqt integration:
+    rqt_gui 
+    rqt_gui_cpp
 )
 
 
 #not catkin packages
+find_package(Qt5Widgets REQUIRED)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
 
@@ -41,7 +45,8 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-# catkin_python_setup()
+catkin_python_setup()
+
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -123,10 +128,17 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES rosee_gui
-#  CATKIN_DEPENDS 
-#        roscpp
+  INCLUDE_DIRS include
+  LIBRARIES ${PROJECT_NAME}
+  CATKIN_DEPENDS 
+    roscpp
+    ros_end_effector #for action type 
+    rosee_msg
+    actionlib
+    srdfdom
+    # rqt integration:
+    rqt_gui 
+    rqt_gui_cpp
 #  DEPENDS system_lib
 )
 
@@ -157,6 +169,7 @@ add_library(${PROJECT_NAME}_TabAction SHARED
     src/TabAction.cpp
     include/rosee_gui/TabAction.h
 )
+qt5_wrap_cpp(${PROJECT_NAME}_TabAction_MOCS src/TabAction.cpp)
 
 add_library(${PROJECT_NAME}_SingleActionGroupBox SHARED
     src/SingleActionGroupBox.cpp
@@ -322,18 +335,24 @@ target_link_libraries(${PROJECT_NAME}_RobotDescriptionHandler
 
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
-# install(TARGETS ${PROJECT_NAME}
+#install(TARGETS ${PROJECT_NAME}
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
-# )
+#)
 
 ## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-# )
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+)
+ 
+install(FILES plugin.xml
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+
+install(PROGRAMS 
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES

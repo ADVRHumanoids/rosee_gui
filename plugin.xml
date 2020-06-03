@@ -1,0 +1,20 @@
+<library path="lib/librosee_gui">
+  <class name="rosee_gui/TabAction" type="rosee_gui::TabAction" base_class_type="rqt_gui_cpp::Plugin">
+    <description>
+      GUI for ROS End-Effector package
+    </description>
+    <qtgui>
+      <!-- optional grouping...
+      <group>
+        <label>Group</label>
+      </group>
+      <group>
+        <label>Subgroup</label>
+      </group>
+      -->
+      <label>ROS End-Effector </label>
+      <icon type="theme">system-help</icon>
+      <statustip>GUI for ROS End-Effector package</statustip>
+    </qtgui>
+  </class>
+</library>

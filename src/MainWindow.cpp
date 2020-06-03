@@ -25,7 +25,7 @@ MainWindow::MainWindow(ros::NodeHandle *nh, QWidget *parent) : QTabWidget(parent
 
     robotDescriptionHandler = std::make_shared<RobotDescriptionHandler>(urdf_file, srdf_file);
 
-    addTab(new TabAction(nh, robotDescriptionHandler,  parent), tr("Action"));
+    //addTab(new rosee_gui::TabAction(nh, robotDescriptionHandler,  parent), tr("Action"));
     
     addTab(new JointMonitorWidget (nh, robotDescriptionHandler,  parent), tr("RobotState"));
 
