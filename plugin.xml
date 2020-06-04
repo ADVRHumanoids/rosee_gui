@@ -1,4 +1,4 @@
-<library path="lib/librosee_gui">
+<library path="lib/librosee_gui_TabAction">
   <class name="rosee_gui/TabAction" type="rosee_gui::TabAction" base_class_type="rqt_gui_cpp::Plugin">
     <description>
       GUI for ROS End-Effector package

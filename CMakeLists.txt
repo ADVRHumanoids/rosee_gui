@@ -6,7 +6,11 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 ## qt5.12 path to be declared
-#set(QT5_PATH "/usr/lib/x86_64-linux-gnu/Qt5.12.8/5.12.8/gcc_64")
+
+##This set is necessary if you build from scratch (no devel and build folders).
+#Then it can be commented, probably the variable remain stored 
+set(QT5_PATH "/usr/lib/x86_64-linux-gnu/Qt5.12.8/5.12.8/gcc_64")
+
 #set(QT5_PATH "" CACHE PATH "Path to QT > 5.9")
 #set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${QT5_PATH}")
 

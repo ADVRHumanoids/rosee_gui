@@ -8,6 +8,8 @@
 #include <QtCharts/QValueAxis>
 #include <QLabel>
 
+#include <chrono>
+
 QT_CHARTS_USE_NAMESPACE
 
 class CustomChartView : public QChartView
