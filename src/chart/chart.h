@@ -7,6 +7,7 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
 #include <QLabel>
+#include <chrono>
 
 QT_CHARTS_USE_NAMESPACE
 
