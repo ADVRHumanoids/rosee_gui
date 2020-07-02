@@ -4,6 +4,7 @@ add_compile_options(-std=c++14)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
+set(QT5_PATH "/usr/share/qt5-15/5.15.0/gcc_64")
 set(QT5_PATH "" CACHE PATH "Path to QT > 5.9")
 set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${QT5_PATH}")
 
