@@ -96,7 +96,7 @@ ContainerActionGroupBox::ContainerActionGroupBox (ros::NodeHandle* nh, QWidget* 
     }
 
     //special last button to reset all widget and send 0 pos to all joints
-    resetButton = new QPushButton("Reset", this);
+    resetButton = new QPushButton("Reset GUI", this);
     resetButton->setMinimumSize(50,50);
     resetButton->setAutoFillBackground(true);
     QPalette palette = resetButton->palette();

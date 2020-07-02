@@ -27,6 +27,7 @@ SingleActionBoxesGroupBox::SingleActionBoxesGroupBox (ros::NodeHandle* nh,
 
     QGridLayout *boxesLayout = new QGridLayout;
     unsigned int buttonId = 0;
+    unsigned int buttonRowColCount = 0; //can be higher that Id because some label may be too long and they do not fit in the second column
     for (auto el : actInfo.selectable_names) {
         QCheckBox* newBox =  new QCheckBox( QString::fromStdString(el));
         newBox->setChecked(false);
@@ -34,8 +35,14 @@ SingleActionBoxesGroupBox::SingleActionBoxesGroupBox (ros::NodeHandle* nh,
         newBox->setToolTip(QString::fromStdString(el));
         boxes->addButton ( newBox, buttonId );
 
-        boxesLayout->addWidget(newBox, buttonId/2, (buttonId%2));
+        //if names is too long and it is in the second column, go to new line
+        if ((buttonRowColCount%2) == 1 && el.size() > 11) {
+            buttonRowColCount++;
+        }
+        
+        boxesLayout->addWidget(newBox, buttonRowColCount/2, (buttonRowColCount%2));
         buttonId++;
+        buttonRowColCount++;
     }
 
     QObject::connect( boxes, SIGNAL (buttonClicked(QAbstractButton*)), this,
@@ -85,15 +92,23 @@ SingleActionBoxesGroupBox::SingleActionBoxesGroupBox (ros::NodeHandle* nh,
 
     QGridLayout *boxesLayout = new QGridLayout;
     unsigned int buttonId = 0;
+    unsigned int buttonRowColCount = 0; //can be higher that Id because some label may be too long and they do not fit in the second column
+
     for (auto el : actInfo.selectable_names) {
         QCheckBox* newBox =  new QCheckBox( QString::fromStdString(el));
         newBox->setChecked(false);
         //tooltip on each checkbox so we can read if the label is cut becasue of no space
         newBox->setToolTip(QString::fromStdString(el));
         boxes->addButton ( newBox, buttonId );
+        
+        //if names is too long and it is in the second column, go to new line
+        if ((buttonRowColCount%2) == 1 && el.size() > 11) {
+            buttonRowColCount++;
+        }
 
-        boxesLayout->addWidget(newBox, buttonId/2, (buttonId%2));
+        boxesLayout->addWidget(newBox, buttonRowColCount/2, (buttonRowColCount%2));
         buttonId++;
+        buttonRowColCount++;
     }
 
     QObject::connect( boxes, SIGNAL (buttonClicked(QAbstractButton*)), this,

@@ -41,13 +41,13 @@ SingleActionTimedGroupBox::SingleActionTimedGroupBox (ros::NodeHandle* nh, rosee
     setRosActionClient(nh, actInfo.ros_action_name);
                                           
     this->setMinimumSize(120*nInner,100);
-    this->setMaximumSize(300*nInner,400);
+    this->setMaximumSize(400*nInner,400);
 
     grid = new QGridLayout;
     
     windowLabel = new QLabel (QString::fromStdString(actInfo.action_name));
     windowLabel->setAlignment(Qt::AlignCenter);
-    windowLabel->setStyleSheet("QLabel { font-size : 27px }");
+    windowLabel->setStyleSheet("QLabel { font-size : 25px }");
     grid->addWidget(windowLabel, 0, 0, 1, nInner);
     
     send_button = new QPushButton ( "SEND", this );
