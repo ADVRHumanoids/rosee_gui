@@ -97,14 +97,16 @@ ContainerActionGroupBox::ContainerActionGroupBox (ros::NodeHandle* nh, QWidget* 
 
     //special last button to reset all widget and send 0 pos to all joints
     resetButton = new QPushButton("Reset GUI", this);
-    resetButton->setMinimumSize(50,50);
+    resetButton->setMinimumSize(150,50);
+    resetButton->setMaximumSize(200,70);
     resetButton->setAutoFillBackground(true);
     QPalette palette = resetButton->palette();
     resetButton->setStyleSheet("QPushButton {background-color: red; color: black;}");
     resetButton->setPalette(palette);
     connect (resetButton, SIGNAL (clicked()), this, SLOT (resetButtonClicked()));
     
-    grid->addWidget(resetButton, rowCol/4, rowCol%4);
+    //we place the button spanning the available space in the row (so, 4-(rowCol/4) )
+    grid->addWidget(resetButton, rowCol/4, rowCol%4, 1, 4-(rowCol/4), Qt::AlignCenter);
     
     this->setLayout(grid);
     
