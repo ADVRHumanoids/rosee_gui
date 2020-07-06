@@ -78,6 +78,8 @@ private:
     QProgressBar * _bar;
     QLabel * _jname;
     QLabel * _status;
+    
+    QString originalJname;
 
     Blinker _blinker;
     int _state;

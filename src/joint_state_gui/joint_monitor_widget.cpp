@@ -147,7 +147,7 @@ JointMonitorWidget::JointMonitorWidget(ros::NodeHandle* nh,
         wid->setActive();
     };
 
-    on_joint_clicked(_jnames[0]);
+    on_joint_clicked(jointsOrdered[0]);
 
     for(auto p: barplot_wid->wid_map)
     {

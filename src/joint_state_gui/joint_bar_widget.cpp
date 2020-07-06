@@ -55,6 +55,10 @@ JointBarWidget::JointBarWidget(const QString& jname, QWidget *parent) :
     _jname = findChild<QLabel *>("JointLabel");
     _jname->installEventFilter(this);
     _jname->setText(jname);
+    
+    //so we can modify the label with (active, passive, mimic) and still return
+    //the right joint name
+    originalJname = jname;
 
     _on_double_click = [](){};
 }
@@ -131,7 +135,8 @@ void JointBarWidget::setInactive()
 
 QString JointBarWidget::getJointName() const
 {
-    return _jname->text();
+    //return _jname->text();
+    return originalJname;
 }
 
 void JointBarWidget::setColor(Qt::GlobalColor color)
