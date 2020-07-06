@@ -49,6 +49,8 @@ ChartWidget::ChartWidget(QWidget * parent):
     
     //show name in tooltip when it is too long to be visualized
     _chart->legend()->setShowToolTips(true);
+    _chart->legend()->setFont(QFont("Ubuntu", 9));
+    _chart->legend()->setMaximumWidth(290);
 
     /* Axes */
     _axis_x = new QValueAxis;
