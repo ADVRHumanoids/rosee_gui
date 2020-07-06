@@ -34,7 +34,7 @@ class JointStateTable : public QTableWidget
     
 public:
     explicit JointStateTable(ros::NodeHandle* nh, 
-                             std::map<std::string, ROSEE::JointActuatedType> jointMap,
+                             std::vector<std::string> jointNames,
                              QWidget *parent = nullptr);
     
 private:

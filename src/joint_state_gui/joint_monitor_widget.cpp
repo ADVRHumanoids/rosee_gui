@@ -128,11 +128,14 @@ JointMonitorWidget::JointMonitorWidget(ros::NodeHandle* nh,
         }
     }
 
+    //we use a vector which contains all joint names, but ordered by type
+    //first the active, then the mimic, then the passive.
+    std::vector<std::string> jointsOrdered = robotDescriptionHandler->getAllJoints();
 
     jstate_wid = new JointStateWidget(this);
-    jstate_wid->setJointName(QString::fromStdString(_jnames[0]), 0);
+    jstate_wid->setJointName(QString::fromStdString(jointsOrdered[0]), 0);
 
-    barplot_wid = new BarPlotWidget(_jnames, this);
+    barplot_wid = new BarPlotWidget(jointsOrdered, this);
 
     auto on_joint_clicked = [this](std::string jname)
     {
@@ -162,27 +165,34 @@ JointMonitorWidget::JointMonitorWidget(ros::NodeHandle* nh,
         
         
         //color the joint names accordingly to actuated type
-        ROSEE::JointActuatedType type = robotDescriptionHandler->getActuatedJointsMap().at(p.first);
+        ROSEE::JointActuatedType type = 
+            robotDescriptionHandler->getActuatedTypeJointsMap().at(p.first);
             
-        if (type == ROSEE::JointActuatedType::ACTUATED) {
-            
-            p.second->findChild<QLabel *>("JointLabel")->setStyleSheet(
-                "background-color: rgba(0,255,0,0.5)");
+        QString temp = p.second->findChild<QLabel *>("JointLabel")->text();
 
+        if (type == ROSEE::JointActuatedType::ACTIVE) {
+            
+            temp.append(" (active)" );
+            p.second->findChild<QLabel *>("JointLabel")->setText(temp);
+            
         } else if (type == ROSEE::JointActuatedType::MIMIC) {
 
-            p.second->findChild<QLabel *>("JointLabel")->setStyleSheet(
-                "background-color: rgba(255,255,0,0.5)");
+            temp.append(" (mimic)" );
+            p.second->findChild<QLabel *>("JointLabel")->setText(temp);
+            
+        } else if (type == ROSEE::JointActuatedType::PASSIVE) {
+            
+            temp.append(" (passive)" );
+            p.second->findChild<QLabel *>("JointLabel")->setText(temp);
             
         } else {
-            
-            p.second->findChild<QLabel *>("JointLabel")->setStyleSheet(
-                "background-color: rgba(255,0,0,0.5)");
+            temp.append(" (type unknown)" );
+            p.second->findChild<QLabel *>("JointLabel")->setText(temp);
         }
     }
 
     _chart = new ChartWidget;
-    _chart->setMinimumSize(640, 400);
+    _chart->setMinimumSize(900, 400);
 
     auto layout = new QHBoxLayout(this);
     layout->addWidget(barplot_wid);

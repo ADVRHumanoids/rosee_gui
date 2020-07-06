@@ -20,34 +20,20 @@ JointStateContainer::JointStateContainer (ros::NodeHandle* nh,
                                           std::shared_ptr<RobotDescriptionHandler> robotDescriptionHandler,
                                           QWidget *parent) : QVBoxLayout(parent) {
     
+                                              
+    activeJointStateTable = new JointStateTable(
+        nh, 
+        robotDescriptionHandler->getJointsByActuatedType(ROSEE::JointActuatedType::ACTIVE), 
+        parent);
+    mimicJointStateTable = new JointStateTable(
+        nh, 
+        robotDescriptionHandler->getJointsByActuatedType(ROSEE::JointActuatedType::MIMIC), 
+        parent);
+    passiveJointStateTable = new JointStateTable(
+        nh, 
+        robotDescriptionHandler->getJointsByActuatedType(ROSEE::JointActuatedType::PASSIVE), 
+        parent);
 
-    std::map<std::string, ROSEE::JointActuatedType> activeJointMap;
-    std::map<std::string, ROSEE::JointActuatedType> mimicointMap;
-    std::map<std::string, ROSEE::JointActuatedType> passiveJointMap;
-    
-    auto actuatedTypeJointFullMap = robotDescriptionHandler->getActuatedJointsMap();
-
-    for (auto it : actuatedTypeJointFullMap) {
-        switch (it.second){
-        
-            case ROSEE::JointActuatedType::ACTUATED :
-                activeJointMap[it.first] = it.second;
-                break;
-            case ROSEE::JointActuatedType::MIMIC :
-                mimicointMap[it.first] = it.second;
-                break;
-            case ROSEE::JointActuatedType::PASSIVE :
-                passiveJointMap[it.first] = it.second;
-                break;
-            default:
-                break;
-        }
-    }
-                                          
-    activeJointStateTable = new JointStateTable(nh, activeJointMap, parent);
-    mimicJointStateTable = new JointStateTable(nh, mimicointMap, parent);
-    passiveJointStateTable = new JointStateTable(nh, passiveJointMap, parent);
-    
     QGridLayout* jointStateTableOptions = new QGridLayout;
     
     QCheckBox* posBox = new QCheckBox ( "position");

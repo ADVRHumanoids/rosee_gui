@@ -18,7 +18,7 @@
 #include <qheaderview.h> //to modify font size
 
 JointStateTable::JointStateTable (ros::NodeHandle* nh, 
-                                   std::map<std::string, ROSEE::JointActuatedType> jointMap, QWidget *parent) :
+                                   std::vector<std::string> jointNames, QWidget *parent) :
     QTableWidget(0, 0, parent) {
         
     if (setJointStateSub(nh)) {
@@ -49,12 +49,12 @@ JointStateTable::JointStateTable (ros::NodeHandle* nh,
         horizontalFont.setPointSize(8);
         this->horizontalHeader()->setFont(horizontalFont);
 
-        this->setRowCount(jointMap.size());
+        this->setRowCount(jointNames.size());
         
         int row = 0;
-        for (auto mapEl : jointMap) {
+        for (auto joint : jointNames) {
             
-            QTableWidgetItem* labelWidget = new QTableWidgetItem(QString::fromStdString(mapEl.first));
+            QTableWidgetItem* labelWidget = new QTableWidgetItem(QString::fromStdString(joint));
 
             setVerticalHeaderItem(row, labelWidget);
             
@@ -65,7 +65,7 @@ JointStateTable::JointStateTable (ros::NodeHandle* nh,
 
             
             //we need this to update the correct row in the callback
-            jointNameRowMap[mapEl.first] = row;
+            jointNameRowMap[joint] = row;
             row++;
         }
 
