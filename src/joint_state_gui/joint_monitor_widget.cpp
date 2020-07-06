@@ -230,6 +230,8 @@ void JointMonitorWidget::on_jstate_recv(const sensor_msgs::JointStateConstPtr& m
     {
         return;
     }
+    
+
 
     static auto t0 = msg->header.stamp;
     auto now = msg->header.stamp;
@@ -238,6 +240,11 @@ void JointMonitorWidget::on_jstate_recv(const sensor_msgs::JointStateConstPtr& m
 
     for(int i = 0; i < msg->name.size(); i++)
     {
+        
+        if (_urdf->getJoint(msg->name[i])->type == urdf::Joint::FIXED) {
+            ROS_WARN_STREAM ("JointMonitorWidget::on_jstate_recv: received state for the fixed joint " << msg->name[i] << ", skipping it");
+            continue;
+        }
 
         _chart->addPoint(QString::fromStdString(msg->name[i]) + "/joint_pos",
                          (now - t0).toSec(),

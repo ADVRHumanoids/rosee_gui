@@ -21,6 +21,7 @@
 #include <QVBoxLayout>
 #include <QCheckBox>
 #include <QGridLayout>
+#include <QLabel>
 
 #include <rosee_gui/JointStateTable.h>
 #include <rosee_gui/RobotDescriptionHandler.h>
@@ -46,8 +47,14 @@ public slots:
     void showPassiveJoints (int);
     
 private: 
-    JointStateTable* jointStateTable;
-    std::shared_ptr<RobotDescriptionHandler> robotDescriptionHandler;
+    JointStateTable* activeJointStateTable;
+    JointStateTable* mimicJointStateTable;
+    JointStateTable* passiveJointStateTable;
+    
+    QLabel* activeJointslabel;
+    QLabel* mimicJointslabel;
+    QLabel* passiveJointslabel;
+
 };
 
 #endif // JOINTSTATECONTAINER_H

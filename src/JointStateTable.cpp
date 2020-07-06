@@ -18,7 +18,7 @@
 #include <qheaderview.h> //to modify font size
 
 JointStateTable::JointStateTable (ros::NodeHandle* nh, 
-                                  std::shared_ptr<RobotDescriptionHandler> robotDescriptionHandler, QWidget *parent) :
+                                   std::map<std::string, ROSEE::JointActuatedType> jointMap, QWidget *parent) :
     QTableWidget(0, 0, parent) {
         
     if (setJointStateSub(nh)) {
@@ -49,23 +49,12 @@ JointStateTable::JointStateTable (ros::NodeHandle* nh,
         horizontalFont.setPointSize(8);
         this->horizontalHeader()->setFont(horizontalFont);
 
-        auto actuatedJointMap = robotDescriptionHandler->getActuatedJointsMap();
-        this->setRowCount(actuatedJointMap.size());
+        this->setRowCount(jointMap.size());
         
         int row = 0;
-        for (auto mapEl : actuatedJointMap) {
+        for (auto mapEl : jointMap) {
             
             QTableWidgetItem* labelWidget = new QTableWidgetItem(QString::fromStdString(mapEl.first));
-            
-            if (mapEl.second == ROSEE::JointActuatedType::ACTUATED) {
-                labelWidget->setBackground(Qt::green);
-                
-            } else if (mapEl.second == ROSEE::JointActuatedType::MIMIC) {
-                labelWidget->setBackground(Qt::yellow);     
-                
-            } else {
-                labelWidget->setBackground(Qt::red);
-            }
 
             setVerticalHeaderItem(row, labelWidget);
             
@@ -104,7 +93,8 @@ void JointStateTable::jointStateClbk(const sensor_msgs::JointStateConstPtr& msg)
         auto mapEl = jointNameRowMap.find(msg->name[i]);
         
         if (mapEl == jointNameRowMap.end()){
-            ROS_WARN_STREAM (__func__ << " '" << msg->name[i] << "' not found in the table of joint states" );
+           // ROS_WARN_STREAM (__func__ << " '" << msg->name[i] << "' not found in the table of joint states" );
+            //now it is normal to go here, because in joinNAmeRowMap only a category of joint is present (mimic active or passive)
         
         } else {
             int row = mapEl->second;

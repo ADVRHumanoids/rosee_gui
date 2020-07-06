@@ -19,10 +19,35 @@
 JointStateContainer::JointStateContainer (ros::NodeHandle* nh,
                                           std::shared_ptr<RobotDescriptionHandler> robotDescriptionHandler,
                                           QWidget *parent) : QVBoxLayout(parent) {
- 
-    this->robotDescriptionHandler = robotDescriptionHandler;
-                                              
-    jointStateTable = new JointStateTable(nh, robotDescriptionHandler, parent);
+    
+
+    std::map<std::string, ROSEE::JointActuatedType> activeJointMap;
+    std::map<std::string, ROSEE::JointActuatedType> mimicointMap;
+    std::map<std::string, ROSEE::JointActuatedType> passiveJointMap;
+    
+    auto actuatedTypeJointFullMap = robotDescriptionHandler->getActuatedJointsMap();
+
+    for (auto it : actuatedTypeJointFullMap) {
+        switch (it.second){
+        
+            case ROSEE::JointActuatedType::ACTUATED :
+                activeJointMap[it.first] = it.second;
+                break;
+            case ROSEE::JointActuatedType::MIMIC :
+                mimicointMap[it.first] = it.second;
+                break;
+            case ROSEE::JointActuatedType::PASSIVE :
+                passiveJointMap[it.first] = it.second;
+                break;
+            default:
+                break;
+        }
+    }
+                                          
+    activeJointStateTable = new JointStateTable(nh, activeJointMap, parent);
+    mimicJointStateTable = new JointStateTable(nh, mimicointMap, parent);
+    passiveJointStateTable = new JointStateTable(nh, passiveJointMap, parent);
+    
     QGridLayout* jointStateTableOptions = new QGridLayout;
     
     QCheckBox* posBox = new QCheckBox ( "position");
@@ -43,8 +68,8 @@ JointStateContainer::JointStateContainer (ros::NodeHandle* nh,
     QObject::connect( effBox, SIGNAL (stateChanged(int)), 
                       this,   SLOT(showEffortCol(int)) );
     
-    QCheckBox* actuatedBox = new QCheckBox ( "actuated joints");
-    actuatedBox->setToolTip("Check to show the state of actuated joints");
+    QCheckBox* actuatedBox = new QCheckBox ( "active joints");
+    actuatedBox->setToolTip("Check to show the state of active joints");
     actuatedBox->setChecked(true);
     QObject::connect( actuatedBox, SIGNAL (stateChanged(int)), 
                       this,   SLOT(showActuatedJoints(int)) );
@@ -68,83 +93,65 @@ JointStateContainer::JointStateContainer (ros::NodeHandle* nh,
     jointStateTableOptions->addWidget(mimicBox, 1, 1);
     jointStateTableOptions->addWidget(passiveBox, 1, 2);
 
-    this->addWidget(jointStateTable);
+    
+    activeJointslabel = new QLabel(activeJointStateTable);
+    activeJointslabel->setText("Active Joints");
+    this->addWidget(activeJointslabel);
+    this->addWidget(activeJointStateTable);
+
+
+    mimicJointslabel = new QLabel(mimicJointStateTable);
+    mimicJointslabel->setText("Mimic Joints");
+    mimicJointslabel->setContentsMargins(0,20,0,0);
+    this->addWidget(mimicJointslabel);
+    this->addWidget(mimicJointStateTable);
+
+    
+    passiveJointslabel = new QLabel(passiveJointStateTable);
+    passiveJointslabel->setText("Passive Joints");
+    passiveJointslabel->setContentsMargins(0,20,0,0);
+    this->addWidget(passiveJointslabel);
+    this->addWidget(passiveJointStateTable);
     this->addLayout(jointStateTableOptions);
     
 }
 
 void JointStateContainer::showActuatedJoints(int state) {
     
-    auto actuatedJointMap = robotDescriptionHandler->getActuatedJointsMap();
-    
-    for (int row = 0; row < jointStateTable->rowCount(); row++) {
+    if (state == Qt::Checked) {
+        activeJointStateTable->setHidden(false);
+        activeJointslabel->setHidden(false);
         
-        std::string jointName = jointStateTable->verticalHeaderItem(row)->text().toStdString();
+    } else {
+        activeJointStateTable->setHidden(true);
+        activeJointslabel->setHidden(true);     
         
-        auto mapEl = actuatedJointMap.find(jointName);
-        
-        if (mapEl == actuatedJointMap.end()) {
-            
-            ROS_ERROR_STREAM (__func__ << " '" << jointName << "' not found in the joint map" <<
-               " of the robotDescriptionHandler, strange error happened" );
-            return;
-        }
-        
-        if (mapEl->second == ROSEE::JointActuatedType::ACTUATED) {
-            
-            (state == Qt::Checked) ? jointStateTable->setRowHidden(row, false) : 
-                                     jointStateTable->setRowHidden(row, true);
-        }
     }
 }
 
 void JointStateContainer::showMimicJoints(int state) {
     
-    auto actuatedJointMap = robotDescriptionHandler->getActuatedJointsMap();
-    
-    for (int row = 0; row < jointStateTable->rowCount(); row++) {
+    if (state == Qt::Checked) {
+        mimicJointStateTable->setHidden(false);
+        mimicJointslabel->setHidden(false);
         
-        std::string jointName = jointStateTable->verticalHeaderItem(row)->text().toStdString();
+    } else {
+        mimicJointStateTable->setHidden(true);
+        mimicJointslabel->setHidden(true);     
         
-        auto mapEl = actuatedJointMap.find(jointName);
-        
-        if (mapEl == actuatedJointMap.end()) {
-            
-            ROS_ERROR_STREAM (__func__ << " '" << jointName << "' not found in the joint map" <<
-               " of the robotDescriptionHandler, strange error happened" );
-            return;
-        }
-        
-        if (mapEl->second == ROSEE::JointActuatedType::MIMIC) {
-            
-            (state == Qt::Checked) ? jointStateTable->setRowHidden(row, false) : 
-                                     jointStateTable->setRowHidden(row, true);
-        }
     }
 }
 
 void JointStateContainer::showPassiveJoints(int state) {
     
-    auto actuatedJointMap = robotDescriptionHandler->getActuatedJointsMap();
-    
-    for (int row = 0; row < jointStateTable->rowCount(); row++) {
+    if (state == Qt::Checked) {
+        passiveJointStateTable->setHidden(false);
+        passiveJointslabel->setHidden(false);
         
-        std::string jointName = jointStateTable->verticalHeaderItem(row)->text().toStdString();
+    } else {
+        passiveJointStateTable->setHidden(true);
+        passiveJointslabel->setHidden(true);     
         
-        auto mapEl = actuatedJointMap.find(jointName);
-        
-        if (mapEl == actuatedJointMap.end()) {
-            
-            ROS_ERROR_STREAM (__func__ << " '" << jointName << "' not found in the joint map" <<
-               " of the robotDescriptionHandler, strange error happened" );
-            return;
-        }
-        
-        if (mapEl->second == ROSEE::JointActuatedType::PASSIVE) {
-            
-            (state == Qt::Checked) ? jointStateTable->setRowHidden(row, false) : 
-                                     jointStateTable->setRowHidden(row, true);
-        }
     }
 }
 
@@ -152,30 +159,42 @@ void JointStateContainer::showPassiveJoints(int state) {
 void JointStateContainer::showPositionCol(int state) {
     
     if (state == Qt::Checked) {
-        jointStateTable->setColumnHidden(0, false);
+        activeJointStateTable->setColumnHidden(0, false);
+        passiveJointStateTable->setColumnHidden(0, false);
+        mimicJointStateTable->setColumnHidden(0, false);
         
     } else {
-        jointStateTable->setColumnHidden(0, true);
+        activeJointStateTable->setColumnHidden(0, true);
+        passiveJointStateTable->setColumnHidden(0, true);
+        mimicJointStateTable->setColumnHidden(0, true);
     }
 }
 
 void JointStateContainer::showVelocityCol(int state) {
     
     if (state == Qt::Checked) {
-        jointStateTable->setColumnHidden(1, false);
+        activeJointStateTable->setColumnHidden(1, false);
+        passiveJointStateTable->setColumnHidden(1, false);
+        mimicJointStateTable->setColumnHidden(1, false);
         
     } else {
-        jointStateTable->setColumnHidden(1, true);
+        activeJointStateTable->setColumnHidden(1, true);
+        passiveJointStateTable->setColumnHidden(1, true);
+        mimicJointStateTable->setColumnHidden(1, true);
     }
 }
 
 void JointStateContainer::showEffortCol(int state) {
     
     if (state == Qt::Checked) {
-        jointStateTable->setColumnHidden(2, false);
+        activeJointStateTable->setColumnHidden(2, false);
+        passiveJointStateTable->setColumnHidden(2, false);
+        mimicJointStateTable->setColumnHidden(2, false);
         
     } else {
-        jointStateTable->setColumnHidden(2, true);
+        activeJointStateTable->setColumnHidden(2, true);
+        passiveJointStateTable->setColumnHidden(2, true);
+        mimicJointStateTable->setColumnHidden(2, true);
     }
 }
 
