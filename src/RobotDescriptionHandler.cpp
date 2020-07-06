@@ -81,9 +81,32 @@ std::string RobotDescriptionHandler::getSrdfFile() {
 
 }
 
-std::map<std::string, ROSEE::JointActuatedType> RobotDescriptionHandler::getActuatedJointsMap() {
+std::map<std::string, ROSEE::JointActuatedType> RobotDescriptionHandler::getActuatedTypeJointsMap() {
     
-    return _actuatedJointsMap;
+    return _actuatedTypeJointsMap;
+}
+
+std::vector<std::string> RobotDescriptionHandler::getJointsByActuatedType(ROSEE::JointActuatedType type) {
+    
+     switch (type) {
+        case ROSEE::JointActuatedType::ACTIVE : 
+            return _activeJoints;
+            
+        case ROSEE::JointActuatedType::PASSIVE : 
+            return _passiveJoints;
+            
+        case ROSEE::JointActuatedType::MIMIC : 
+            return _mimicJoints;
+            
+        default:
+            ROS_ERROR_STREAM ("[RobotDescriptionHandler::getJointsByActuatedType] type '" << type 
+             << "' not recognized, returning an empty vector");
+            return std::vector<std::string>();
+     }
+}
+
+std::vector <std::string> RobotDescriptionHandler::getAllJoints() {
+    return _allJoints;
 }
 
 
@@ -99,21 +122,47 @@ void RobotDescriptionHandler::look4ActuatedJoints(){
         
         if (it.second->mimic == nullptr) { //not a mimic joint...
             
-            _actuatedJointsMap[it.second->name] = ROSEE::JointActuatedType::ACTUATED;
+            _actuatedTypeJointsMap[it.second->name] = ROSEE::JointActuatedType::ACTIVE;
             
         } else {
            
-            _actuatedJointsMap[it.second->name] = ROSEE::JointActuatedType::MIMIC;
+            _actuatedTypeJointsMap[it.second->name] = ROSEE::JointActuatedType::MIMIC;
         }
     }
     
     //now we look for passive. If any found, the entry in the map will be overwritten with
     //the value PASSIVE
     for (auto it : _srdfModel->getPassiveJoints()) {
-        _actuatedJointsMap[it.name_] = ROSEE::JointActuatedType::PASSIVE;
+        _actuatedTypeJointsMap[it.name_] = ROSEE::JointActuatedType::PASSIVE;
     }
     
+    //we fill the vectors that can be useful
+    for (auto it : _actuatedTypeJointsMap) {
+        
+        switch (it.second) {
+            case ROSEE::JointActuatedType::ACTIVE : 
+                _activeJoints.push_back(it.first);
+                break;
+                
+            case ROSEE::JointActuatedType::PASSIVE : 
+                _passiveJoints.push_back(it.first);
+                break;
+                
+            case ROSEE::JointActuatedType::MIMIC : 
+                _mimicJoints.push_back(it.first);
+                break;
+                
+            default:
+                break;
+            
+        }
+    }
     
+    //we also fill a vector containing ALL joints, but in order type, first the active, then
+    //the mimic, and then the passive
+    _allJoints.insert(_allJoints.end(), _activeJoints.begin(), _activeJoints.end());
+    _allJoints.insert(_allJoints.end(), _mimicJoints.begin(), _mimicJoints.end());
+    _allJoints.insert(_allJoints.end(), _passiveJoints.begin(), _passiveJoints.end());
 }
 
 

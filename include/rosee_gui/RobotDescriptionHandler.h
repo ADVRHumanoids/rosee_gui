@@ -26,7 +26,7 @@
 namespace ROSEE {
     //for parsing thing of main package, a joint can be OR passive OR mimic, not both
     //PASSIVE is simply a not actuated joint that other actuated one will not influence
-    enum JointActuatedType { ACTUATED, MIMIC, PASSIVE };
+    enum JointActuatedType { ACTIVE, MIMIC, PASSIVE };
 }
 
 /**
@@ -45,7 +45,11 @@ public:
     std::string getUrdfFile();
     std::string getSrdfFile();
     
-    std::map <std::string, ROSEE::JointActuatedType> getActuatedJointsMap();
+    std::map <std::string, ROSEE::JointActuatedType> getActuatedTypeJointsMap();
+    std::vector<std::string> getJointsByActuatedType(ROSEE::JointActuatedType type);
+    std::vector <std::string> getAllJoints();
+
+
     
 private:
     
@@ -56,7 +60,12 @@ private:
     urdf::ModelInterfaceSharedPtr _urdfModel;
     srdf::ModelSharedPtr _srdfModel;
     
-    std::map <std::string, ROSEE::JointActuatedType> _actuatedJointsMap;
+    std::map <std::string, ROSEE::JointActuatedType> _actuatedTypeJointsMap;
+    
+    std::vector <std::string> _activeJoints;
+    std::vector <std::string> _passiveJoints;
+    std::vector <std::string> _mimicJoints;
+    std::vector <std::string> _allJoints;
     
 
 };
