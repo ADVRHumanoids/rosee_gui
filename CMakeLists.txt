@@ -26,6 +26,7 @@ find_package(catkin REQUIRED COMPONENTS
     ros_end_effector #for action type 
     rosee_msg
     actionlib
+    urdf
     srdfdom
 )
 
