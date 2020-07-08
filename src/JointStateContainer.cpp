@@ -60,11 +60,13 @@ JointStateContainer::JointStateContainer (ros::NodeHandle* nh,
     QObject::connect( actuatedBox, SIGNAL (stateChanged(int)), 
                       this,   SLOT(showActuatedJoints(int)) );
     
+    
     QCheckBox* mimicBox = new QCheckBox ( "mimic joints");
     mimicBox->setToolTip("Check to show the state of mimic joints");
     mimicBox->setChecked(true);
     QObject::connect( mimicBox, SIGNAL (stateChanged(int)), 
                       this,   SLOT(showMimicJoints(int)) );
+    
     
     QCheckBox* passiveBox = new QCheckBox ( "passive joints");
     passiveBox->setToolTip("Check to show the state of passive joints");
@@ -99,6 +101,19 @@ JointStateContainer::JointStateContainer (ros::NodeHandle* nh,
     this->addWidget(passiveJointslabel);
     this->addWidget(passiveJointStateTable);
     this->addLayout(jointStateTableOptions);
+    
+    if (robotDescriptionHandler->getJointsByActuatedType(ROSEE::JointActuatedType::ACTIVE).size() == 0) {
+        actuatedBox->click();
+    } 
+    
+    if (robotDescriptionHandler->getJointsByActuatedType(ROSEE::JointActuatedType::MIMIC).size() == 0) {
+        mimicBox->click();
+    } 
+    
+    if (robotDescriptionHandler->getJointsByActuatedType(ROSEE::JointActuatedType::PASSIVE).size() == 0) {
+        passiveBox->click();
+    } 
+    
     
 }
 
