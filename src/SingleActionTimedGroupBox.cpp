@@ -38,7 +38,7 @@ SingleActionTimedGroupBox::SingleActionTimedGroupBox (ros::NodeHandle* nh, rosee
     this->actionName = actInfo.action_name;
     this->rosMsgSeq = 0;
 
-    setRosActionClient(nh, actInfo.ros_action_name);
+    setRosActionClient(nh);
                                           
     this->setMinimumSize(120*nInner,100);
     this->setMaximumSize(400*nInner,400);
@@ -79,11 +79,11 @@ void SingleActionTimedGroupBox::sendBtnClicked() {
 
 }
 
-void SingleActionTimedGroupBox::setRosActionClient(ros::NodeHandle* nh, std::string rosActionName) {
+void SingleActionTimedGroupBox::setRosActionClient(ros::NodeHandle* nh) {
     
     action_client = 
         std::make_shared <actionlib::SimpleActionClient <rosee_msg::ROSEECommandAction>>
-        (*nh, rosActionName, false);
+        (*nh, "/ros_end_effector/action_command", false);
         //false because we handle the thread
 }
 

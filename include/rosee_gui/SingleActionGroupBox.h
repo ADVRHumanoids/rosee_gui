@@ -62,7 +62,7 @@ private:
     QProgressBar *progressBar;
 
     virtual void sendActionRos();
-    void setRosActionClient ( ros::NodeHandle * nh, std::string rosActionName);
+    void setRosActionClient ( ros::NodeHandle * nh);
     
 
 signals:

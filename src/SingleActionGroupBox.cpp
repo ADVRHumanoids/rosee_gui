@@ -10,7 +10,7 @@ SingleActionGroupBox::SingleActionGroupBox(ros::NodeHandle* nh, rosee_msg::Actio
     this->actionType = static_cast<ROSEE::Action::Type> (actInfo.action_type);
     this->rosMsgSeq = 0;
 
-    setRosActionClient(nh, actInfo.ros_action_name);
+    setRosActionClient(nh);
 
     grid = new QGridLayout;
 
@@ -58,11 +58,11 @@ double SingleActionGroupBox::getSpinBoxPercentage() {
 }
 
 
-void SingleActionGroupBox::setRosActionClient ( ros::NodeHandle * nh, std::string rosActionName) {
+void SingleActionGroupBox::setRosActionClient ( ros::NodeHandle * nh) {
     
     action_client = 
         std::make_shared <actionlib::SimpleActionClient <rosee_msg::ROSEECommandAction>>
-        (*nh, rosActionName, false);
+        (*nh, "/ros_end_effector/action_command", false);
         //false because we handle the thread
 }
 

@@ -60,7 +60,7 @@ private:
     std::string actionName;
     
     virtual void sendActionRos();
-    void setRosActionClient ( ros::NodeHandle * nh, std::string rosActionName);
+    void setRosActionClient ( ros::NodeHandle * nh);
 
 private slots:
     void sendBtnClicked();
