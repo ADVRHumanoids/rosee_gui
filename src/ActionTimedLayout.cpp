@@ -38,7 +38,7 @@ ActionTimedLayout::ActionTimedLayout (ros::NodeHandle* nh, rosee_msg::ActionInfo
     this->actionName = actInfo.action_name;
     this->rosMsgSeq = 0;
 
-    setRosActionClient(nh, actInfo.ros_action_name);
+    setRosActionClient(nh);
                                           
     this->setMinimumSize(600,200);
 
@@ -78,11 +78,11 @@ void ActionTimedLayout::sendBtnClicked() {
 
 }
 
-void ActionTimedLayout::setRosActionClient(ros::NodeHandle* nh, std::string rosActionName) {
+void ActionTimedLayout::setRosActionClient(ros::NodeHandle* nh) {
     
     action_client = 
         std::make_shared <actionlib::SimpleActionClient <rosee_msg::ROSEECommandAction>>
-        (*nh, rosActionName, false);
+        (*nh, "/ros_end_effector/action_command", false);
         //false because we handle the thread
 }
 
