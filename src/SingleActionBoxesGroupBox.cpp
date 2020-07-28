@@ -242,5 +242,8 @@ void SingleActionBoxesGroupBox::resetAll() {
         box->setEnabled(true);
         box->setChecked(false);
     }
+    
+    actualChecked = 0;
+    send_button->setEnabled(false);
 }
 
