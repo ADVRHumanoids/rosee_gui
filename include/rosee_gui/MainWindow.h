@@ -18,6 +18,7 @@
 #define MAINWINDOW_H
 
 #include <ros/ros.h>
+#include <QtGlobal> //for QT_VERSION flag
 #include <QWidget>
 #include <QTabWidget>
 #include <QVBoxLayout>
@@ -25,8 +26,10 @@
 
 #include <rosee_gui/RobotDescriptionHandler.h>
 
-//TODO solve this
-#include "../../src/joint_state_gui/joint_monitor_widget.h"
+#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
+    //TODO solve this relative include
+    #include "../../src/joint_state_gui/joint_monitor_widget.h"
+#endif
 
 /**
  * @todo write docs

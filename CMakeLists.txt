@@ -5,11 +5,11 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-## qt5.12 path to be declared
-set(QT5_PATH "/usr/share/qt5-15/5.15.0/gcc_64")
+#set(QT5_PATH "/usr/share/qt5-15/5.15.0/gcc_64") #iit pc
+#set(QT5_PATH "/usr/lib/x86_64-linux-gnu/Qt5.12.8/5.12.8/gcc_64") #tori pc
+
 set(QT5_PATH "" CACHE PATH "Path to QT > 5.9")
 set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${QT5_PATH}")
-
 
 if(CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -31,9 +31,10 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 
-#not catkin packages
+#First one is necessary because even if we have a qt version greater than 5.9,
+#if we use only the second find package the variable ${Qt5_VERSION} remains 5.5
+find_package(Qt5 5.9 COMPONENTS Widgets)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
-
 
 ## System dependencies are found with CMake's conventions
 # find_package(ros_end_effector REQUIRED)
@@ -133,8 +134,13 @@ catkin_package(
 
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-add_subdirectory(src/chart/)
-add_subdirectory(src/joint_state_gui/)
+#VERSION_GREATER_EQUAL require cmake 3.7, we are using minimum 3.1
+if(Qt5_VERSION VERSION_LESS "5.9")
+
+else()
+    add_subdirectory(src/chart/)
+    add_subdirectory(src/joint_state_gui/)
+endif()
 
 ###########
 ## Build ##
@@ -227,13 +233,18 @@ set_target_properties(${PROJECT_NAME}_gui_main PROPERTIES OUTPUT_NAME "gui_main"
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
+if(Qt5_VERSION VERSION_LESS "5.9")
+
+else()
+    list(APPEND 2tabLibs "joint_bar_ui")
+endif()
+
 target_link_libraries(${PROJECT_NAME}_gui_main
     ${catkin_LIBRARIES}
     Qt5::Widgets
     ${PROJECT_NAME}_MainWindow
     ${PROJECT_NAME}_TimerHandler
-    joint_bar_ui
-
+    ${2tabLibs}
 )
 
 target_link_libraries(${PROJECT_NAME}_MainWindow
