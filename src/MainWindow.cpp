@@ -27,7 +27,7 @@ MainWindow::MainWindow(ros::NodeHandle *nh, QWidget *parent) : QTabWidget(parent
 
     addTab(new TabAction(nh, robotDescriptionHandler,  parent), tr("Action"));
     
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 9, 0))
+#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
     addTab(new JointMonitorWidget (nh, robotDescriptionHandler,  parent), tr("RobotState"));
 #endif
 
