@@ -1,4 +1,8 @@
 <?xml version="1.0"?>
 <launch>
-     <node type="gui_main" name="gui_main" pkg="rosee_gui" output="screen"/> 
+    <arg name="gdb" default="false"/> <!-- for debug with gdb -->
+
+     <node unless="$(arg gdb)" type="gui_main" name="gui_main" pkg="rosee_gui" output="screen"/> 
+     
+     <node if="$(arg gdb)" type="gui_main" name="gui_main" pkg="rosee_gui" output="screen" launch-prefix="gdb -ex run --args"/>
 </launch>

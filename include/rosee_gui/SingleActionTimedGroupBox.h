@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef ACTIONTIMEDLAYOUT_H
-#define ACTIONTIMEDLAYOUT_H
+#ifndef SINGLEACTIONTIMEDGROUPBOX_H
+#define SINGLEACTIONTIMEDGROUPBOX_H
 
 #include <iostream>
 
@@ -31,16 +31,16 @@
 
 #include <actionlib/client/simple_action_client.h>
 
-#include <rosee_gui/ActionLayout.h> //TODO remove when solve problem with type from rosee pkg
+#include <rosee_gui/SingleActionGroupBox.h> //TODO remove when solve problem with type from rosee pkg
 
 /**
  * @todo write docs
  */
-class ActionTimedLayout : public QGroupBox {
+class SingleActionTimedGroupBox : public QGroupBox {
     
     Q_OBJECT
 public :
-    explicit ActionTimedLayout (ros::NodeHandle* nh, rosee_msg::ActionInfo actInfo,
+    explicit SingleActionTimedGroupBox (ros::NodeHandle* nh, rosee_msg::ActionInfo actInfo,
                                 QWidget* parent = 0);
     
     std::shared_ptr <actionlib::SimpleActionClient <rosee_msg::ROSEECommandAction> > action_client;
@@ -48,6 +48,8 @@ public :
             const rosee_msg::ROSEECommandResultConstPtr& result);
     void activeCallback();
     void feedbackCallback(const rosee_msg::ROSEECommandFeedbackConstPtr& feedback);
+    
+    void resetAll();
 
 private: 
     QGridLayout *grid;
@@ -65,4 +67,4 @@ private slots:
     
 };
 
-#endif // ACTIONTIMEDLAYOUT_H
+#endif // SINGLEACTIONTIMEDGROUPBOX_H

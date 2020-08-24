@@ -14,33 +14,23 @@
  * limitations under the License.
  */
 
-#ifndef ACTIONTIMEDELEMENT_H
-#define ACTIONTIMEDELEMENT_H
+#include <rosee_gui/MainWindow.h>
 
-#include <QGroupBox>
-#include <QGridLayout>
-#include <QLabel>
-#include <QProgressBar>
-
-//to set precision of double when converting to string
-#include <sstream> 
-#include <iomanip>
-
-/**
- * @todo write docs
- */
-class ActionTimedElement : public QGroupBox {
+MainWindow::MainWindow(ros::NodeHandle *nh, QWidget *parent) : QTabWidget(parent) {
     
-    Q_OBJECT
-public:
-    explicit ActionTimedElement(std::string actionName, double before, double after, QWidget* parent);
+    std::string urdf_file, srdf_file;
     
-    void setProgressBarValue(double);
+    nh->getParam("robot_description", urdf_file);
+    nh->getParam("robot_description_semantic", srdf_file);
+
+    robotDescriptionHandler = std::make_shared<RobotDescriptionHandler>(urdf_file, srdf_file);
+
+    addTab(new TabAction(nh, robotDescriptionHandler,  parent), tr("Action"));
     
-    void resetAll();
+#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
+    addTab(new JointMonitorWidget (nh, robotDescriptionHandler,  parent), tr("RobotState"));
+#endif
 
-private: 
-    QProgressBar* bar;
-};
+}
 
-#endif // ACTIONTIMEDELEMENT_H
+
