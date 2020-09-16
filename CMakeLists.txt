@@ -24,7 +24,8 @@ add_compile_options(-std=c++11)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
     roscpp
-    ros_end_effector #for action type 
+    ros_end_effector #for action type
+    message_generation
     rosee_msg
     actionlib
     urdf
