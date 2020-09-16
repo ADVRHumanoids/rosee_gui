@@ -5,6 +5,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+#not necessary anymore, we set the path as cmake flag
 #set(QT5_PATH "/usr/share/qt5-15/5.15.0/gcc_64") #iit pc
 #set(QT5_PATH "/usr/lib/x86_64-linux-gnu/Qt5.12.8/5.12.8/gcc_64") #tori pc
 
@@ -136,7 +137,7 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 #VERSION_GREATER_EQUAL require cmake 3.7, we are using minimum 3.1
 if(Qt5_VERSION VERSION_LESS "5.9")
-
+    # do nothing more
 else()
     add_subdirectory(src/chart/)
     add_subdirectory(src/joint_state_gui/)
@@ -244,7 +245,6 @@ target_link_libraries(${PROJECT_NAME}_gui_main
     Qt5::Widgets
     ${PROJECT_NAME}_MainWindow
     ${PROJECT_NAME}_TimerHandler
-    ${2tabLibs}
 )
 
 target_link_libraries(${PROJECT_NAME}_MainWindow
@@ -252,7 +252,7 @@ target_link_libraries(${PROJECT_NAME}_MainWindow
     Qt5::Widgets
     ${PROJECT_NAME}_TabAction
     ${PROJECT_NAME}_RobotDescriptionHandler
-
+    ${2tabLibs}
 )
 
 target_link_libraries(${PROJECT_NAME}_TabAction
