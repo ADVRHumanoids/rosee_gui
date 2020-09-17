@@ -115,11 +115,15 @@ ContainerActionGroupBox::ContainerActionGroupBox (ros::NodeHandle* nh, QWidget* 
 
 void ContainerActionGroupBox::getInfoServices() {
     
-    ros::service::waitForService("ros_end_effector/ActionsInfo"); //blocking infinite wait, it also print
+    std::string actionInfoServiceName;
+    nh->param<std::string>("/rosee/action_info_service", actionInfoServiceName, "actions_info");
+    actionInfoServiceName = "ros_end_effector/" + actionInfoServiceName ; //for the gui the nodehandle is not in the ros_end_effector workspace
+    
+    ros::service::waitForService(actionInfoServiceName); //blocking infinite wait, it also print
     
     rosee_msg::ActionsInfo actionsInfo;
 
-    if (ros::service::call ("ros_end_effector/ActionsInfo", actionsInfo)) {
+    if (ros::service::call (actionInfoServiceName, actionsInfo)) {
         actionInfoVect = actionsInfo.response.actionsInfo;
     } else {
         ROS_ERROR_STREAM (" ros::service::call FAILED " );
@@ -133,9 +137,13 @@ std::map < std::string, std::vector<std::string> > ContainerActionGroupBox::getP
     
     std::map<std::string, std::vector<std::string>> pairedElementMap;
     
-    ROS_INFO_STREAM ("waiting for ros_end_effector/SelectablePairInfo service for 5 seconds...");
-    if (! ros::service::waitForService("ros_end_effector/SelectablePairInfo", 5000)) {
-        ROS_WARN_STREAM ("ros_end_effector/SelectablePairInfo not found");
+    std::string selectableFingersPairName;
+    nh->param<std::string>("/rosee/selectable_finger_pair_info", selectableFingersPairName, "selectable_finger_pair_info");
+    selectableFingersPairName = "ros_end_effector/" + selectableFingersPairName;
+    
+    ROS_INFO_STREAM ("waiting for " << selectableFingersPairName << " service for 5 seconds...");
+    if (! ros::service::waitForService(selectableFingersPairName, 5000)) {
+        ROS_WARN_STREAM (selectableFingersPairName << " not found");
         return std::map < std::string, std::vector<std::string> >();
     }
     ROS_INFO_STREAM ("... service found, I will call it");
@@ -145,12 +153,12 @@ std::map < std::string, std::vector<std::string> > ContainerActionGroupBox::getP
 
     for (auto elementName : elements) {
         pairInfo.request.element_name = elementName;
-        if (ros::service::call("ros_end_effector/SelectablePairInfo", pairInfo)) {
+        if (ros::service::call(selectableFingersPairName, pairInfo)) {
             
             pairedElementMap.insert(std::make_pair(elementName, pairInfo.response.pair_elements) );
             
         } else {
-            ROS_ERROR_STREAM ("ros_end_effector/SelectablePairInfo call failed with " << 
+            ROS_ERROR_STREAM (selectableFingersPairName << " call failed with " << 
                 pairInfo.request.action_name << ", " << pairInfo.request.element_name <<
                 " as request");
             return std::map < std::string, std::vector<std::string> >();
