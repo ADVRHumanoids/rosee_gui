@@ -162,7 +162,6 @@ std::map < std::string, std::vector<std::string> > ContainerActionGroupBox::getP
         pairInfo.request.element_name = elementName;
         if (ros::service::call(selectablePairSrvName, pairInfo)) {
 
-            
             pairedElementMap.insert(std::make_pair(elementName, pairInfo.response.pair_elements) );
             
         } else {
