@@ -112,6 +112,7 @@ void ContainerActionGroupBox::getInfoServices() {
     rosee_msg::GraspingPrimitiveAggregatedAvailable primitiveAggregatedSrv;
     if (ros::service::call (primitiveAggregatedSrvName, primitiveAggregatedSrv)) {
         primitivesAggregatedAvailableMsg = primitiveAggregatedSrv.response.primitives_aggregated;
+
     } else {
         ROS_ERROR_STREAM (" ros::service::call FAILED for primitives " );
     }
@@ -138,7 +139,7 @@ std::map < std::string, std::vector<std::string> > ContainerActionGroupBox::getP
     std::string action_name, std::vector<std::string> elements) {
     
     std::map<std::string, std::vector<std::string>> pairedElementMap;
-    
+
     std::string selectablePairSrvName;
     nh->param<std::string>("/rosee/selectable_finger_pair_info", selectablePairSrvName, 
                            "selectable_finger_pair_info");
@@ -149,6 +150,7 @@ std::map < std::string, std::vector<std::string> > ContainerActionGroupBox::getP
     ROS_INFO_STREAM ("waiting "<< selectablePairSrvName << " service for 5 seconds...");
     if (! ros::service::waitForService(selectablePairSrvName, 5000)) {
         ROS_WARN_STREAM (selectablePairSrvName << " not found");
+
         return std::map < std::string, std::vector<std::string> >();
     }
     ROS_INFO_STREAM ("..." << selectablePairSrvName << " service found, I will call it");
@@ -159,10 +161,12 @@ std::map < std::string, std::vector<std::string> > ContainerActionGroupBox::getP
     for (auto elementName : elements) {
         pairInfo.request.element_name = elementName;
         if (ros::service::call(selectablePairSrvName, pairInfo)) {
+
             
             pairedElementMap.insert(std::make_pair(elementName, pairInfo.response.pair_elements) );
             
         } else {
+            
             ROS_ERROR_STREAM (selectablePairSrvName << " call failed with " << 
                 pairInfo.request.action_name << ", " << pairInfo.request.element_name <<
                 " as request");
