@@ -18,7 +18,7 @@
 #include <ros/ros.h>
 
 #include <rosee_msg/ROSEECommandAction.h>
-#include <rosee_msg/ActionInfo.h> //msg
+#include <rosee_msg/GraspingAction.h> //msg
 #include <ros_end_effector/Action.h>
 #include <ros_end_effector/ActionPrimitive.h>
 
@@ -31,7 +31,8 @@ class SingleActionGroupBox: public QGroupBox
 {
     Q_OBJECT
 public:
-    explicit SingleActionGroupBox(ros::NodeHandle *nh, rosee_msg::ActionInfo, QWidget* parent=0);
+    explicit SingleActionGroupBox(ros::NodeHandle *nh, std::string actionName, 
+                                           ROSEE::Action::Type actionType, QWidget* parent=0);
     
     virtual void resetAll();
         

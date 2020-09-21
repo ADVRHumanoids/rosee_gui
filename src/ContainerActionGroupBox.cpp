@@ -25,74 +25,50 @@ ContainerActionGroupBox::ContainerActionGroupBox (ros::NodeHandle* nh, QWidget* 
     
     grid = new QGridLayout;
     int rowCol = 0;
-
-    for (auto actInfo: actionInfoVect) {
-            
-        switch (actInfo.action_type) {
+    
+    for (auto primitive : primitivesAggregatedAvailableMsg) {
         
-        case ROSEE::Action::Type::Primitive :
-        {
-            if (actInfo.max_selectable == 2) {
-                // get (wait) for service that provide info of which element can be paired
-                // so in the gui we disable the not pairable checkboxes if one is checked
-                std::map<std::string, std::vector<std::string>> pairedElementMap = 
-                    getPairMap(actInfo.action_name, actInfo.selectable_names);
-                
-                SingleActionBoxesGroupBox* singleActionBoxesGroupBox;
-                if (pairedElementMap.size() != 0) {
-                    singleActionBoxesGroupBox = 
-                    new SingleActionBoxesGroupBox(nh, actInfo, pairedElementMap, this) ;
-                    
-                } else {
-                    //version without disabling the not pairable checkboxes
-                    singleActionBoxesGroupBox = 
-                    new SingleActionBoxesGroupBox(nh, actInfo, this) ; 
-                    
-                }
-                grid->addWidget (singleActionBoxesGroupBox, rowCol/4, rowCol%4);
-                
-            } else {
-                SingleActionBoxesGroupBox* singleActionBoxesGroupBox;
-                singleActionBoxesGroupBox = 
-                    new SingleActionBoxesGroupBox(nh, actInfo, this) ; 
-                grid->addWidget (singleActionBoxesGroupBox, rowCol/4, rowCol%4);
-            }
-
-            break;
-        }
-        case ROSEE::Action::Type::Generic : // same thing as composed
-        case ROSEE::Action::Type::Composed :
-        {
-            SingleActionGroupBox* singleActionGroupBox = new SingleActionGroupBox(nh, actInfo, this);
-            grid->addWidget (singleActionGroupBox, rowCol/4, rowCol%4);
-            break;
-        }
-        case ROSEE::Action::Type::Timed : 
-        {
-            SingleActionTimedGroupBox* timed = new SingleActionTimedGroupBox(nh, actInfo, this);
-            grid->addWidget(timed, rowCol/4, rowCol%4, 1, actInfo.inner_actions.size());
+        std::map<std::string, std::vector<std::string>> pairedElementMap ;
+        if (primitive.max_selectable == 2 ) {
             
-            //timed action occupy more space in the grid... -1 because +1 increment
-            //is already present at the end of this switch
-            rowCol += (actInfo.inner_actions.size()-1);
-
-            break;
+            // get from service that provide info of which element can be paired
+            // so in the gui we disable the not pairable checkboxes if one is checked
+            pairedElementMap = getPairMap(primitive.action_name, primitive.selectable_names);
         }
-        case ROSEE::Action::Type::None :
-        {
-            
-            ROS_ERROR_STREAM ("GUI ERROR, type NONE received for action " << actInfo.action_name);
-            throw "";
-            break;
-        }
-        default : {
-            ROS_ERROR_STREAM ("GUI ERROR, not recognized type " << actInfo.action_type
-            << " received for action " << actInfo.action_name);
-            throw "";
-        }
-        } 
         
+        SingleActionBoxesGroupBox* singleActionBoxesGroupBox;
+
+        if (pairedElementMap.size() > 0 ) {
+            
+            singleActionBoxesGroupBox = 
+                new SingleActionBoxesGroupBox(nh, primitive, pairedElementMap, this) ;  
+                
+        } else {
+
+            singleActionBoxesGroupBox = 
+                new SingleActionBoxesGroupBox(nh, primitive, this) ; 
+        }
+
+        grid->addWidget (singleActionBoxesGroupBox, rowCol/4, rowCol%4);
         rowCol++;
+        
+    }
+    
+    for (auto generic : genericsAvailableMsg) {
+        SingleActionGroupBox* singleActionGroupBox = new SingleActionGroupBox(nh, generic.action_name, (ROSEE::Action::Type)generic.action_type, this);
+            grid->addWidget (singleActionGroupBox, rowCol/4, rowCol%4);
+            rowCol++;
+    } 
+    
+    for (auto timed : timedsAvailableMsg) {
+        
+        SingleActionTimedGroupBox* singleActionTimedGroupBox = new SingleActionTimedGroupBox(nh, timed, this);
+        grid->addWidget(singleActionTimedGroupBox, rowCol/4, rowCol%4, 1, timed.inner_actions.size());
+        
+        //timed action occupy more space in the grid... -1 because +1 increment
+        //is already present at the end of this switch
+        rowCol += (timed.inner_actions.size());
+
     }
 
     //special last button to reset all widget and send 0 pos to all joints
@@ -115,14 +91,44 @@ ContainerActionGroupBox::ContainerActionGroupBox (ros::NodeHandle* nh, QWidget* 
 
 void ContainerActionGroupBox::getInfoServices() {
     
-    ros::service::waitForService("ros_end_effector/ActionsInfo"); //blocking infinite wait, it also print
+    std::string primitiveAggregatedSrvName, graspingActionsSrvName;
+    nh->param<std::string>("/rosee/grasping_action_srv_name", graspingActionsSrvName, 
+                           "grasping_actions_available");
     
-    rosee_msg::ActionsInfo actionsInfo;
-
-    if (ros::service::call ("ros_end_effector/ActionsInfo", actionsInfo)) {
-        actionInfoVect = actionsInfo.response.actionsInfo;
+    nh->param<std::string>("/rosee/primitive_aggregated_srv_name", primitiveAggregatedSrvName, 
+                           "primitives_aggregated_available");
+    
+    graspingActionsSrvName = "/ros_end_effector/" + graspingActionsSrvName;
+    primitiveAggregatedSrvName = "/ros_end_effector/" + primitiveAggregatedSrvName;
+    
+    //wait for infinite (-1) for the service
+    ros::service::waitForService(graspingActionsSrvName, -1);
+    ROS_INFO_STREAM ("... " << graspingActionsSrvName << " service found, I will call it");
+    
+    ros::service::waitForService(primitiveAggregatedSrvName, -1);
+    ROS_INFO_STREAM ("... " << primitiveAggregatedSrvName << " service found, I will call it");
+        
+    //for primitives, we call the primitiveAggregatedSrvName service
+    rosee_msg::GraspingPrimitiveAggregatedAvailable primitiveAggregatedSrv;
+    if (ros::service::call (primitiveAggregatedSrvName, primitiveAggregatedSrv)) {
+        primitivesAggregatedAvailableMsg = primitiveAggregatedSrv.response.primitives_aggregated;
     } else {
-        ROS_ERROR_STREAM (" ros::service::call FAILED " );
+        ROS_ERROR_STREAM (" ros::service::call FAILED for primitives " );
+    }
+    
+    rosee_msg::GraspingActionsAvailable graspingActionSrv;
+    graspingActionSrv.request.action_type = 1; //generic & composed
+    if (ros::service::call (graspingActionsSrvName, graspingActionSrv)) {
+        genericsAvailableMsg = graspingActionSrv.response.grasping_actions;
+    } else {
+        ROS_ERROR_STREAM (" ros::service::call FAILED for generic and composed" );
+    }
+    
+    graspingActionSrv.request.action_type = 2; //timed
+    if (ros::service::call (graspingActionsSrvName, graspingActionSrv)) {
+        timedsAvailableMsg = graspingActionSrv.response.grasping_actions;
+    } else {
+        ROS_ERROR_STREAM (" ros::service::call FAILED for timed" );
     }
     
 }
@@ -133,24 +139,31 @@ std::map < std::string, std::vector<std::string> > ContainerActionGroupBox::getP
     
     std::map<std::string, std::vector<std::string>> pairedElementMap;
     
-    ROS_INFO_STREAM ("waiting for ros_end_effector/SelectablePairInfo service for 5 seconds...");
-    if (! ros::service::waitForService("ros_end_effector/SelectablePairInfo", 5000)) {
-        ROS_WARN_STREAM ("ros_end_effector/SelectablePairInfo not found");
+    std::string selectablePairSrvName;
+    nh->param<std::string>("/rosee/selectable_finger_pair_info", selectablePairSrvName, 
+                           "selectable_finger_pair_info");
+    
+    selectablePairSrvName = "/ros_end_effector/" + selectablePairSrvName;
+    
+    
+    ROS_INFO_STREAM ("waiting "<< selectablePairSrvName << " service for 5 seconds...");
+    if (! ros::service::waitForService(selectablePairSrvName, 5000)) {
+        ROS_WARN_STREAM (selectablePairSrvName << " not found");
         return std::map < std::string, std::vector<std::string> >();
     }
-    ROS_INFO_STREAM ("... service found, I will call it");
+    ROS_INFO_STREAM ("..." << selectablePairSrvName << " service found, I will call it");
 
     rosee_msg::SelectablePairInfo pairInfo;
     pairInfo.request.action_name = action_name;
 
     for (auto elementName : elements) {
         pairInfo.request.element_name = elementName;
-        if (ros::service::call("ros_end_effector/SelectablePairInfo", pairInfo)) {
+        if (ros::service::call(selectablePairSrvName, pairInfo)) {
             
             pairedElementMap.insert(std::make_pair(elementName, pairInfo.response.pair_elements) );
             
         } else {
-            ROS_ERROR_STREAM ("ros_end_effector/SelectablePairInfo call failed with " << 
+            ROS_ERROR_STREAM (selectablePairSrvName << " call failed with " << 
                 pairInfo.request.action_name << ", " << pairInfo.request.element_name <<
                 " as request");
             return std::map < std::string, std::vector<std::string> >();

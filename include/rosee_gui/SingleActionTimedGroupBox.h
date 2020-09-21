@@ -26,12 +26,12 @@
 #include <ros/ros.h>
 #include <rosee_gui/ActionTimedElement.h>
 
+#include <ros_end_effector/Action.h> //for action types
+#include <ros_end_effector/ActionPrimitive.h> //for action types
 #include <rosee_msg/ROSEECommandAction.h>
-#include <rosee_msg/ActionInfo.h> //msg
+#include <rosee_msg/GraspingAction.h> //msg
 
 #include <actionlib/client/simple_action_client.h>
-
-#include <rosee_gui/SingleActionGroupBox.h> //TODO remove when solve problem with type from rosee pkg
 
 /**
  * @todo write docs
@@ -40,7 +40,7 @@ class SingleActionTimedGroupBox : public QGroupBox {
     
     Q_OBJECT
 public :
-    explicit SingleActionTimedGroupBox (ros::NodeHandle* nh, rosee_msg::ActionInfo actInfo,
+    explicit SingleActionTimedGroupBox (ros::NodeHandle* nh, rosee_msg::GraspingAction graspingAction,
                                 QWidget* parent = 0);
     
     std::shared_ptr <actionlib::SimpleActionClient <rosee_msg::ROSEECommandAction> > action_client;

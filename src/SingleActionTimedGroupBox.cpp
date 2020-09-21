@@ -16,26 +16,26 @@
 
 #include <rosee_gui/SingleActionTimedGroupBox.h>
 
-SingleActionTimedGroupBox::SingleActionTimedGroupBox (ros::NodeHandle* nh, rosee_msg::ActionInfo actInfo,
-                                      QWidget* parent) : QGroupBox(parent) {
+SingleActionTimedGroupBox::SingleActionTimedGroupBox (ros::NodeHandle* nh, 
+    rosee_msg::GraspingAction graspingAction, QWidget* parent) : QGroupBox(parent) {
     
-    if (actInfo.inner_actions.size() == 0) {
+    unsigned int nInner = graspingAction.inner_actions.size();
+        
+    if (nInner == 0) {
         ROS_ERROR_STREAM("[ActionTimed not valid: no inner actions selected");
         throw "";
     }
     
-    unsigned int nInner = actInfo.inner_actions.size();
-    
-    if (nInner != actInfo.before_margins.size() ||
-        nInner != actInfo.after_margins.size() ) {
+    if (nInner != graspingAction.before_time_margins.size() ||
+        nInner != graspingAction.after_time_margins.size() ) {
         ROS_ERROR_STREAM("[ERROR SingleActionTimedGroupBox costructor] different size of innerNames and innerTimeMargins: " 
-        << nInner << " and " << actInfo.before_margins.size() <<
-        "(before marg), and " << actInfo.after_margins.size()
+        << nInner << " and " << graspingAction.before_time_margins.size() <<
+        "(before marg), and " << graspingAction.after_time_margins.size()
         << "(after marg)");
         throw "";
     } 
     
-    this->actionName = actInfo.action_name;
+    this->actionName = graspingAction.action_name;
     this->rosMsgSeq = 0;
 
     setRosActionClient(nh);
@@ -45,7 +45,7 @@ SingleActionTimedGroupBox::SingleActionTimedGroupBox (ros::NodeHandle* nh, rosee
 
     grid = new QGridLayout;
     
-    windowLabel = new QLabel (QString::fromStdString(actInfo.action_name));
+    windowLabel = new QLabel (QString::fromStdString(graspingAction.action_name));
     windowLabel->setAlignment(Qt::AlignCenter);
     windowLabel->setStyleSheet("QLabel { font-size : 25px }");
     grid->addWidget(windowLabel, 0, 0, 1, nInner);
@@ -57,13 +57,14 @@ SingleActionTimedGroupBox::SingleActionTimedGroupBox (ros::NodeHandle* nh, rosee
     
     for (int i =0; i<nInner; i++) {
         ActionTimedElement* element = 
-            new ActionTimedElement(actInfo.inner_actions.at(i), actInfo.before_margins.at(i),
-                                   actInfo.after_margins.at(i), this);
+            new ActionTimedElement(graspingAction.inner_actions.at(i),
+                                   graspingAction.before_time_margins.at(i),
+                                   graspingAction.after_time_margins.at(i), this);
         //we set object name so we can retrieve later with this->getChild(name)
         //TODO BUG problem when we have more action with same name.. can happen if they are
         // of different type (eg 2 primitive cant have same name, but theoretically a primitive and
         // a composed yes
-        element->setObjectName(QString::fromStdString(actInfo.inner_actions.at(i)));
+        element->setObjectName(QString::fromStdString(graspingAction.inner_actions.at(i)));
         grid->addWidget(element, 2, i );
     }
     

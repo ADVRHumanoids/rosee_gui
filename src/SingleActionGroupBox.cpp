@@ -1,13 +1,14 @@
 #include <rosee_gui/SingleActionGroupBox.h>
 
 //TODO add as sub-label the type?
-SingleActionGroupBox::SingleActionGroupBox(ros::NodeHandle* nh, rosee_msg::ActionInfo actInfo, QWidget* parent) :
-    QGroupBox(parent) {
+SingleActionGroupBox::SingleActionGroupBox(ros::NodeHandle* nh, std::string actionName, 
+                                           ROSEE::Action::Type actionType,
+                                           QWidget* parent) : QGroupBox(parent) {
 
     this->setMinimumSize(120,140);
     this->setMaximumSize(400,400);
-    this->actionName = actInfo.action_name;
-    this->actionType = static_cast<ROSEE::Action::Type> (actInfo.action_type);
+    this->actionName = actionName;
+    this->actionType = actionType;
     this->rosMsgSeq = 0;
 
     setRosActionClient(nh);

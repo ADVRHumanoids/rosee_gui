@@ -26,7 +26,10 @@
 #include <rosee_gui/SingleActionGroupBox.h>
 #include <rosee_gui/SingleActionTimedGroupBox.h>
 
-#include <rosee_msg/ActionsInfo.h>
+#include <rosee_msg/GraspingAction.h>
+#include <rosee_msg/GraspingActionsAvailable.h>
+#include <rosee_msg/GraspingPrimitiveAggregated.h>
+#include <rosee_msg/GraspingPrimitiveAggregatedAvailable.h>
 #include <rosee_msg/SelectablePairInfo.h>
 #include <ros_end_effector/Action.h>
 
@@ -45,7 +48,9 @@ public:
 private:
     QGridLayout *grid;
     ros::NodeHandle* nh;
-    std::vector <rosee_msg::ActionInfo> actionInfoVect;
+    std::vector <rosee_msg::GraspingPrimitiveAggregated> primitivesAggregatedAvailableMsg;
+    std::vector <rosee_msg::GraspingAction> genericsAvailableMsg;
+    std::vector <rosee_msg::GraspingAction> timedsAvailableMsg;
     QPushButton *resetButton;
 
     
