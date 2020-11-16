@@ -78,8 +78,7 @@ JointStateTable::JointStateTable (ros::NodeHandle* nh,
 bool JointStateTable::setJointStateSub(ros::NodeHandle* nh) {
     
     //to get joint state from gazebo, if used
-    std::string jsTopic;
-    nh->param<std::string>("/rosee/joint_states_topic", jsTopic, "/ros_end_effector/joint_states");
+    std::string jsTopic = "/ros_end_effector/joint_states";
     
     ROS_INFO_STREAM ( "Getting joint pos from '" << jsTopic << "'" );
     

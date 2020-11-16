@@ -31,7 +31,7 @@
 #include <rosee_msg/GraspingPrimitiveAggregated.h>
 #include <rosee_msg/GraspingPrimitiveAggregatedAvailable.h>
 #include <rosee_msg/SelectablePairInfo.h>
-#include <ros_end_effector/Action.h>
+#include <ros_end_effector/GraspingActions/Action.h>
 
 /**
  * @todo write docs

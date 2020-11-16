@@ -11,7 +11,7 @@
 
 #include <rosee_msg/GraspingAction.h> //msg
 #include <rosee_msg/GraspingPrimitiveAggregated.h> //msg
-#include <ros_end_effector/ActionPrimitive.h>
+#include <ros_end_effector/GraspingActions/ActionPrimitive.h>
 
 class SingleActionBoxesGroupBox : public SingleActionGroupBox
 {
