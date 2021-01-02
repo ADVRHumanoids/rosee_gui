@@ -9,6 +9,8 @@
 #include <QLabel>
 #include <chrono>
 
+#include <cmath>
+
 QT_CHARTS_USE_NAMESPACE
 
 class CustomChartView : public QChartView
