@@ -53,7 +53,7 @@ RobotDescriptionHandler::RobotDescriptionHandler(std::string urdfFile, std::stri
     
     //initString take as 2nd arg the xml content of the file. 
     //initFile takes instead the flename. We have the file xml content in the param server
-    _srdfModel = boost::make_shared<srdf::Model>();
+    _srdfModel = std::make_shared<srdf::Model>();
     _srdfModel->initString ( *_urdfModel, _srdfFile );
     
     look4ActuatedJoints();
