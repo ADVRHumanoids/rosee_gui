@@ -41,7 +41,7 @@ public:
     RobotDescriptionHandler(std::string urdfFile, std::string srdfFile );
     
     urdf::ModelInterfaceSharedPtr getUrdfModel();
-    srdf::ModelSharedPtr getSrdfModel();
+    std::shared_ptr<srdf::Model> getSrdfModel();
     std::string getUrdfFile();
     std::string getSrdfFile();
     
@@ -58,7 +58,7 @@ private:
     std::string _urdfFile;
     std::string _srdfFile;
     urdf::ModelInterfaceSharedPtr _urdfModel;
-    srdf::ModelSharedPtr _srdfModel;
+    std::shared_ptr<srdf::Model> _srdfModel;
     
     std::map <std::string, ROSEE::JointActuatedType> _actuatedTypeJointsMap;
     

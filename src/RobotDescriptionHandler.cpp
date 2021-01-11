@@ -60,7 +60,7 @@ RobotDescriptionHandler::RobotDescriptionHandler(std::string urdfFile, std::stri
 
 }
 
-srdf::ModelSharedPtr RobotDescriptionHandler::getSrdfModel() {
+std::shared_ptr<srdf::Model> RobotDescriptionHandler::getSrdfModel() {
     
     return _srdfModel;
 }
