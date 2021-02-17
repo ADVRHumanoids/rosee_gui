@@ -114,7 +114,8 @@ JointStateContainer::JointStateContainer (ros::NodeHandle* nh,
         passiveBox->click();
     } 
     
-    
+    nh->getParam("store_pos_filename", storePosFilename);
+    initStoreButton();
 }
 
 void JointStateContainer::showActuatedJoints(int state) {
@@ -198,5 +199,49 @@ void JointStateContainer::showEffortCol(int state) {
         mimicJointStateTable->setColumnHidden(2, true);
     }
 }
+
+void JointStateContainer::initStoreButton() {
+    
+    matLogger = XBot::MatLogger2::MakeLogger(storePosFilename);// date-time automatically appended
+    matLogger->set_buffer_mode(XBot::VariableBuffer::Mode::circular_buffer);
+    
+    // the button to emit jont pos to file
+    storePosButton = new QPushButton("Save Joints Position");
+    storePosButton->setMinimumSize(100,40);
+    storePosButton->setMaximumSize(180,70);
+    storePosButton->setAutoFillBackground(true);
+    QPalette palette = storePosButton->palette();
+    storePosButton->setStyleSheet("QPushButton {background-color: orange; color: black;}");
+    storePosButton->setPalette(palette);
+    connect (storePosButton, SIGNAL (clicked()), this, SLOT (storePosButtonClick()));
+    
+    this->addWidget(storePosButton, 0, Qt::AlignCenter);
+}
+
+void JointStateContainer::storePosButtonClick() {
+        
+    unsigned nRow = this->activeJointStateTable->rowCount();    
+    
+    std::vector<double> pos(nRow);
+    
+    for (int i = 0; i < nRow ; i++ ) {
+        //std::cout << this->activeJointStateTable->verticalHeaderItem(i)->text().toStdString() << "  " ;
+        //std::cout << this->activeJointStateTable->item(i, 0)->text().toStdString() << std::endl;
+        
+        pos.at(i) = this->activeJointStateTable->item(i, 0)->text().toDouble();
+    }
+    
+    if (matLogger->add("motorPosMeasured", pos)) {
+        std::cout << "Added pos!" << std::endl;
+
+    } else {
+        std::cout << "Error in storing joint pos with matlogger" << std::endl;
+
+    }
+    //std::cout << matLogger->get_filename() << std::endl;
+    //std::cout << storePosFilename << std::endl;
+     
+}
+
 
 

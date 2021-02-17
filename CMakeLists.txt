@@ -38,8 +38,7 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(Qt5 5.9 COMPONENTS Widgets)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
-## System dependencies are found with CMake's conventions
-# find_package(ros_end_effector REQUIRED)
+find_package(matlogger2 REQUIRED) #to emit joint pos on file
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -301,6 +300,7 @@ target_link_libraries(${PROJECT_NAME}_JointStateContainer
     Qt5::Widgets
     ${PROJECT_NAME}_JointStateTable
     ${PROJECT_NAME}_RobotDescriptionHandler
+    matlogger2::matlogger2
 )
 target_link_libraries(${PROJECT_NAME}_ContainerActionGroupBox
     ${catkin_LIBRARIES}

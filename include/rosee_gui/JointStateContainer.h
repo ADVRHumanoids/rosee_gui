@@ -22,9 +22,13 @@
 #include <QCheckBox>
 #include <QGridLayout>
 #include <QLabel>
+#include <QPushButton>
 
 #include <rosee_gui/JointStateTable.h>
 #include <rosee_gui/RobotDescriptionHandler.h>
+
+#include <matlogger2/matlogger2.h>
+#include <matlogger2/utils/mat_appender.h>
 
 #include <ros/ros.h>
 
@@ -51,9 +55,18 @@ private:
     JointStateTable* mimicJointStateTable;
     JointStateTable* passiveJointStateTable;
     
+    QPushButton *storePosButton;
+    std::string storePosFilename;
+    XBot::MatLogger2::Ptr matLogger;
+
+    
     QLabel* activeJointslabel;
     QLabel* mimicJointslabel;
     QLabel* passiveJointslabel;
+    
+private slots:
+    void storePosButtonClick();
+    void initStoreButton();
 
 };
 

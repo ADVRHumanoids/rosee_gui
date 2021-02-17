@@ -2,6 +2,9 @@
 <launch>
     <arg name="gdb" default="false"/> <!-- for debug with gdb -->
 
+    <arg name="pos_file"  default="$(find rosee_gui)/matLog/joint_positions"/>
+    <param name = "store_pos_filename" type="string" value="$(arg pos_file)"/>
+
      <node unless="$(arg gdb)" type="gui_main" name="gui_main_copy" pkg="rosee_gui" output="screen"/> 
      
      <node if="$(arg gdb)" type="gui_main" name="gui_main_copy" pkg="rosee_gui" output="screen" launch-prefix="gdb -ex run --args"/>

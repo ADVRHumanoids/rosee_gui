@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <launch>
     <arg name="gdb" default="false"/> <!-- for debug with gdb -->
+    
+    <arg name="pos_file"  default="$(find rosee_gui)/joint_positions"/>
+    <param name = "store_pos_filename" type="string" value="$(arg pos_file)"/>
 
      <node unless="$(arg gdb)" type="gui_main" name="gui_main" pkg="rosee_gui" output="screen"/> 
      
