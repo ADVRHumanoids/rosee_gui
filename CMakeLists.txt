@@ -5,6 +5,13 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+#not necessary anymore, we set the path as cmake flag
+#set(QT5_PATH "/usr/share/qt5-15/5.15.0/gcc_64") #iit pc
+#set(QT5_PATH "/usr/lib/x86_64-linux-gnu/Qt5.12.8/5.12.8/gcc_64") #tori pc
+
+set(QT5_PATH "" CACHE PATH "Path to QT > 5.9")
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${QT5_PATH}")
+
 if(CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
 endif()
@@ -17,13 +24,19 @@ add_compile_options(-std=c++11)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
     roscpp
-    ros_end_effector #for msgs
+    ros_end_effector #for action type
+    message_generation
     rosee_msg
+    actionlib
+    urdf
+    srdfdom
 )
 
-#not catkin packages
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
+#First one is necessary because even if we have a qt version greater than 5.9,
+#if we use only the second find package the variable ${Qt5_VERSION} remains 5.5
+find_package(Qt5 5.9 COMPONENTS Widgets)
+find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(ros_end_effector REQUIRED)
@@ -114,12 +127,22 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS include
 #  LIBRARIES rosee_gui
 #  CATKIN_DEPENDS 
 #        roscpp
 #  DEPENDS system_lib
 )
+
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+#VERSION_GREATER_EQUAL require cmake 3.7, we are using minimum 3.1
+if(Qt5_VERSION VERSION_LESS "5.9")
+    # do nothing more
+else()
+    add_subdirectory(src/chart/)
+    add_subdirectory(src/joint_state_gui/)
+endif()
 
 ###########
 ## Build ##
@@ -129,28 +152,34 @@ catkin_package(
 include_directories(
     include
     ${catkin_INCLUDE_DIRS}
+    ${ros_end_effector_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
 # needed also the .h for qt automoc things
-add_library(${PROJECT_NAME}_Window SHARED
-    src/Window.cpp
-    include/rosee_gui/Window.h
+add_library(${PROJECT_NAME}_MainWindow SHARED
+    src/MainWindow.cpp
+    include/rosee_gui/MainWindow.h
 )
 
-add_library(${PROJECT_NAME}_ActionLayout SHARED
-    src/ActionLayout.cpp
-    include/rosee_gui/ActionLayout.h
+add_library(${PROJECT_NAME}_TabAction SHARED
+    src/TabAction.cpp
+    include/rosee_gui/TabAction.h
 )
 
-add_library(${PROJECT_NAME}_ActionBoxesLayout SHARED
-    src/ActionBoxesLayout.cpp
-    include/rosee_gui/ActionBoxesLayout.h
+add_library(${PROJECT_NAME}_SingleActionGroupBox SHARED
+    src/SingleActionGroupBox.cpp
+    include/rosee_gui/SingleActionGroupBox.h
 )
 
-add_library(${PROJECT_NAME}_ActionTimedLayout SHARED
-    src/ActionTimedLayout.cpp
-    include/rosee_gui/ActionTimedLayout.h
+add_library(${PROJECT_NAME}_SingleActionBoxesGroupBox SHARED
+    src/SingleActionBoxesGroupBox.cpp
+    include/rosee_gui/SingleActionBoxesGroupBox.h
+)
+
+add_library(${PROJECT_NAME}_SingleActionTimedGroupBox SHARED
+    src/SingleActionTimedGroupBox.cpp
+    include/rosee_gui/SingleActionTimedGroupBox.h
 )
 
 add_library(${PROJECT_NAME}_ActionTimedElement SHARED
@@ -158,6 +187,30 @@ add_library(${PROJECT_NAME}_ActionTimedElement SHARED
     include/rosee_gui/ActionTimedElement.h
 )
 
+add_library(${PROJECT_NAME}_TimerHandler SHARED
+    src/TimerHandler.cpp
+    include/rosee_gui/TimerHandler.h
+)
+
+add_library(${PROJECT_NAME}_JointStateTable SHARED
+    src/JointStateTable.cpp
+    include/rosee_gui/JointStateTable.h
+)
+
+add_library(${PROJECT_NAME}_JointStateContainer SHARED
+    src/JointStateContainer.cpp
+    include/rosee_gui/JointStateContainer.h 
+)
+
+add_library(${PROJECT_NAME}_ContainerActionGroupBox SHARED
+    src/ContainerActionGroupBox.cpp
+    include/rosee_gui/ContainerActionGroupBox.h 
+)
+
+add_library(${PROJECT_NAME}_RobotDescriptionHandler SHARED
+    src/RobotDescriptionHandler.cpp
+    include/rosee_gui/RobotDescriptionHandler.h 
+)
 
 
 ## Add cmake target dependencies of the library
@@ -182,31 +235,47 @@ set_target_properties(${PROJECT_NAME}_gui_main PROPERTIES OUTPUT_NAME "gui_main"
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
+if(Qt5_VERSION VERSION_LESS "5.9")
+
+else()
+    list(APPEND 2tabLibs "joint_bar_ui")
+endif()
+
 target_link_libraries(${PROJECT_NAME}_gui_main
     ${catkin_LIBRARIES}
     Qt5::Widgets
-    ${PROJECT_NAME}_Window
+    ${PROJECT_NAME}_MainWindow
+    ${PROJECT_NAME}_TimerHandler
 )
 
-target_link_libraries(${PROJECT_NAME}_Window
+target_link_libraries(${PROJECT_NAME}_MainWindow
     ${catkin_LIBRARIES}
-    ${PROJECT_NAME}_ActionLayout
-    ${PROJECT_NAME}_ActionBoxesLayout
-    ${PROJECT_NAME}_ActionTimedLayout
+    Qt5::Widgets
+    ${PROJECT_NAME}_TabAction
+    ${PROJECT_NAME}_RobotDescriptionHandler
+    ${2tabLibs}
+)
+
+target_link_libraries(${PROJECT_NAME}_TabAction
+    ${catkin_LIBRARIES}
+    Qt5::Widgets
+    ${PROJECT_NAME}_ContainerActionGroupBox
+    ${PROJECT_NAME}_JointStateContainer
+    ${PROJECT_NAME}_RobotDescriptionHandler
 )
 
 
-target_link_libraries(${PROJECT_NAME}_ActionLayout
+target_link_libraries(${PROJECT_NAME}_SingleActionGroupBox
     ${catkin_LIBRARIES}
     Qt5::Widgets
 )
 
-target_link_libraries(${PROJECT_NAME}_ActionBoxesLayout
+target_link_libraries(${PROJECT_NAME}_SingleActionBoxesGroupBox
     ${catkin_LIBRARIES}
     Qt5::Widgets
 )
 
-target_link_libraries(${PROJECT_NAME}_ActionTimedLayout
+target_link_libraries(${PROJECT_NAME}_SingleActionTimedGroupBox
     ${catkin_LIBRARIES}
     Qt5::Widgets
     ${PROJECT_NAME}_ActionTimedElement
@@ -217,8 +286,32 @@ target_link_libraries(${PROJECT_NAME}_ActionTimedElement
     Qt5::Widgets
 )
 
+target_link_libraries(${PROJECT_NAME}_TimerHandler
+    ${catkin_LIBRARIES}
+    Qt5::Widgets
+)
 
+target_link_libraries(${PROJECT_NAME}_JointStateTable
+    ${catkin_LIBRARIES}
+    Qt5::Widgets
+)
 
+target_link_libraries(${PROJECT_NAME}_JointStateContainer
+    ${catkin_LIBRARIES}
+    Qt5::Widgets
+    ${PROJECT_NAME}_JointStateTable
+    ${PROJECT_NAME}_RobotDescriptionHandler
+)
+target_link_libraries(${PROJECT_NAME}_ContainerActionGroupBox
+    ${catkin_LIBRARIES}
+    Qt5::Widgets
+    ${PROJECT_NAME}_SingleActionGroupBox
+    ${PROJECT_NAME}_SingleActionBoxesGroupBox
+    ${PROJECT_NAME}_SingleActionTimedGroupBox
+)
+target_link_libraries(${PROJECT_NAME}_RobotDescriptionHandler
+    ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##
@@ -261,6 +354,12 @@ target_link_libraries(${PROJECT_NAME}_ActionTimedElement
 #   # myfile2
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
+# Mark executables and/or libraries for installation
+#install(TARGETS ${PROJECT_NAME}_gui_main
+#    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+#    )
 
 #############
 ## Testing ##
