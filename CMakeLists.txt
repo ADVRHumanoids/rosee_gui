@@ -38,6 +38,7 @@ find_package(catkin REQUIRED COMPONENTS
 #if we use only the second find package the variable ${Qt5_VERSION} remains 5.5
 find_package(Qt5 5.9 COMPONENTS Widgets)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
+find_package(Qt5Charts QUIET)
 
 ## System dependencies are found with CMake's conventions
 # find_package(ros_end_effector REQUIRED)
