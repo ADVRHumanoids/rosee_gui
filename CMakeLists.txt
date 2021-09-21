@@ -25,12 +25,12 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
     roscpp
     rospy
-    ros_end_effector #for action type
-    message_generation
-    rosee_msg
-    actionlib
-    urdf
     srdfdom
+    urdf
+    message_generation
+    actionlib
+    ros_end_effector #for action type
+    rosee_msg
 )
 
 
