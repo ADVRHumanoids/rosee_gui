@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>rosee_gui</name>
-  <version>1</version>
+  <version>1.0.0</version>
   <description>The rosee_gui package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
@@ -9,6 +9,8 @@
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
   <maintainer email="luca.muratore@iit.it">Luca Muratore</maintainer>
   <maintainer email="davide.torielli@iit.it">Davide Torielli</maintainer>
+  <maintainer email="toridebraus@gmail.com">Davide Torielli</maintainer>
+
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
@@ -31,8 +33,11 @@
   <!-- Use depend as a shortcut for packages that are both build and exec dependencies -->
     <depend>roscpp</depend>
     <depend>rospy</depend>
+    <depend>srdfdom</depend>
+    <depend>urdf</depend>  
+    <depend>actionlib</depend>
     <depend>ros_end_effector</depend>
-    <depend>srdfdom</depend>    
+    <depend>rosee_msg</depend>   
   <!--   Note that this is equivalent to the following: -->
   <!--   <build_depend>roscpp</build_depend> -->
   <!--   <exec_depend>roscpp</exec_depend> -->
