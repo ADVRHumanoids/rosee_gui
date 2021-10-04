@@ -12,20 +12,22 @@
   <maintainer email="toridebraus@gmail.com">Davide Torielli</maintainer>
 
 
-
   <!-- One license tag required, multiple allowed, one license per tag -->
   <!-- Commonly used license strings: -->
   <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
   <license>Apache License 2.0</license>
 
-  <url type="website">https://advrhumanoids.github.io/ROSEndEffector/</url>
-
+  <url type="website">https://advrhumanoids.github.io/ROSEndEffectorDocs/</url>
+  <url type="repository">https://github.com/ADVRHumanoids/rosee_gui/</url>
+  <url type="bugtracker">https://github.com/ADVRHumanoids/rosee_gui/issues/</url>
 
   <!-- Author tags are optional, multiple are allowed, one per tag -->
   <!-- Authors do not have to be maintainers, but could be -->
   <!-- Example: -->
   <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
-
+  <author email="luca.muratore@iit.it">Luca Muratore</author>
+  <author email="davide.torielli@iit.it">Davide Torielli</author>
+  <author email="liana.bertoni@iit.it">Liana Bertoni</author>
 
   <!-- The *depend tags are used to specify dependencies -->
   <!-- Dependencies can be catkin packages or system dependencies -->
