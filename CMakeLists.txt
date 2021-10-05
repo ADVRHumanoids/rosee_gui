@@ -29,7 +29,7 @@ find_package(catkin REQUIRED COMPONENTS
     urdf
     message_generation
     actionlib
-    ros_end_effector #for action type
+    end_effector #for action type
     rosee_msg
 )
 
@@ -41,8 +41,6 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt5Charts QUIET)
 
 ## System dependencies are found with CMake's conventions
-# find_package(ros_end_effector REQUIRED)
-
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -154,7 +152,7 @@ endif()
 include_directories(
     include
     ${catkin_INCLUDE_DIRS}
-    ${ros_end_effector_INCLUDE_DIRS}
+    ${end_effector_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library

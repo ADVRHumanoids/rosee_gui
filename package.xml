@@ -38,7 +38,7 @@
     <depend>srdfdom</depend>
     <depend>urdf</depend>  
     <depend>actionlib</depend>
-    <depend>ros_end_effector</depend>
+    <depend>end_effector</depend>
     <depend>rosee_msg</depend>   
   <!--   Note that this is equivalent to the following: -->
   <!--   <build_depend>roscpp</build_depend> -->
