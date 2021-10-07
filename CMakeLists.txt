@@ -1,21 +1,6 @@
 cmake_minimum_required(VERSION 3.1.0)
 project(rosee_gui)
 
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
-
-#not necessary anymore, we set the path as cmake flag
-#set(QT5_PATH "/usr/share/qt5-15/5.15.0/gcc_64") #iit pc
-#set(QT5_PATH "/usr/lib/x86_64-linux-gnu/Qt5.12.8/5.12.8/gcc_64") #tori pc
-
-set(QT5_PATH "" CACHE PATH "Path to QT > 5.9")
-set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${QT5_PATH}")
-
-if(CMAKE_VERSION VERSION_LESS "3.7.0")
-    set(CMAKE_INCLUDE_CURRENT_DIR ON)
-endif()
-
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
 
@@ -33,12 +18,38 @@ find_package(catkin REQUIRED COMPONENTS
     rosee_msg
 )
 
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
+#not necessary anymore, we set the path as cmake flag
+#set(QT5_PATH "/usr/share/qt5-15/5.15.0/gcc_64") #iit pc
+#set(QT5_PATH "/usr/lib/x86_64-linux-gnu/Qt5.12.8/5.12.8/gcc_64") #tori pc
+
+set(QT5_PATH "" CACHE PATH "Path to QT > 5.9")
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${QT5_PATH}")
+
+if(CMAKE_VERSION VERSION_LESS "3.7.0")
+    set(CMAKE_INCLUDE_CURRENT_DIR ON)
+endif()
 
 #First one is necessary because even if we have a qt version greater than 5.9,
 #if we use only the second find package the variable ${Qt5_VERSION} remains 5.5
-find_package(Qt5 5.9 COMPONENTS Widgets)
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
-find_package(Qt5Charts QUIET)
+#find_package(Qt5 5.9 COMPONENTS Widgets)
+find_package(Qt5 REQUIRED COMPONENTS Widgets REQUIRED )
+find_package(Qt5Charts 5.9 QUIET)
+find_package(Qt5UiTools 5.9 QUIET)
+
+#VERSION_GREATER_EQUAL require cmake 3.7, we are using minimum 3.1
+if ( (NOT Qt5_VERSION VERSION_LESS "5.9") AND Qt5UiTools_FOUND AND Qt5Charts_FOUND )
+    set(SECOND_TAB ON)
+    add_definitions(-DSECOND_TAB_CODE=1)
+    message("Compiling also the 2nd tab")
+else()
+    set(SECOND_TAB OFF)
+    add_definitions(-DSECOND_TAB_CODE=0)
+endif()
+
 
 ## System dependencies are found with CMake's conventions
 
@@ -136,12 +147,14 @@ catkin_package(
 
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-#VERSION_GREATER_EQUAL require cmake 3.7, we are using minimum 3.1
-if(Qt5_VERSION VERSION_LESS "5.9")
-    # do nothing more
-else()
+if(SECOND_TAB)
+    message("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
+
     add_subdirectory(src/chart/)
     add_subdirectory(src/joint_state_gui/)
+else()
+        message("fffffffffffffffffffffffff")
+
 endif()
 
 ###########
@@ -152,7 +165,6 @@ endif()
 include_directories(
     include
     ${catkin_INCLUDE_DIRS}
-    ${end_effector_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -235,9 +247,7 @@ set_target_properties(${PROJECT_NAME}_gui_main PROPERTIES OUTPUT_NAME "gui_main"
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-if(Qt5_VERSION VERSION_LESS "5.9")
-
-else()
+if(SECOND_TAB)
     list(APPEND 2tabLibs "joint_bar_ui")
 endif()
 

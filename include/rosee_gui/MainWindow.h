@@ -26,7 +26,7 @@
 
 #include <rosee_gui/RobotDescriptionHandler.h>
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
+#if SECOND_TAB_CODE
     //TODO solve this relative include
     #include "../../src/joint_state_gui/joint_monitor_widget.h"
 #endif
