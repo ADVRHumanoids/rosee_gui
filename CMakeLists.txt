@@ -36,18 +36,20 @@ endif()
 #First one is necessary because even if we have a qt version greater than 5.9,
 #if we use only the second find package the variable ${Qt5_VERSION} remains 5.5
 #find_package(Qt5 5.9 COMPONENTS Widgets)
-find_package(Qt5 REQUIRED COMPONENTS Widgets REQUIRED )
+#find_package(Qt5 REQUIRED COMPONENTS Widgets REQUIRED )
 find_package(Qt5Charts 5.9 QUIET)
 find_package(Qt5UiTools 5.9 QUIET)
+find_package(Qt5Widgets REQUIRED)
 
 #VERSION_GREATER_EQUAL require cmake 3.7, we are using minimum 3.1
-if ( (NOT Qt5_VERSION VERSION_LESS "5.9") AND Qt5UiTools_FOUND AND Qt5Charts_FOUND )
+if ( Qt5UiTools_FOUND AND Qt5Charts_FOUND )
     set(SECOND_TAB ON)
     add_definitions(-DSECOND_TAB_CODE=1)
     message("Compiling also the 2nd tab")
 else()
     set(SECOND_TAB OFF)
     add_definitions(-DSECOND_TAB_CODE=0)
+    message("Compiling without the 2nd tab")
 endif()
 
 
@@ -148,13 +150,8 @@ catkin_package(
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 if(SECOND_TAB)
-    message("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
-
     add_subdirectory(src/chart/)
     add_subdirectory(src/joint_state_gui/)
-else()
-        message("fffffffffffffffffffffffff")
-
 endif()
 
 ###########
