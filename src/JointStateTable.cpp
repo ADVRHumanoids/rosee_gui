@@ -83,6 +83,8 @@ bool JointStateTable::setJointStateSub(ros::NodeHandle* nh) {
     ROS_INFO_STREAM ( "Getting joint pos from '" << jsTopic << "'" );
     
     jointPosSub = nh->subscribe (jsTopic, 1, &JointStateTable::jointStateClbk, this);
+    
+    return true;
 }
 
 void JointStateTable::jointStateClbk(const sensor_msgs::JointStateConstPtr& msg) {
