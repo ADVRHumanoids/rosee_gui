@@ -26,8 +26,8 @@
 #include <ros/ros.h>
 #include <rosee_gui/ActionTimedElement.h>
 
-#include <ros_end_effector/GraspingActions/Action.h> //for action types
-#include <ros_end_effector/GraspingActions/ActionPrimitive.h> //for action types
+#include <end_effector/GraspingActions/Action.h> //for action types
+#include <end_effector/GraspingActions/ActionPrimitive.h> //for action types
 #include <rosee_msg/ROSEECommandAction.h>
 #include <rosee_msg/GraspingAction.h> //msg
 
