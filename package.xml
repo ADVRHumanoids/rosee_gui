@@ -28,16 +28,19 @@
   <author email="luca.muratore@iit.it">Luca Muratore</author>
   <author email="davide.torielli@iit.it">Davide Torielli</author>
   <author email="liana.bertoni@iit.it">Liana Bertoni</author>
+  
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
 
   <!-- The *depend tags are used to specify dependencies -->
   <!-- Dependencies can be catkin packages or system dependencies -->
   <!-- Examples: -->
   <!-- Use depend as a shortcut for packages that are both build and exec dependencies -->
-  <depend>roscpp</depend>
-  <depend>rospy</depend>
+  <depend>rclcpp</depend>
+  <depend>rclpy</depend>
   <depend>srdfdom</depend>
   <depend>urdf</depend>  
-  <depend>actionlib</depend>
+  <depend>rclcpp_action</depend>
   <depend>end_effector</depend>
   <depend>rosee_msg</depend>   
 
@@ -51,7 +54,6 @@
   <!-- Use build_export_depend for packages you need in order to build against this package: -->
   <!--   <build_export_depend>message_generation</build_export_depend> -->
   <!-- Use buildtool_depend for build tool packages: -->
-  <buildtool_depend>catkin</buildtool_depend>
   <!-- Use exec_depend for packages you need at runtime: -->
   <exec_depend>message_runtime</exec_depend>
   <!-- Use test_depend for packages you need only for testing: -->
@@ -62,8 +64,7 @@
   <exec_depend>libqt5-widgets</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
-  <export>
-    <!-- Other tools can request additional information be placed here -->
-
-  </export>
+    <export>
+    <build_type>ament_cmake</build_type>
+    </export>
 </package>

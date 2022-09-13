@@ -18,17 +18,20 @@
 #define TIMERHANDLER_H
 
 #include <QTimer>
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
 class TimerHandler : public QObject
 {
     Q_OBJECT
 public:
-    TimerHandler(int msec = 100);
+    TimerHandler(const rclcpp::Node::SharedPtr node, int msec = 100);
     QTimer *timer;
 
 public slots:
     void timerSlot();
+
+private:
+    rclcpp::Node::SharedPtr _node;
 };
 
 #endif // TIMERHANDLER_H

@@ -26,7 +26,7 @@
 #include <rosee_gui/JointStateTable.h>
 #include <rosee_gui/RobotDescriptionHandler.h>
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
 /**
  * @todo write docs

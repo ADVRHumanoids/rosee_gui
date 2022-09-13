@@ -24,7 +24,7 @@ RobotDescriptionHandler::RobotDescriptionHandler(std::string urdfFile) {
     
     if(_urdfFile.empty())
     {
-        ROS_ERROR_STREAM("urdfFilePath passed is an empty string!");
+        RCLCPP_ERROR_STREAM (_node->get_logger(),"urdfFilePath passed is an empty string!");
         return;
     }
     
@@ -39,13 +39,13 @@ RobotDescriptionHandler::RobotDescriptionHandler(std::string urdfFile, std::stri
     
     if(_urdfFile.empty())
     {
-        ROS_ERROR_STREAM("urdfFile passed is an empty string!");
+        RCLCPP_ERROR_STREAM (_node->get_logger(),"urdfFile passed is an empty string!");
         return;
     }
     
     if(_srdfFile.empty())
     {
-        ROS_ERROR_STREAM("srdfFile passed is an empty string!");
+        RCLCPP_ERROR_STREAM (_node->get_logger(),"srdfFile passed is an empty string!");
         return;
     }
     
@@ -99,7 +99,7 @@ std::vector<std::string> RobotDescriptionHandler::getJointsByActuatedType(ROSEE:
             return _mimicJoints;
             
         default:
-            ROS_ERROR_STREAM ("[RobotDescriptionHandler::getJointsByActuatedType] type '" << type 
+            RCLCPP_ERROR_STREAM (_node->get_logger(),"[RobotDescriptionHandler::getJointsByActuatedType] type '" << type 
              << "' not recognized, returning an empty vector");
             return std::vector<std::string>();
      }

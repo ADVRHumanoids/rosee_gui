@@ -7,10 +7,10 @@
 #include <QGroupBox>
 #include <QCheckBox>
 #include <QButtonGroup>
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
-#include <rosee_msg/GraspingAction.h> //msg
-#include <rosee_msg/GraspingPrimitiveAggregated.h> //msg
+#include <rosee_msg/msg/grasping_action.h> //msg
+#include <rosee_msg/srv/grasping_primitive_aggregated.h> //msg
 #include <end_effector/GraspingActions/ActionPrimitive.h>
 
 class SingleActionBoxesGroupBox : public SingleActionGroupBox

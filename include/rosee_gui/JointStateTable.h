@@ -20,8 +20,8 @@
 #include <QWidget>
 #include <QTableWidget>
 
-#include <ros/ros.h>
-#include <sensor_msgs/JointState.h>
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/joint_state.h>
 
 #include <rosee_gui/RobotDescriptionHandler.h>
 

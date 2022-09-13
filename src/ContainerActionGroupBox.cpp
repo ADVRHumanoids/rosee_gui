@@ -114,7 +114,7 @@ void ContainerActionGroupBox::getInfoServices() {
         primitivesAggregatedAvailableMsg = primitiveAggregatedSrv.response.primitives_aggregated;
 
     } else {
-        ROS_ERROR_STREAM (" ros::service::call FAILED for primitives " );
+        RCLCPP_ERROR_STREAM (_node->get_logger()," ros::service::call FAILED for primitives " );
     }
     
     rosee_msg::GraspingActionsAvailable graspingActionSrv;
@@ -122,14 +122,14 @@ void ContainerActionGroupBox::getInfoServices() {
     if (ros::service::call (graspingActionsSrvName, graspingActionSrv)) {
         genericsAvailableMsg = graspingActionSrv.response.grasping_actions;
     } else {
-        ROS_ERROR_STREAM (" ros::service::call FAILED for generic and composed" );
+        RCLCPP_ERROR_STREAM (_node->get_logger()," ros::service::call FAILED for generic and composed" );
     }
     
     graspingActionSrv.request.action_type = 2; //timed
     if (ros::service::call (graspingActionsSrvName, graspingActionSrv)) {
         timedsAvailableMsg = graspingActionSrv.response.grasping_actions;
     } else {
-        ROS_ERROR_STREAM (" ros::service::call FAILED for timed" );
+        RCLCPP_ERROR_STREAM (_node->get_logger()," ros::service::call FAILED for timed" );
     }
     
 }
@@ -166,7 +166,7 @@ std::map < std::string, std::vector<std::string> > ContainerActionGroupBox::getP
             
         } else {
             
-            ROS_ERROR_STREAM (selectablePairSrvName << " call failed with " << 
+            RCLCPP_ERROR_STREAM (_node->get_logger(),selectablePairSrvName << " call failed with " << 
                 pairInfo.request.action_name << ", " << pairInfo.request.element_name <<
                 " as request");
             return std::map < std::string, std::vector<std::string> >();

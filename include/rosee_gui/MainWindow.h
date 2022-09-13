@@ -17,7 +17,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 #include <QtGlobal> //for QT_VERSION flag
 #include <QWidget>
 #include <QTabWidget>

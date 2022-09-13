@@ -17,8 +17,7 @@
 #ifndef ROBOTDESCRIPTIONHANDLER_H
 #define ROBOTDESCRIPTIONHANDLER_H
 
-#include <ros/ros.h>
-#include <ros/console.h>
+#include <rclcpp/rclcpp.hpp>
 #include <urdf_parser/urdf_parser.h>
 #include <srdfdom/model.h>
 

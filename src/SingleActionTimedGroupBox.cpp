@@ -22,13 +22,13 @@ SingleActionTimedGroupBox::SingleActionTimedGroupBox (ros::NodeHandle* nh,
     unsigned int nInner = graspingAction.inner_actions.size();
         
     if (nInner == 0) {
-        ROS_ERROR_STREAM("[ActionTimed not valid: no inner actions selected");
+        RCLCPP_ERROR_STREAM (_node->get_logger(),"[ActionTimed not valid: no inner actions selected");
         throw "";
     }
     
     if (nInner != graspingAction.before_time_margins.size() ||
         nInner != graspingAction.after_time_margins.size() ) {
-        ROS_ERROR_STREAM("[ERROR SingleActionTimedGroupBox costructor] different size of innerNames and innerTimeMargins: " 
+        RCLCPP_ERROR_STREAM (_node->get_logger(),"[ERROR SingleActionTimedGroupBox costructor] different size of innerNames and innerTimeMargins: " 
         << nInner << " and " << graspingAction.before_time_margins.size() <<
         "(before marg), and " << graspingAction.after_time_margins.size()
         << "(after marg)");
@@ -128,8 +128,8 @@ void SingleActionTimedGroupBox::feedbackCallback(
             QString::fromStdString(feedback->action_name_current));
     
     if (el == NULL ){ 
-        ROS_ERROR_STREAM (feedback->action_name_current << " not a child of this action layout");        
-        ROS_ERROR_STREAM ("Child Are:");
+        RCLCPP_ERROR_STREAM (_node->get_logger(),feedback->action_name_current << " not a child of this action layout");        
+        RCLCPP_ERROR_STREAM (_node->get_logger(),"Child Are:");
         for (auto child : findChildren<QWidget *>()) {
             if (! child->objectName().isNull() ) {
                 ROS_WARN_STREAM (  qPrintable(child->objectName()) );

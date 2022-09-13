@@ -15,10 +15,10 @@
 #include <iostream>
 #include <memory.h>
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
-#include <rosee_msg/ROSEECommandAction.h>
-#include <rosee_msg/GraspingAction.h> //msg
+#include <rosee_msg/action/rosee_command.hpp>
+#include <rosee_msg/msg/grasping_action.h> //msg
 #include <end_effector/GraspingActions/Action.h>
 #include <end_effector/GraspingActions/ActionPrimitive.h>
 

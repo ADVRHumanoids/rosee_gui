@@ -1,6 +1,6 @@
 #include <rosee_gui/TimerHandler.h>
 
-TimerHandler::TimerHandler(int msec) {
+TimerHandler::TimerHandler(const rclcpp::Node::SharedPtr node, int msec) : _node ( node ) {
     
     timer = new QTimer(this);
     
@@ -13,6 +13,6 @@ TimerHandler::TimerHandler(int msec) {
 void TimerHandler::timerSlot() {
     
     // spin ros to deal with pub and sub of all layouts
-    ros::spinOnce();
+    rclcpp::spinOnce(_node);
 
 }
