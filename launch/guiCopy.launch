@@ -1,8 +1,18 @@
 <?xml version="1.0"?>
 <launch>
+    <arg name="hand_name" description="the name of the hand, as defined in urdf and srdf files"/>
     <arg name="gdb" default="false"/> <!-- for debug with gdb -->
+	<arg name="urdf_path" default="$(find-pkg-share end_effector)/configs/urdf/$(var hand_name).urdf"/>
+	<arg name="srdf_path" default="$(find-pkg-share end_effector)/configs/srdf/$(var hand_name).srdf"/>
 
-     <node unless="$(arg gdb)" type="gui_main" name="gui_main_copy" pkg="rosee_gui" output="screen"/> 
+    <node unless="$(var gdb)" exec="gui_main" name="gui_main_copy" pkg="rosee_gui" output="screen">
+        <param name="urdf_path" value="$(var urdf_path)"/> 
+        <param name="srdf_path" value="$(var srdf_path)"/> 
+    </node> 
      
-     <node if="$(arg gdb)" type="gui_main" name="gui_main_copy" pkg="rosee_gui" output="screen" launch-prefix="gdb -ex run --args"/>
+    <node if="$(var gdb)" exec="gui_main" name="gui_main_copy" pkg="rosee_gui" output="screen" launch-prefix="gdb -ex run --args">
+        <param name="urdf_path" value="$(var urdf_path)"/> 
+        <param name="srdf_path" value="$(var srdf_path)"/> 
+    </node> 
+    
 </launch>
