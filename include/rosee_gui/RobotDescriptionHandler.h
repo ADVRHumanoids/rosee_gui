@@ -37,7 +37,7 @@ class RobotDescriptionHandler
 public:
     //RobotDescriptorHandler();
     //RobotDescriptionHandler(std::string urdfFile );
-    RobotDescriptionHandler(std::string urdfFile, std::string srdfFile );
+    RobotDescriptionHandler(const rclcpp::Node::SharedPtr node, std::string urdfFile, std::string srdfFile);
     
     urdf::ModelInterfaceSharedPtr getUrdfModel();
     std::shared_ptr<srdf::Model> getSrdfModel();
@@ -54,6 +54,7 @@ private:
     
     void look4ActuatedJoints();
 
+    rclcpp::Node::SharedPtr _node;
     std::string _urdfFile;
     std::string _srdfFile;
     urdf::ModelInterfaceSharedPtr _urdfModel;

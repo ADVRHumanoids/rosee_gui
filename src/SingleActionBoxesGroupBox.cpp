@@ -1,11 +1,11 @@
 #include <rosee_gui/SingleActionBoxesGroupBox.h>
 
-SingleActionBoxesGroupBox::SingleActionBoxesGroupBox (ros::NodeHandle* nh, 
-                                      rosee_msg::GraspingPrimitiveAggregated graspingPrimitiveAggregated,
+SingleActionBoxesGroupBox::SingleActionBoxesGroupBox (rclcpp::Node::SharedPtr node, 
+                                      rosee_msg::msg::GraspingPrimitiveAggregated graspingPrimitiveAggregated,
                                       std::map<std::string, std::vector<std::string>> pairedMap,
                                       QWidget* parent) : 
-                                      SingleActionGroupBox(nh, graspingPrimitiveAggregated.action_name, ROSEE::Action::Type::Primitive, parent) {
-                                          
+                                      SingleActionGroupBox(node, graspingPrimitiveAggregated.action_name, ROSEE::Action::Type::Primitive, parent) {
+                                                                                    
     if (graspingPrimitiveAggregated.max_selectable != 2) {
         std::cerr << "[ERROR] max_selectable is " << graspingPrimitiveAggregated.max_selectable << 
         " this costructor is only for primitive with selectable pairs (for now)" 
@@ -29,11 +29,11 @@ SingleActionBoxesGroupBox::SingleActionBoxesGroupBox (ros::NodeHandle* nh,
 
 }
 
-SingleActionBoxesGroupBox::SingleActionBoxesGroupBox (ros::NodeHandle* nh, 
-                                      rosee_msg::GraspingPrimitiveAggregated graspingPrimitiveAggregated,
+SingleActionBoxesGroupBox::SingleActionBoxesGroupBox (rclcpp::Node::SharedPtr node, 
+                                      rosee_msg::msg::GraspingPrimitiveAggregated graspingPrimitiveAggregated,
                                       QWidget* parent) : 
-                                      SingleActionGroupBox(nh, graspingPrimitiveAggregated.action_name, ROSEE::Action::Type::Primitive, parent) {
-                                          
+                                      SingleActionGroupBox(node, graspingPrimitiveAggregated.action_name, ROSEE::Action::Type::Primitive, parent) {
+
     init(graspingPrimitiveAggregated);
 
     QObject::connect( boxes, SIGNAL (buttonClicked(QAbstractButton*)), this,
@@ -43,7 +43,7 @@ SingleActionBoxesGroupBox::SingleActionBoxesGroupBox (ros::NodeHandle* nh,
     
 }
 
-bool SingleActionBoxesGroupBox::init( rosee_msg::GraspingPrimitiveAggregated graspingPrimitiveAggregated) {
+bool SingleActionBoxesGroupBox::init( rosee_msg::msg::GraspingPrimitiveAggregated graspingPrimitiveAggregated) {
     
     
     if (graspingPrimitiveAggregated.max_selectable > graspingPrimitiveAggregated.selectable_names.size()){
@@ -95,26 +95,35 @@ bool SingleActionBoxesGroupBox::init( rosee_msg::GraspingPrimitiveAggregated gra
 
 void SingleActionBoxesGroupBox::sendActionRos () {
     
-    rosee_msg::ROSEECommandGoal goal;
-    goal.goal_action.seq = rosMsgSeq++ ;
-    goal.goal_action.stamp = ros::Time::now();
-    goal.goal_action.percentage = getSpinBoxPercentage();
-    goal.goal_action.action_name = actionName;
+    using namespace std::placeholders;
+    
+    auto goal_msg = rosee_msg::action::ROSEECommand::Goal();
+    goal_msg.goal_action.seq = rosMsgSeq++ ;
+    goal_msg.goal_action.stamp = rclcpp::Clock().now();
+    goal_msg.goal_action.percentage = getSpinBoxPercentage();
+    goal_msg.goal_action.action_name = actionName;
     //singleActionGroupBox can be generic or composed, but it do not change what we put in type
     //because the server will act on them equally
-    goal.goal_action.action_type = actionType ;
-    goal.goal_action.actionPrimitive_type = actionPrimitiveType ;
+    goal_msg.goal_action.action_type = actionType ;
+    goal_msg.goal_action.action_primitive_type = actionPrimitiveType ;
     
     //now fill selectable items with the label of all checkboxes checked
     for (auto box : boxes->buttons()) {
         if (box->isChecked()) {
             
-            goal.goal_action.selectable_items.push_back(box->text().toUtf8().constData());
+            goal_msg.goal_action.selectable_items.push_back(box->text().toUtf8().constData());
         }
     }
     
-    action_client->sendGoal (goal, boost::bind(&SingleActionBoxesGroupBox::doneCallback, this, _1, _2),
-        boost::bind(&SingleActionBoxesGroupBox::activeCallback, this), boost::bind(&SingleActionBoxesGroupBox::feedbackCallback, this, _1));
+    auto send_goal_options = rclcpp_action::Client<rosee_msg::action::ROSEECommand>::SendGoalOptions();
+    send_goal_options.goal_response_callback =
+      std::bind(&SingleActionBoxesGroupBox::goal_response_callback, this, _1);
+    send_goal_options.feedback_callback =
+      std::bind(&SingleActionBoxesGroupBox::feedback_callback, this, _1, _2);
+    send_goal_options.result_callback =
+      std::bind(&SingleActionBoxesGroupBox::result_callback, this, _1);
+    
+    action_client->async_send_goal(goal_msg, send_goal_options);
 
 }
 

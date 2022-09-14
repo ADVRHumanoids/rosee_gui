@@ -45,7 +45,7 @@ class MainWindow : public  QTabWidget
     Q_OBJECT
     
 public:
-    explicit MainWindow(ros::NodeHandle* nh, QWidget *parent = 0);
+    explicit MainWindow(const rclcpp::Node::SharedPtr node, QWidget *parent = 0);
 
 private:
     std::shared_ptr<RobotDescriptionHandler> robotDescriptionHandler;

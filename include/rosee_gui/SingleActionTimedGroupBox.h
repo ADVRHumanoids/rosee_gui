@@ -17,21 +17,27 @@
 #ifndef SINGLEACTIONTIMEDGROUPBOX_H
 #define SINGLEACTIONTIMEDGROUPBOX_H
 
+#include <functional>
+#include <future>
+#include <memory>
+#include <string>
+#include <sstream>
+
 #include <iostream>
 
 #include <QGroupBox>
 #include <QGridLayout>
 #include <QLabel>
 #include <QPushButton>
-#include <rclcpp/rclcpp.hpp>
+
 #include <rosee_gui/ActionTimedElement.h>
 
-#include <end_effector/GraspingActions/Action.h> //for action types
-#include <end_effector/GraspingActions/ActionPrimitive.h> //for action types
-#include <rosee_msg/action/rosee_command_action.h>
-#include <rosee_msg/msg/grasping_action.h> //msg
-
-#include <actionlib/client/simple_action_client.h>
+#include <rclcpp/rclcpp.hpp>
+#include <rclcpp_action/rclcpp_action.hpp>
+#include <rosee_msg/action/rosee_command.hpp>
+#include <rosee_msg/msg/grasping_action.hpp> //msg
+#include "Action.h"
+#include "ActionPrimitive.h"
 
 /**
  * @todo write docs
@@ -40,18 +46,24 @@ class SingleActionTimedGroupBox : public QGroupBox {
     
     Q_OBJECT
 public :
-    explicit SingleActionTimedGroupBox (ros::NodeHandle* nh, rosee_msg::GraspingAction graspingAction,
+    //using GraspingActionROS = rosee_msg::action::ROSEECommand;
+    using GoalHandleGraspingActionROS = rclcpp_action::ClientGoalHandle<rosee_msg::action::ROSEECommand>;
+    
+    explicit SingleActionTimedGroupBox (const rclcpp::Node::SharedPtr node, const rosee_msg::msg::GraspingAction graspingAction,
                                 QWidget* parent = 0);
     
-    std::shared_ptr <actionlib::SimpleActionClient <rosee_msg::ROSEECommandAction> > action_client;
-    void doneCallback(const actionlib::SimpleClientGoalState& state,
-            const rosee_msg::ROSEECommandResultConstPtr& result);
-    void activeCallback();
-    void feedbackCallback(const rosee_msg::ROSEECommandFeedbackConstPtr& feedback);
-    
+    rclcpp_action::Client<rosee_msg::action::ROSEECommand>::SharedPtr action_client;
+    void goal_response_callback(std::shared_future<GoalHandleGraspingActionROS::SharedPtr> future);
+
+    void feedback_callback(GoalHandleGraspingActionROS::SharedPtr, 
+                          const std::shared_ptr<const rosee_msg::action::ROSEECommand::Feedback> feedback);
+    void result_callback(const GoalHandleGraspingActionROS::WrappedResult & result);
+
     void resetAll();
 
 private: 
+    rclcpp::Node::SharedPtr _node;
+    
     QGridLayout *grid;
     QLabel* windowLabel;
     QPushButton *send_button;
@@ -60,7 +72,7 @@ private:
     std::string actionName;
     
     virtual void sendActionRos();
-    void setRosActionClient ( ros::NodeHandle * nh);
+    void setRosActionClient ();
 
 private slots:
     void sendBtnClicked();

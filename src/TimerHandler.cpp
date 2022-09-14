@@ -13,6 +13,6 @@ TimerHandler::TimerHandler(const rclcpp::Node::SharedPtr node, int msec) : _node
 void TimerHandler::timerSlot() {
     
     // spin ros to deal with pub and sub of all layouts
-    rclcpp::spinOnce(_node);
+    rclcpp::spin_some(_node);
 
 }

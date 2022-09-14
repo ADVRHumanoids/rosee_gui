@@ -32,7 +32,9 @@ RobotDescriptionHandler::RobotDescriptionHandler(std::string urdfFile) {
 }
 **/
 
-RobotDescriptionHandler::RobotDescriptionHandler(std::string urdfFile, std::string srdfFile) {
+RobotDescriptionHandler::RobotDescriptionHandler(const rclcpp::Node::SharedPtr node, std::string urdfFile, std::string srdfFile) {
+
+    _node = node;
     
     this->_urdfFile = urdfFile;
     this->_srdfFile = srdfFile;

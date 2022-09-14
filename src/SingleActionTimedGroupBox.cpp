@@ -16,8 +16,10 @@
 
 #include <rosee_gui/SingleActionTimedGroupBox.h>
 
-SingleActionTimedGroupBox::SingleActionTimedGroupBox (ros::NodeHandle* nh, 
-    rosee_msg::GraspingAction graspingAction, QWidget* parent) : QGroupBox(parent) {
+SingleActionTimedGroupBox::SingleActionTimedGroupBox (const rclcpp::Node::SharedPtr node, 
+    const rosee_msg::msg::GraspingAction graspingAction, QWidget* parent) : QGroupBox(parent) {
+    
+    _node = node;
     
     unsigned int nInner = graspingAction.inner_actions.size();
         
@@ -38,7 +40,7 @@ SingleActionTimedGroupBox::SingleActionTimedGroupBox (ros::NodeHandle* nh,
     this->actionName = graspingAction.action_name;
     this->rosMsgSeq = 0;
 
-    setRosActionClient(nh);
+    setRosActionClient();
                                           
     this->setMinimumSize(120*nInner,100);
     this->setMaximumSize(400*nInner,400);
@@ -74,54 +76,61 @@ SingleActionTimedGroupBox::SingleActionTimedGroupBox (ros::NodeHandle* nh,
 
 void SingleActionTimedGroupBox::sendBtnClicked() {
 
-    ROS_INFO_STREAM( "[SingleActionTimedGroupBox " << actionName << "] Sending ROS message..." ) ;
+    RCLCPP_INFO_STREAM(_node->get_logger(), "[SingleActionTimedGroupBox " << actionName << "] Sending ROS message..." ) ;
     sendActionRos();
-    ROS_INFO_STREAM( "[SingleActionTimedGroupBox " << actionName << "] ... sent" ) ;
+    RCLCPP_INFO_STREAM(_node->get_logger(), "[SingleActionTimedGroupBox " << actionName << "] ... sent" ) ;
 
 }
 
-void SingleActionTimedGroupBox::setRosActionClient(ros::NodeHandle* nh) {
+void SingleActionTimedGroupBox::setRosActionClient() {
     
-    action_client = 
-        std::make_shared <actionlib::SimpleActionClient <rosee_msg::ROSEECommandAction>>
-        (*nh, "/ros_end_effector/action_command", false);
+    action_client = rclcpp_action::create_client<rosee_msg::action::ROSEECommand>(
+            _node,
+            "/ros_end_effector/action_command");
+
+        //(*nh, "/ros_end_effector/action_command", false);
         //false because we handle the thread
 }
 
 void SingleActionTimedGroupBox::sendActionRos () {
-
-    rosee_msg::ROSEECommandGoal goal;
-    goal.goal_action.seq = rosMsgSeq++ ;
-    goal.goal_action.stamp = ros::Time::now();
-    //goal.goal_action.percentage not used for timed
-    goal.goal_action.action_name = actionName;
-    goal.goal_action.action_type = ROSEE::Action::Type::Timed ;
-    goal.goal_action.actionPrimitive_type = ROSEE::ActionPrimitive::Type::None ;
-    //goal.goal_action.selectable_items left empty 
-
-    action_client->sendGoal (goal, boost::bind(&SingleActionTimedGroupBox::doneCallback, this, _1, _2),
-        boost::bind(&SingleActionTimedGroupBox::activeCallback, this), boost::bind(&SingleActionTimedGroupBox::feedbackCallback, this, _1)) ;
-
-}
-
-void SingleActionTimedGroupBox::doneCallback(const actionlib::SimpleClientGoalState& state,
-            const rosee_msg::ROSEECommandResultConstPtr& result) {
     
-    ROS_INFO_STREAM("[SingleActionTimedGroupBox " << actionName << "] Finished in state "<<  state.toString().c_str());
-    //progressBar->setValue(100);
-    
-}
+    using namespace std::placeholders;
 
-void SingleActionTimedGroupBox::activeCallback() {
+    auto goal_msg = rosee_msg::action::ROSEECommand::Goal();
+    goal_msg.goal_action.seq = rosMsgSeq++ ;
+    goal_msg.goal_action.stamp = rclcpp::Clock().now();
+    //goal_msg.goal_action.percentage not used for timed
+    goal_msg.goal_action.action_name = actionName;
+    goal_msg.goal_action.action_type = ROSEE::Action::Type::Timed ;
+    goal_msg.goal_action.action_primitive_type = ROSEE::ActionPrimitive::Type::None ;
+    //goal_msg.goal_action.selectable_items left empty 
+
     
-    ROS_INFO_STREAM("[SingleActionTimedGroupBox " << actionName << "] Goal just went active");
+    auto send_goal_options = rclcpp_action::Client<rosee_msg::action::ROSEECommand>::SendGoalOptions();
+    send_goal_options.goal_response_callback =
+      std::bind(&SingleActionTimedGroupBox::goal_response_callback, this, _1);
+    send_goal_options.feedback_callback =
+      std::bind(&SingleActionTimedGroupBox::feedback_callback, this, _1, _2);
+    send_goal_options.result_callback =
+      std::bind(&SingleActionTimedGroupBox::result_callback, this, _1);
+      
+    action_client->async_send_goal(goal_msg, send_goal_options);
     
 }
 
-void SingleActionTimedGroupBox::feedbackCallback(
-    const rosee_msg::ROSEECommandFeedbackConstPtr& feedback) {
+
+void SingleActionTimedGroupBox::goal_response_callback(
+    std::shared_future<GoalHandleGraspingActionROS::SharedPtr> future) {
     
-    ROS_INFO_STREAM("[SingleActionTimedGroupBox " << actionName << "] Got Feedback: " <<
+    RCLCPP_INFO_STREAM(_node->get_logger(),"[SingleActionTimedGroupBox " << actionName << "] Goal just went active");
+    
+}
+
+void SingleActionTimedGroupBox::feedback_callback(
+    GoalHandleGraspingActionROS::SharedPtr,
+    const std::shared_ptr<const rosee_msg::action::ROSEECommand::Feedback> feedback) {
+    
+    RCLCPP_INFO_STREAM(_node->get_logger(),"[SingleActionTimedGroupBox " << actionName << "] Got Feedback: " <<
         feedback->action_name_current << " , "  << feedback->completation_percentage);    
 
     ActionTimedElement* el = this->findChild <ActionTimedElement*> (
@@ -132,16 +141,25 @@ void SingleActionTimedGroupBox::feedbackCallback(
         RCLCPP_ERROR_STREAM (_node->get_logger(),"Child Are:");
         for (auto child : findChildren<QWidget *>()) {
             if (! child->objectName().isNull() ) {
-                ROS_WARN_STREAM (  qPrintable(child->objectName()) );
+                RCLCPP_WARN_STREAM(_node->get_logger(),  qPrintable(child->objectName()) );
 
             } else {
-                ROS_WARN_STREAM ( "nullName" );
+                RCLCPP_WARN_STREAM(_node->get_logger(), "nullName" );
             }
         }
     }
     el->setProgressBarValue(feedback->completation_percentage);
    
 }
+
+void SingleActionTimedGroupBox::result_callback(
+    const GoalHandleGraspingActionROS::WrappedResult & result) {
+    
+    RCLCPP_INFO_STREAM(_node->get_logger(),"[SingleActionTimedGroupBox " << actionName << "] Finished");
+    //progressBar->setValue(100);
+    
+}
+
 
 //TODO or it is better to store the child and not look for them each time?
 void SingleActionTimedGroupBox::resetAll() {

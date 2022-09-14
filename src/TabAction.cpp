@@ -1,19 +1,19 @@
 #include <rosee_gui/TabAction.h>
 
-TabAction::TabAction(ros::NodeHandle *nh, 
+TabAction::TabAction(const rclcpp::Node::SharedPtr node, 
                      std::shared_ptr<RobotDescriptionHandler> robotDescriptionHandler,
                      QWidget *parent) : QWidget(parent) {
 
-    this->nh = nh;
+    this->_node = node;
 
     // createActionGroupBox();
     //createJointStateContainer();
     
     //the group box where the singleActionGroupBox will be set.
     //This groupbox will be added with addWidget in TabAction costructor
-    containerActionGroupBox = new ContainerActionGroupBox(nh, parent);
+    containerActionGroupBox = new ContainerActionGroupBox(_node, parent);
     
-    jointStateContainer = new JointStateContainer(nh, robotDescriptionHandler, parent);
+    jointStateContainer = new JointStateContainer(_node, robotDescriptionHandler, parent);
     
     
     QGridLayout *windowGrid = new QGridLayout;
@@ -27,13 +27,13 @@ void TabAction::createActionGroupBox() {
     
     //the group box where the singleActionGroupBox will be set.
     //This groupbox will be added with addWidget in TabAction costructor
-    //containerActionGroupBox = new ContainerActionGroupBox(nh, this);
+    //containerActionGroupBox = new ContainerActionGroupBox(_node, this);
     
 }
 
 void TabAction::createJointStateContainer() {
     
-    //jointStateContainer = new JointStateContainer(nh);
+    //jointStateContainer = new JointStateContainer(_node);
     
 }
 

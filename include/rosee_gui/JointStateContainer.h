@@ -36,7 +36,7 @@ class JointStateContainer : public QVBoxLayout
     Q_OBJECT
     
 public:
-    explicit JointStateContainer(ros::NodeHandle* nh,  std::shared_ptr<RobotDescriptionHandler>, QWidget *parent = nullptr);
+    explicit JointStateContainer(rclcpp::Node::SharedPtr node,  std::shared_ptr<RobotDescriptionHandler>, QWidget *parent = nullptr);
     
 public slots:
     void showPositionCol (int);

@@ -5,26 +5,27 @@
 
 #include <rosee_gui/MainWindow.h>
 #include <rosee_gui/TimerHandler.h>
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
 int main(int argc, char **argv)
 {
 
     QApplication app (argc, argv);
 
-    ros::init (argc, argv, "rosee_GUI");
-    ros::NodeHandle nh;
     
-    TimerHandler tHandler(100);
+    rclcpp::init ( argc, argv );
+    rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared("rosee_GUI");
     
-    MainWindow mainwindow(&nh);
+    TimerHandler tHandler(node, 100);
+    
+    MainWindow mainwindow(node);
 
     mainwindow.show();
     
     int appReturn = app.exec();
     //app.exec is blocking
     
-    ros::shutdown();
+    rclcpp::shutdown();
 
     return appReturn;
 }

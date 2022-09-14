@@ -26,12 +26,12 @@
 #include <rosee_gui/SingleActionGroupBox.h>
 #include <rosee_gui/SingleActionTimedGroupBox.h>
 
-#include <rosee_msg/msg/grasping_action.h>
-#include <rosee_msg/srv/grasping_actions_available.h>
-#include <rosee_msg/msg/grasping_primitive_aggregated.h>
-#include <rosee_msg/srv/grasping_primitive_aggregated_available.h>
-#include <rosee_msg/srv/selectable_pair_info.h>
-#include <end_effector/GraspingActions/Action.h>
+#include <rosee_msg/msg/grasping_action.hpp>
+#include <rosee_msg/srv/grasping_actions_available.hpp>
+#include <rosee_msg/msg/grasping_primitive_aggregated.hpp>
+#include <rosee_msg/srv/grasping_primitive_aggregated_available.hpp>
+#include <rosee_msg/srv/selectable_pair_info.hpp>
+#include "Action.h"
 
 /**
  * @todo write docs
@@ -43,14 +43,14 @@ class ContainerActionGroupBox : public QGroupBox
 
 public:
     
-    explicit ContainerActionGroupBox (ros::NodeHandle* nh, QWidget* parent = 0);
+    explicit ContainerActionGroupBox (const rclcpp::Node::SharedPtr node, QWidget* parent = 0);
     
 private:
     QGridLayout *grid;
-    ros::NodeHandle* nh;
-    std::vector <rosee_msg::GraspingPrimitiveAggregated> primitivesAggregatedAvailableMsg;
-    std::vector <rosee_msg::GraspingAction> genericsAvailableMsg;
-    std::vector <rosee_msg::GraspingAction> timedsAvailableMsg;
+    rclcpp::Node::SharedPtr _node;
+    std::vector <rosee_msg::msg::GraspingPrimitiveAggregated> primitivesAggregatedAvailableMsg;
+    std::vector <rosee_msg::msg::GraspingAction> genericsAvailableMsg;
+    std::vector <rosee_msg::msg::GraspingAction> timedsAvailableMsg;
     QPushButton *resetButton;
 
     

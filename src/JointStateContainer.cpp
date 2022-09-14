@@ -16,21 +16,21 @@
 
 #include <rosee_gui/JointStateContainer.h>
 
-JointStateContainer::JointStateContainer (ros::NodeHandle* nh,
+JointStateContainer::JointStateContainer (rclcpp::Node::SharedPtr node,
                                           std::shared_ptr<RobotDescriptionHandler> robotDescriptionHandler,
                                           QWidget *parent) : QVBoxLayout(parent) {
     
                                               
     activeJointStateTable = new JointStateTable(
-        nh, 
+        node, 
         robotDescriptionHandler->getJointsByActuatedType(ROSEE::JointActuatedType::ACTIVE), 
         parent);
     mimicJointStateTable = new JointStateTable(
-        nh, 
+        node, 
         robotDescriptionHandler->getJointsByActuatedType(ROSEE::JointActuatedType::MIMIC), 
         parent);
     passiveJointStateTable = new JointStateTable(
-        nh, 
+        node, 
         robotDescriptionHandler->getJointsByActuatedType(ROSEE::JointActuatedType::PASSIVE), 
         parent);
 

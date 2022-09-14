@@ -21,9 +21,11 @@
 #include <QTableWidget>
 
 #include <rclcpp/rclcpp.hpp>
-#include <sensor_msgs/msg/joint_state.h>
+#include <sensor_msgs/msg/joint_state.hpp>
 
 #include <rosee_gui/RobotDescriptionHandler.h>
+
+using std::placeholders::_1;
 
 /**
  * @todo write docs
@@ -33,16 +35,16 @@ class JointStateTable : public QTableWidget
     Q_OBJECT
     
 public:
-    explicit JointStateTable(ros::NodeHandle* nh, 
+    explicit JointStateTable(rclcpp::Node::SharedPtr node, 
                              std::vector<std::string> jointNames,
                              QWidget *parent = nullptr);
     
 private:
-    bool setJointStateSub(ros::NodeHandle* nh);
-    void jointStateClbk ( const sensor_msgs::JointStateConstPtr& msg );
+    bool setJointStateSub(rclcpp::Node::SharedPtr node);
+    void jointStateClbk ( const sensor_msgs::msg::JointState::SharedPtr msg );
     
-    ros::Subscriber jointPosSub;
-    sensor_msgs::JointState jointStateMsg;
+    rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr jointPosSub;
+    sensor_msgs::msg::JointState jointStateMsg;
     
     std::map <std::string, int> jointNameRowMap;
     

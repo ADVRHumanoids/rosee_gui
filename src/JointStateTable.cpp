@@ -17,11 +17,11 @@
 #include <rosee_gui/JointStateTable.h>
 #include <qheaderview.h> //to modify font size
 
-JointStateTable::JointStateTable (ros::NodeHandle* nh, 
+JointStateTable::JointStateTable (rclcpp::Node::SharedPtr node, 
                                    std::vector<std::string> jointNames, QWidget *parent) :
     QTableWidget(0, 0, parent) {
         
-    if (setJointStateSub(nh)) {
+    if (setJointStateSub(node)) {
         //this->setMinimumSize(1,1);
         
         //table not editable
@@ -75,19 +75,19 @@ JointStateTable::JointStateTable (ros::NodeHandle* nh,
         
 }
 
-bool JointStateTable::setJointStateSub(ros::NodeHandle* nh) {
+bool JointStateTable::setJointStateSub(rclcpp::Node::SharedPtr node) {
     
     //to get joint state from gazebo, if used
     std::string jsTopic = "/ros_end_effector/joint_states";
     
-    ROS_INFO_STREAM ( "Getting joint pos from '" << jsTopic << "'" );
+    RCLCPP_INFO_STREAM (node->get_logger(), "Getting joint pos from '" << jsTopic << "'" );
     
-    jointPosSub = nh->subscribe (jsTopic, 1, &JointStateTable::jointStateClbk, this);
+    jointPosSub = node->create_subscription<sensor_msgs::msg::JointState> (jsTopic, 1, std::bind(&JointStateTable::jointStateClbk, this, _1));
     
     return true;
 }
 
-void JointStateTable::jointStateClbk(const sensor_msgs::JointStateConstPtr& msg) {
+void JointStateTable::jointStateClbk(const sensor_msgs::msg::JointState::SharedPtr msg) {
        
     for (int i = 0; i < msg->name.size(); i++){
         

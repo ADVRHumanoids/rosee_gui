@@ -16,9 +16,9 @@
 
 #include <rosee_gui/ContainerActionGroupBox.h>
 
-ContainerActionGroupBox::ContainerActionGroupBox (ros::NodeHandle* nh, QWidget* parent) : QGroupBox(parent) {
+ContainerActionGroupBox::ContainerActionGroupBox (const rclcpp::Node::SharedPtr node, QWidget* parent) : QGroupBox(parent) {
     
-    this->nh = nh;
+    this->_node = node;
     
     // get (wait) for info from unviersalroseeExecutor about all the action parsed by it
     getInfoServices();
@@ -41,12 +41,12 @@ ContainerActionGroupBox::ContainerActionGroupBox (ros::NodeHandle* nh, QWidget* 
         if (pairedElementMap.size() > 0 ) {
             
             singleActionBoxesGroupBox = 
-                new SingleActionBoxesGroupBox(nh, primitive, pairedElementMap, this) ;  
+                new SingleActionBoxesGroupBox(_node, primitive, pairedElementMap, this) ;  
                 
         } else {
 
             singleActionBoxesGroupBox = 
-                new SingleActionBoxesGroupBox(nh, primitive, this) ; 
+                new SingleActionBoxesGroupBox(_node, primitive, this) ; 
         }
 
         grid->addWidget (singleActionBoxesGroupBox, rowCol/4, rowCol%4);
@@ -55,14 +55,14 @@ ContainerActionGroupBox::ContainerActionGroupBox (ros::NodeHandle* nh, QWidget* 
     }
     
     for (auto generic : genericsAvailableMsg) {
-        SingleActionGroupBox* singleActionGroupBox = new SingleActionGroupBox(nh, generic.action_name, (ROSEE::Action::Type)generic.action_type, this);
+        SingleActionGroupBox* singleActionGroupBox = new SingleActionGroupBox(_node, generic.action_name, (ROSEE::Action::Type)generic.action_type, this);
             grid->addWidget (singleActionGroupBox, rowCol/4, rowCol%4);
             rowCol++;
     } 
     
     for (auto timed : timedsAvailableMsg) {
         
-        SingleActionTimedGroupBox* singleActionTimedGroupBox = new SingleActionTimedGroupBox(nh, timed, this);
+        SingleActionTimedGroupBox* singleActionTimedGroupBox = new SingleActionTimedGroupBox(_node, timed, this);
         grid->addWidget(singleActionTimedGroupBox, rowCol/4, rowCol%4, 1, timed.inner_actions.size());
         
         //timed action occupy more space in the grid... -1 because +1 increment
@@ -92,45 +92,64 @@ ContainerActionGroupBox::ContainerActionGroupBox (ros::NodeHandle* nh, QWidget* 
 void ContainerActionGroupBox::getInfoServices() {
     
     std::string primitiveAggregatedSrvName, graspingActionsSrvName;
-    nh->param<std::string>("/rosee/grasping_action_srv_name", graspingActionsSrvName, 
-                           "grasping_actions_available");
+    _node->declare_parameter("/rosee/grasping_action_srv_name", "grasping_actions_available");
+    _node->get_parameter("/rosee/grasping_action_srv_name", graspingActionsSrvName);    
     
-    nh->param<std::string>("/rosee/primitive_aggregated_srv_name", primitiveAggregatedSrvName, 
-                           "primitives_aggregated_available");
+    _node->declare_parameter("/rosee/primitive_aggregated_srv_name", "primitives_aggregated_available");
+    _node->get_parameter("/rosee/primitive_aggregated_srv_name", primitiveAggregatedSrvName);
+    
     
     graspingActionsSrvName = "/ros_end_effector/" + graspingActionsSrvName;
     primitiveAggregatedSrvName = "/ros_end_effector/" + primitiveAggregatedSrvName;
     
-    //wait for infinite (-1) for the service
-    ros::service::waitForService(graspingActionsSrvName, -1);
-    ROS_INFO_STREAM ("... " << graspingActionsSrvName << " service found, I will call it");
+    rclcpp::Client<rosee_msg::srv::GraspingActionsAvailable>::SharedPtr graspingActionAvailableClient =
+        _node->create_client<rosee_msg::srv::GraspingActionsAvailable>(graspingActionsSrvName);
     
-    ros::service::waitForService(primitiveAggregatedSrvName, -1);
-    ROS_INFO_STREAM ("... " << primitiveAggregatedSrvName << " service found, I will call it");
+    rclcpp::Client<rosee_msg::srv::GraspingPrimitiveAggregatedAvailable>::SharedPtr primitivesAggregatedAvailableClient =
+        _node->create_client<rosee_msg::srv::GraspingPrimitiveAggregatedAvailable>(primitiveAggregatedSrvName);
+    
+    //wait for infinite (-1) for the service
+    graspingActionAvailableClient->wait_for_service();
+    
+    RCLCPP_INFO_STREAM (_node->get_logger(), "... " << graspingActionsSrvName << " service found, I will call it");
+    
+    primitivesAggregatedAvailableClient->wait_for_service();
+    RCLCPP_INFO_STREAM (_node->get_logger(), "... " << primitiveAggregatedSrvName << " service found, I will call it");
         
     //for primitives, we call the primitiveAggregatedSrvName service
-    rosee_msg::GraspingPrimitiveAggregatedAvailable primitiveAggregatedSrv;
-    if (ros::service::call (primitiveAggregatedSrvName, primitiveAggregatedSrv)) {
-        primitivesAggregatedAvailableMsg = primitiveAggregatedSrv.response.primitives_aggregated;
+    auto primitivesAggregatedAvailableRequest = std::make_shared<rosee_msg::srv::GraspingPrimitiveAggregatedAvailable::Request>();
 
+    auto primitivesAggregatedAvailableResult = primitivesAggregatedAvailableClient->async_send_request(primitivesAggregatedAvailableRequest);
+    // Wait for the result.
+    if (rclcpp::spin_until_future_complete(_node, primitivesAggregatedAvailableResult) == rclcpp::FutureReturnCode::SUCCESS)
+    {
+        primitivesAggregatedAvailableMsg = primitivesAggregatedAvailableResult.get()->primitives_aggregated;
     } else {
         RCLCPP_ERROR_STREAM (_node->get_logger()," ros::service::call FAILED for primitives " );
-    }
+    } 
     
-    rosee_msg::GraspingActionsAvailable graspingActionSrv;
-    graspingActionSrv.request.action_type = 1; //generic & composed
-    if (ros::service::call (graspingActionsSrvName, graspingActionSrv)) {
-        genericsAvailableMsg = graspingActionSrv.response.grasping_actions;
+    //graspingsactions
+    auto graspingActionAvailableRequest = std::make_shared<rosee_msg::srv::GraspingActionsAvailable::Request>();
+    graspingActionAvailableRequest->action_type = 1; //generic & composed
+    auto graspingActionAvailableResult = graspingActionAvailableClient->async_send_request(graspingActionAvailableRequest);
+    // Wait for the result.
+    if (rclcpp::spin_until_future_complete(_node, graspingActionAvailableResult) == rclcpp::FutureReturnCode::SUCCESS)
+    {
+        genericsAvailableMsg = graspingActionAvailableResult.get()->grasping_actions;
     } else {
         RCLCPP_ERROR_STREAM (_node->get_logger()," ros::service::call FAILED for generic and composed" );
-    }
+    } 
     
-    graspingActionSrv.request.action_type = 2; //timed
-    if (ros::service::call (graspingActionsSrvName, graspingActionSrv)) {
-        timedsAvailableMsg = graspingActionSrv.response.grasping_actions;
+    
+    graspingActionAvailableRequest->action_type = 2; //timed
+    auto graspingActionAvailableResult2 = graspingActionAvailableClient->async_send_request(graspingActionAvailableRequest);
+    // Wait for the result.
+    if (rclcpp::spin_until_future_complete(_node, graspingActionAvailableResult2) == rclcpp::FutureReturnCode::SUCCESS)
+    {
+        timedsAvailableMsg = graspingActionAvailableResult2.get()->grasping_actions;
     } else {
         RCLCPP_ERROR_STREAM (_node->get_logger()," ros::service::call FAILED for timed" );
-    }
+    } 
     
 }
 
@@ -141,36 +160,42 @@ std::map < std::string, std::vector<std::string> > ContainerActionGroupBox::getP
     std::map<std::string, std::vector<std::string>> pairedElementMap;
 
     std::string selectablePairSrvName;
-    nh->param<std::string>("/rosee/selectable_finger_pair_info", selectablePairSrvName, 
-                           "selectable_finger_pair_info");
+    _node->declare_parameter("/rosee/selectable_finger_pair_info", "selectable_finger_pair_info");
+    _node->get_parameter("/rosee/selectable_finger_pair_info", selectablePairSrvName);
     
     selectablePairSrvName = "/ros_end_effector/" + selectablePairSrvName;
     
     
-    ROS_INFO_STREAM ("waiting "<< selectablePairSrvName << " service for 5 seconds...");
-    if (! ros::service::waitForService(selectablePairSrvName, 5000)) {
-        ROS_WARN_STREAM (selectablePairSrvName << " not found");
+    RCLCPP_INFO_STREAM (_node->get_logger(), "waiting "<< selectablePairSrvName << " service for 5 seconds...");
+    
+    rclcpp::Client<rosee_msg::srv::SelectablePairInfo>::SharedPtr pairInfoClient =
+        _node->create_client<rosee_msg::srv::SelectablePairInfo>(selectablePairSrvName);
+        
+    if (! pairInfoClient->wait_for_service(std::chrono::seconds(5))) {
+        RCLCPP_WARN_STREAM (_node->get_logger(), selectablePairSrvName << " not found");
 
         return std::map < std::string, std::vector<std::string> >();
     }
-    ROS_INFO_STREAM ("..." << selectablePairSrvName << " service found, I will call it");
+    RCLCPP_INFO_STREAM (_node->get_logger(), "..." << selectablePairSrvName << " service found, I will call it");
 
-    rosee_msg::SelectablePairInfo pairInfo;
-    pairInfo.request.action_name = action_name;
+    auto pairInfoRequest = std::make_shared<rosee_msg::srv::SelectablePairInfo::Request>();
+    pairInfoRequest->action_name = action_name;
 
     for (auto elementName : elements) {
-        pairInfo.request.element_name = elementName;
-        if (ros::service::call(selectablePairSrvName, pairInfo)) {
+        pairInfoRequest->element_name = elementName;
+        
+        auto pairInfoResult = pairInfoClient->async_send_request(pairInfoRequest);     
 
-            pairedElementMap.insert(std::make_pair(elementName, pairInfo.response.pair_elements) );
-            
+        // Wait for the result.
+        if (rclcpp::spin_until_future_complete(_node, pairInfoResult) == rclcpp::FutureReturnCode::SUCCESS)
+        {
+            pairedElementMap.insert(std::make_pair(elementName, pairInfoResult.get()->pair_elements) );
+
         } else {
-            
             RCLCPP_ERROR_STREAM (_node->get_logger(),selectablePairSrvName << " call failed with " << 
-                pairInfo.request.action_name << ", " << pairInfo.request.element_name <<
+                pairInfoRequest->action_name << ", " << pairInfoRequest->element_name <<
                 " as request");
             return std::map < std::string, std::vector<std::string> >();
-
         }
     }
     return pairedElementMap;

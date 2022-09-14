@@ -9,22 +9,23 @@
 #include <QButtonGroup>
 #include <rclcpp/rclcpp.hpp>
 
-#include <rosee_msg/msg/grasping_action.h> //msg
-#include <rosee_msg/srv/grasping_primitive_aggregated.h> //msg
-#include <end_effector/GraspingActions/ActionPrimitive.h>
+#include <rosee_msg/msg/grasping_action.hpp> //msg
+#include <rosee_msg/msg/grasping_primitive_aggregated.hpp> //msg
+#include "ActionPrimitive.h"
 
 class SingleActionBoxesGroupBox : public SingleActionGroupBox
 {
     Q_OBJECT
 public:
-    explicit SingleActionBoxesGroupBox(ros::NodeHandle* nh, rosee_msg::GraspingPrimitiveAggregated,
+    explicit SingleActionBoxesGroupBox(const rclcpp::Node::SharedPtr node, rosee_msg::msg::GraspingPrimitiveAggregated,
                                std::map<std::string, std::vector<std::string>> pairedMap, QWidget* parent=0);
-    explicit SingleActionBoxesGroupBox(ros::NodeHandle* nh, rosee_msg::GraspingPrimitiveAggregated, 
+    explicit SingleActionBoxesGroupBox(const rclcpp::Node::SharedPtr node, rosee_msg::msg::GraspingPrimitiveAggregated, 
                                        QWidget* parent=0);
         
     virtual void resetAll() override;
 
 private:
+    
     QButtonGroup* boxes;
     unsigned int maxChecked;
     ROSEE::ActionPrimitive::Type actionPrimitiveType;
@@ -34,7 +35,7 @@ private:
     std::map<std::string, std::vector<std::string>> pairedMap; //if not passed in costructor, it will remain empty
 
     //used by the two costructors for primitives
-    bool init(rosee_msg::GraspingPrimitiveAggregated);
+    bool init(rosee_msg::msg::GraspingPrimitiveAggregated);
     
     void sendActionRos() override;
     

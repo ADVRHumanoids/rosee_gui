@@ -13,10 +13,10 @@ class TabAction : public QWidget
 {
     Q_OBJECT
 public:
-    explicit TabAction(ros::NodeHandle* nh, std::shared_ptr<RobotDescriptionHandler>,  QWidget *parent = 0);
+    explicit TabAction(const rclcpp::Node::SharedPtr node, std::shared_ptr<RobotDescriptionHandler>,  QWidget *parent = 0);
     
 private:
-    ros::NodeHandle* nh;
+    rclcpp::Node::SharedPtr _node;
     ContainerActionGroupBox* containerActionGroupBox;
     
     QGroupBox* actionGroupBox;

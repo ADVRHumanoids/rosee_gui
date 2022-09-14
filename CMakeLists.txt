@@ -5,7 +5,7 @@ if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
 endif()
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
+  #add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
 ## Find catkin macros and libraries
@@ -13,13 +13,13 @@ endif()
 ## is used, also find other catkin packages
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(rclpy REQUIRED)
 find_package(srdfdom REQUIRED)
 find_package(urdf REQUIRED)
 find_package(rclcpp_action REQUIRED)
-find_package(end_effector REQUIRED)
+find_package(rclpy REQUIRED)
+#find_package(end_effector REQUIRED)
+find_package(action_msgs REQUIRED)
 find_package(rosee_msg REQUIRED)
-find_package(urdf REQUIRED)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -76,6 +76,7 @@ include_directories(
     include
     ${Qt5Core_INCLUDE_DIRS}
     ${Qt5Widgets_INCLUDE_DIRS}
+    ${rosee_msg_INCLUDE_DIRS}
 )
 
 set(QT_LIBRARIES
@@ -83,62 +84,82 @@ set(QT_LIBRARIES
     Qt5::Widgets
 )
 
+set(MSG_LIBS
+    rosee_msg
+    rclcpp_action
+    action_msgs
+)
+
 ## Declare a C++ library
 # needed also the .h for qt automoc things
+
+list(APPEND libToInstall)
+
 add_library(${PROJECT_NAME}_MainWindow SHARED
     src/MainWindow.cpp
     include/rosee_gui/MainWindow.h
 )
+list(APPEND libToInstall ${PROJECT_NAME}_MainWindow)
 
 add_library(${PROJECT_NAME}_TabAction SHARED
     src/TabAction.cpp
     include/rosee_gui/TabAction.h
 )
+list(APPEND libToInstall ${PROJECT_NAME}_TabAction )
 
 add_library(${PROJECT_NAME}_SingleActionGroupBox SHARED
     src/SingleActionGroupBox.cpp
     include/rosee_gui/SingleActionGroupBox.h
 )
+list(APPEND libToInstall ${PROJECT_NAME}_SingleActionGroupBox)
 
 add_library(${PROJECT_NAME}_SingleActionBoxesGroupBox SHARED
     src/SingleActionBoxesGroupBox.cpp
     include/rosee_gui/SingleActionBoxesGroupBox.h
 )
+list(APPEND libToInstall ${PROJECT_NAME}_SingleActionBoxesGroupBox )
 
 add_library(${PROJECT_NAME}_SingleActionTimedGroupBox SHARED
     src/SingleActionTimedGroupBox.cpp
     include/rosee_gui/SingleActionTimedGroupBox.h
 )
+list(APPEND libToInstall ${PROJECT_NAME}_SingleActionTimedGroupBox )
 
 add_library(${PROJECT_NAME}_ActionTimedElement SHARED
     src/ActionTimedElement.cpp
     include/rosee_gui/ActionTimedElement.h
 )
+list(APPEND libToInstall ${PROJECT_NAME}_ActionTimedElement )
 
 add_library(${PROJECT_NAME}_TimerHandler SHARED
     src/TimerHandler.cpp
     include/rosee_gui/TimerHandler.h
 )
+list(APPEND libToInstall ${PROJECT_NAME}_TimerHandler)
 
 add_library(${PROJECT_NAME}_JointStateTable SHARED
     src/JointStateTable.cpp
     include/rosee_gui/JointStateTable.h
 )
+list(APPEND libToInstall ${PROJECT_NAME}_JointStateTable)
 
 add_library(${PROJECT_NAME}_JointStateContainer SHARED
     src/JointStateContainer.cpp
     include/rosee_gui/JointStateContainer.h 
 )
+list(APPEND libToInstall ${PROJECT_NAME}_JointStateContainer)
 
 add_library(${PROJECT_NAME}_ContainerActionGroupBox SHARED
     src/ContainerActionGroupBox.cpp
     include/rosee_gui/ContainerActionGroupBox.h 
 )
+list(APPEND libToInstall ${PROJECT_NAME}_ContainerActionGroupBox)
 
 add_library(${PROJECT_NAME}_RobotDescriptionHandler SHARED
     src/RobotDescriptionHandler.cpp
     include/rosee_gui/RobotDescriptionHandler.h 
 )
+list(APPEND libToInstall ${PROJECT_NAME}_RobotDescriptionHandler)
 
 
 ## Add cmake target dependencies of the library
@@ -169,6 +190,7 @@ endif()
 
 ament_target_dependencies(${PROJECT_NAME}_gui_main
     rclcpp
+    ${MSG_LIBS}
 )
 target_link_libraries(${PROJECT_NAME}_gui_main
     #Qt5::Widgets
@@ -178,6 +200,7 @@ target_link_libraries(${PROJECT_NAME}_gui_main
 
 ament_target_dependencies(${PROJECT_NAME}_MainWindow
     rclcpp
+    ${MSG_LIBS}
 )
 target_link_libraries(${PROJECT_NAME}_MainWindow
     #Qt5::Widgets
@@ -188,6 +211,7 @@ target_link_libraries(${PROJECT_NAME}_MainWindow
 
 ament_target_dependencies(${PROJECT_NAME}_TabAction
     rclcpp
+    ${MSG_LIBS}
 )
 target_link_libraries(${PROJECT_NAME}_TabAction
     #Qt5::Widgets
@@ -199,6 +223,7 @@ target_link_libraries(${PROJECT_NAME}_TabAction
 
 ament_target_dependencies(${PROJECT_NAME}_SingleActionGroupBox
     rclcpp
+    ${MSG_LIBS}
 )
 target_link_libraries(${PROJECT_NAME}_SingleActionGroupBox
     #Qt5::Widgets
@@ -206,6 +231,7 @@ target_link_libraries(${PROJECT_NAME}_SingleActionGroupBox
 
 ament_target_dependencies(${PROJECT_NAME}_SingleActionBoxesGroupBox
     rclcpp
+    ${MSG_LIBS}
 )
 target_link_libraries(${PROJECT_NAME}_SingleActionBoxesGroupBox
    # Qt5::Widgets
@@ -213,6 +239,7 @@ target_link_libraries(${PROJECT_NAME}_SingleActionBoxesGroupBox
 
 ament_target_dependencies(${PROJECT_NAME}_SingleActionTimedGroupBox
     rclcpp
+    ${MSG_LIBS}
 )
 target_link_libraries(${PROJECT_NAME}_SingleActionTimedGroupBox
    # Qt5::Widgets
@@ -221,44 +248,85 @@ target_link_libraries(${PROJECT_NAME}_SingleActionTimedGroupBox
 
 ament_target_dependencies(${PROJECT_NAME}_ActionTimedElement
     rclcpp
+    ${MSG_LIBS}
 )
 target_link_libraries(${PROJECT_NAME}_ActionTimedElement
    # Qt5::Widgets
+   
 )
 
 ament_target_dependencies(${PROJECT_NAME}_TimerHandler
     rclcpp
+    ${MSG_LIBS}
 )
 target_link_libraries(${PROJECT_NAME}_TimerHandler
     Qt5::Core
+    
 )
 
 ament_target_dependencies(${PROJECT_NAME}_JointStateTable
     rclcpp
+    ${MSG_LIBS}
 )
 target_link_libraries(${PROJECT_NAME}_JointStateTable
     #Qt5::Widgets
+    
 )
 
 ament_target_dependencies(${PROJECT_NAME}_JointStateContainer
     rclcpp
+    ${MSG_LIBS}
 )
 target_link_libraries(${PROJECT_NAME}_JointStateContainer
     #Qt5::Widgets
     ${PROJECT_NAME}_JointStateTable
     ${PROJECT_NAME}_RobotDescriptionHandler
+    
 )
 ament_target_dependencies(${PROJECT_NAME}_ContainerActionGroupBox
     rclcpp
+    ${MSG_LIBS}
 )
 target_link_libraries(${PROJECT_NAME}_ContainerActionGroupBox
     #Qt5::Widgets
     ${PROJECT_NAME}_SingleActionGroupBox
     ${PROJECT_NAME}_SingleActionBoxesGroupBox
     ${PROJECT_NAME}_SingleActionTimedGroupBox
+    
 )
 ament_target_dependencies(${PROJECT_NAME}_RobotDescriptionHandler
     rclcpp
+    ${MSG_LIBS}
 )
+
+#############
+## Install ##
+#############
+# Mark executables and/or libraries for installation
+install(TARGETS 
+    ${PROJECT_NAME}_gui_main
+    ${libToInstall}
+    DESTINATION lib/${PROJECT_NAME}
+    EXPORT export_${PROJECT_NAME}
+)
+
+## Mark cpp header files for installation
+install(DIRECTORY include/
+  DESTINATION include
+)
+ament_export_include_directories(include)
+
+install(DIRECTORY launch/
+  DESTINATION launch
+  DESTINATION share/${PROJECT_NAME}/launch/
+)
+
+ament_export_libraries(
+  rosee_gui
+)
+ament_export_targets(
+  export_${PROJECT_NAME}
+)
+
 
 ament_package()
