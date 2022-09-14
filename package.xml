@@ -43,7 +43,9 @@
   <depend>rclcpp_action</depend>
   <!--  <depend>end_effector</depend> -->
   <depend>rosee_msg</depend>   
-
+  <depend>sensor_msgs</depend>  
+  <depend>action_msgs</depend>  
+  
   <exec_depend>libqt5-core</exec_depend>
   <exec_depend>libqt5-widgets</exec_depend>
 

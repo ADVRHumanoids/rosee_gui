@@ -20,6 +20,7 @@ find_package(rclpy REQUIRED)
 #find_package(end_effector REQUIRED)
 find_package(action_msgs REQUIRED)
 find_package(rosee_msg REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -60,7 +61,7 @@ find_package(Qt5 REQUIRED COMPONENTS
     message("Compiling without the 2nd tab")
 #endif()
 
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+#set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 if(SECOND_TAB)
     add_subdirectory(src/chart/)
@@ -74,9 +75,8 @@ endif()
 ## Your package locations should be listed before other locations
 include_directories(
     include
-    ${Qt5Core_INCLUDE_DIRS}
-    ${Qt5Widgets_INCLUDE_DIRS}
-    ${rosee_msg_INCLUDE_DIRS}
+    #${Qt5Core_INCLUDE_DIRS}
+   # ${Qt5Widgets_INCLUDE_DIRS}
 )
 
 set(QT_LIBRARIES
@@ -193,7 +193,7 @@ ament_target_dependencies(${PROJECT_NAME}_gui_main
     ${MSG_LIBS}
 )
 target_link_libraries(${PROJECT_NAME}_gui_main
-    #Qt5::Widgets
+    Qt5::Widgets
     ${PROJECT_NAME}_MainWindow
     ${PROJECT_NAME}_TimerHandler
 )
@@ -203,7 +203,7 @@ ament_target_dependencies(${PROJECT_NAME}_MainWindow
     ${MSG_LIBS}
 )
 target_link_libraries(${PROJECT_NAME}_MainWindow
-    #Qt5::Widgets
+    Qt5::Widgets
     ${PROJECT_NAME}_TabAction
     ${PROJECT_NAME}_RobotDescriptionHandler
     ${2tabLibs}
@@ -226,7 +226,7 @@ ament_target_dependencies(${PROJECT_NAME}_SingleActionGroupBox
     ${MSG_LIBS}
 )
 target_link_libraries(${PROJECT_NAME}_SingleActionGroupBox
-    #Qt5::Widgets
+    Qt5::Widgets
 )
 
 ament_target_dependencies(${PROJECT_NAME}_SingleActionBoxesGroupBox
@@ -234,7 +234,8 @@ ament_target_dependencies(${PROJECT_NAME}_SingleActionBoxesGroupBox
     ${MSG_LIBS}
 )
 target_link_libraries(${PROJECT_NAME}_SingleActionBoxesGroupBox
-   # Qt5::Widgets
+    Qt5::Widgets
+    ${PROJECT_NAME}_SingleActionGroupBox
 )
 
 ament_target_dependencies(${PROJECT_NAME}_SingleActionTimedGroupBox
@@ -242,7 +243,7 @@ ament_target_dependencies(${PROJECT_NAME}_SingleActionTimedGroupBox
     ${MSG_LIBS}
 )
 target_link_libraries(${PROJECT_NAME}_SingleActionTimedGroupBox
-   # Qt5::Widgets
+    Qt5::Widgets
     ${PROJECT_NAME}_ActionTimedElement
 )
 
@@ -251,7 +252,7 @@ ament_target_dependencies(${PROJECT_NAME}_ActionTimedElement
     ${MSG_LIBS}
 )
 target_link_libraries(${PROJECT_NAME}_ActionTimedElement
-   # Qt5::Widgets
+    Qt5::Widgets
    
 )
 
@@ -267,9 +268,12 @@ target_link_libraries(${PROJECT_NAME}_TimerHandler
 ament_target_dependencies(${PROJECT_NAME}_JointStateTable
     rclcpp
     ${MSG_LIBS}
+    sensor_msgs
 )
 target_link_libraries(${PROJECT_NAME}_JointStateTable
-    #Qt5::Widgets
+    Qt5::Widgets
+    ${PROJECT_NAME}_RobotDescriptionHandler
+
     
 )
 
@@ -278,7 +282,7 @@ ament_target_dependencies(${PROJECT_NAME}_JointStateContainer
     ${MSG_LIBS}
 )
 target_link_libraries(${PROJECT_NAME}_JointStateContainer
-    #Qt5::Widgets
+    Qt5::Widgets
     ${PROJECT_NAME}_JointStateTable
     ${PROJECT_NAME}_RobotDescriptionHandler
     
@@ -288,7 +292,7 @@ ament_target_dependencies(${PROJECT_NAME}_ContainerActionGroupBox
     ${MSG_LIBS}
 )
 target_link_libraries(${PROJECT_NAME}_ContainerActionGroupBox
-    #Qt5::Widgets
+    Qt5::Widgets
     ${PROJECT_NAME}_SingleActionGroupBox
     ${PROJECT_NAME}_SingleActionBoxesGroupBox
     ${PROJECT_NAME}_SingleActionTimedGroupBox
@@ -296,6 +300,8 @@ target_link_libraries(${PROJECT_NAME}_ContainerActionGroupBox
 )
 ament_target_dependencies(${PROJECT_NAME}_RobotDescriptionHandler
     rclcpp
+    urdf
+    srdfdom
     ${MSG_LIBS}
 )
 
