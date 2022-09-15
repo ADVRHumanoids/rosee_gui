@@ -51,12 +51,29 @@ RobotDescriptionHandler::RobotDescriptionHandler(const rclcpp::Node::SharedPtr n
         return;
     }
     
-    _urdfModel = urdf::parseURDF(_urdfFile);
+    std::string xml_string;
+    std::fstream xml_file ( _urdfFile.c_str(), std::fstream::in );
+    if ( xml_file.is_open() ) {
+
+        while ( xml_file.good() ) {
+
+            std::string line;
+            std::getline ( xml_file, line );
+            xml_string += ( line + "\n" );
+        }
+        xml_file.close();
+        _urdfModel = urdf::parseURDF ( xml_string );
+        
+    } else {
+
+        RCLCPP_ERROR_STREAM (_node->get_logger(), "in " << __func__ << " : Can NOT open " << _urdfFile << " !" );
+        return ;
+    }
     
     //initString take as 2nd arg the xml content of the file. 
     //initFile takes instead the flename. We have the file xml content in the param server
     _srdfModel = std::make_shared<srdf::Model>();
-    _srdfModel->initString ( *_urdfModel, _srdfFile );
+    _srdfModel->initFile ( *_urdfModel, _srdfFile );
     
     look4ActuatedJoints();
 

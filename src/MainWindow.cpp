@@ -20,11 +20,11 @@ MainWindow::MainWindow(const rclcpp::Node::SharedPtr node, QWidget *parent) : QT
     
     std::string urdf_file, srdf_file;
     
-    node->declare_parameter("robot_description", "");
-    node->declare_parameter("robot_description_semantic", "");
+    node->declare_parameter("urdf_path", "");
+    node->declare_parameter("srdf_path", "");
     
-    node->get_parameter("robot_description", urdf_file);
-    node->get_parameter("robot_description_semantic", srdf_file);
+    node->get_parameter("urdf_path", urdf_file);
+    node->get_parameter("srdf_path", srdf_file);
 
     robotDescriptionHandler = std::make_shared<RobotDescriptionHandler>(node, urdf_file, srdf_file);
 

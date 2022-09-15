@@ -86,7 +86,7 @@ void SingleActionTimedGroupBox::setRosActionClient() {
     
     action_client = rclcpp_action::create_client<rosee_msg::action::ROSEECommand>(
             _node,
-            "/ros_end_effector/action_command");
+            "/action_command");
 
         //(*nh, "/ros_end_effector/action_command", false);
         //false because we handle the thread
