@@ -55,6 +55,9 @@ JointBarWidget::JointBarWidget(const QString& jname, QWidget *parent) :
     _jname = findChild<QLabel *>("JointLabel");
     _jname->installEventFilter(this);
     _jname->setText(jname);
+    auto font = _jname->font();
+    font.setPointSize(12);
+    _jname->setFont(font);
     
     //so we can modify the label with (active, passive, mimic) and still return
     //the right joint name

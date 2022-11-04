@@ -49,7 +49,7 @@ ChartWidget::ChartWidget(QWidget * parent):
     
     //show name in tooltip when it is too long to be visualized
     _chart->legend()->setShowToolTips(true);
-    _chart->legend()->setFont(QFont("Ubuntu", 9));
+    _chart->legend()->setFont(QFont("Ubuntu", 13));
     _chart->legend()->setMaximumWidth(290);
 
     /* Axes */
@@ -140,6 +140,11 @@ void ChartWidget::addSeries(QString name)
     _chart->addSeries(series);
     series->attachAxis(_axis_x);
     series->attachAxis(_axis_y);
+    
+    //linewidth
+    QPen pen = series->pen();
+    pen.setWidth(5);
+    series->setPen(pen);
 
     _series[name] = series;
 
