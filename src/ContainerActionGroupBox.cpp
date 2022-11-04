@@ -92,15 +92,15 @@ ContainerActionGroupBox::ContainerActionGroupBox (const rclcpp::Node::SharedPtr 
 void ContainerActionGroupBox::getInfoServices() {
     
     std::string primitiveAggregatedSrvName, graspingActionsSrvName;
-    _node->declare_parameter("/rosee/grasping_action_srv_name", "grasping_actions_available");
-    _node->get_parameter("/rosee/grasping_action_srv_name", graspingActionsSrvName);    
+//     _node->declare_parameter("/rosee/grasping_action_srv_name", "grasping_actions_available");
+//     _node->get_parameter("/rosee/grasping_action_srv_name", graspingActionsSrvName);    
+//     
+//     _node->declare_parameter("/rosee/primitive_aggregated_srv_name", "primitives_aggregated_available");
+//     _node->get_parameter("/rosee/primitive_aggregated_srv_name", primitiveAggregatedSrvName);
     
-    _node->declare_parameter("/rosee/primitive_aggregated_srv_name", "primitives_aggregated_available");
-    _node->get_parameter("/rosee/primitive_aggregated_srv_name", primitiveAggregatedSrvName);
     
-    
-    graspingActionsSrvName = "/ros_end_effector/" + graspingActionsSrvName;
-    primitiveAggregatedSrvName = "/ros_end_effector/" + primitiveAggregatedSrvName;
+    graspingActionsSrvName = "/grasping_actions_available";
+    primitiveAggregatedSrvName = "/primitives_aggregated_available";
     
     rclcpp::Client<rosee_msg::srv::GraspingActionsAvailable>::SharedPtr graspingActionAvailableClient =
         _node->create_client<rosee_msg::srv::GraspingActionsAvailable>(graspingActionsSrvName);
@@ -108,6 +108,10 @@ void ContainerActionGroupBox::getInfoServices() {
     rclcpp::Client<rosee_msg::srv::GraspingPrimitiveAggregatedAvailable>::SharedPtr primitivesAggregatedAvailableClient =
         _node->create_client<rosee_msg::srv::GraspingPrimitiveAggregatedAvailable>(primitiveAggregatedSrvName);
     
+    RCLCPP_INFO_STREAM (_node->get_logger(), "Waiting for " << graspingActionsSrvName << " service...");
+    RCLCPP_INFO_STREAM (_node->get_logger(), "Waiting for " << primitiveAggregatedSrvName << " service...");
+    
+        
     //wait for infinite (-1) for the service
     graspingActionAvailableClient->wait_for_service();
     
@@ -160,10 +164,10 @@ std::map < std::string, std::vector<std::string> > ContainerActionGroupBox::getP
     std::map<std::string, std::vector<std::string>> pairedElementMap;
 
     std::string selectablePairSrvName;
-    _node->declare_parameter("/rosee/selectable_finger_pair_info", "selectable_finger_pair_info");
-    _node->get_parameter("/rosee/selectable_finger_pair_info", selectablePairSrvName);
+//     _node->declare_parameter("/rosee/selectable_finger_pair_info", "selectable_finger_pair_info");
+//     _node->get_parameter("/rosee/selectable_finger_pair_info", selectablePairSrvName);
     
-    selectablePairSrvName = "/ros_end_effector/" + selectablePairSrvName;
+    selectablePairSrvName = "/selectable_finger_pair_info";
     
     
     RCLCPP_INFO_STREAM (_node->get_logger(), "waiting "<< selectablePairSrvName << " service for 5 seconds...");

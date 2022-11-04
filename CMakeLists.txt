@@ -188,6 +188,7 @@ if(SECOND_TAB)
     list(APPEND 2tabLibs "joint_bar_ui")
 endif()
 
+
 ament_target_dependencies(${PROJECT_NAME}_gui_main
     rclcpp
     ${MSG_LIBS}
@@ -309,12 +310,22 @@ ament_target_dependencies(${PROJECT_NAME}_RobotDescriptionHandler
 ## Install ##
 #############
 # Mark executables and/or libraries for installation
-install(TARGETS 
-    ${PROJECT_NAME}_gui_main
-    ${libToInstall}
-    DESTINATION lib/${PROJECT_NAME}
-    EXPORT export_${PROJECT_NAME}
+install(TARGETS
+  ${libToInstall}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
+  
+install(TARGETS
+  ${PROJECT_NAME}_gui_main
+  DESTINATION lib/${PROJECT_NAME}
 )
+  
+# install(TARGETS 
+#     ${PROJECT_NAME}_gui_main
+#     DESTINATION lib/${PROJECT_NAME}
+#     EXPORT export_${PROJECT_NAME}
+# )
 
 ## Mark cpp header files for installation
 install(DIRECTORY include/
@@ -327,12 +338,12 @@ install(DIRECTORY launch/
   DESTINATION share/${PROJECT_NAME}/launch/
 )
 
-ament_export_libraries(
-  rosee_gui
-)
-ament_export_targets(
-  export_${PROJECT_NAME}
-)
+# ament_export_libraries(
+#   rosee_gui
+# )
+# ament_export_targets(
+#   export_${PROJECT_NAME}
+# )
 
 
 ament_package()

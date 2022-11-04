@@ -21,6 +21,8 @@
 #include <urdf_parser/urdf_parser.h>
 #include <srdfdom/model.h>
 
+#include <fstream>
+
 
 namespace ROSEE {
     //for parsing thing of main package, a joint can be OR passive OR mimic, not both
