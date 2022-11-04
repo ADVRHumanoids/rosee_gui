@@ -43,6 +43,9 @@ BarPlotWidget::BarPlotWidget(std::vector<std::string> jnames, QWidget *parent) :
 
     auto bars_layout_left = findChild<QVBoxLayout *>("BarsLayoutLeft");
     auto bars_layout_right = findChild<QVBoxLayout *>("BarsLayoutRight");
+    
+    bars_layout_left->setSpacing(2);
+    bars_layout_right->setSpacing(2);
 
     for(int i = 0; i < jnames.size(); i++)
     {
@@ -50,7 +53,7 @@ BarPlotWidget::BarPlotWidget(std::vector<std::string> jnames, QWidget *parent) :
         auto wid = new JointBarWidget(QString::fromStdString(jnames[i]),
                                       this);
 
-        if(i < jnames.size() / 2 || jnames.size() < 6)
+        if(i < jnames.size() / 2 || jnames.size() < 10)
         {
             bars_layout_left->addWidget(wid);
         }
@@ -61,6 +64,13 @@ BarPlotWidget::BarPlotWidget(std::vector<std::string> jnames, QWidget *parent) :
 
         wid_map[jnames[i]] = wid;
 
+    }
+    
+    //remove layout if it is empty to handle better the space
+    if (bars_layout_right->count() == 0) {
+        bars_layout_right->setParent(nullptr);
+        auto line = findChild<QWidget *>("line");
+        line->setVisible(false);
     }
 
 

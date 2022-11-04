@@ -7,6 +7,7 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
 #include <QLabel>
+#include <QPen>
 #include <chrono>
 
 #include <cmath>
